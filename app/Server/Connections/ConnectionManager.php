@@ -9,12 +9,12 @@ class ConnectionManager
 {
     /** @var array */
     protected $connections = [];
-    protected $host;
+    protected $hostname;
     protected $port;
 
-    public function __construct($host, $port)
+    public function __construct($hostname, $port)
     {
-        $this->host = $host;
+        $this->hostname = $hostname;
         $this->port = $port;
     }
 
@@ -50,7 +50,7 @@ class ConnectionManager
 
     public function host()
     {
-        return $this->host === '127.0.0.1' ? 'localhost' : $this->host;
+        return $this->hostname;
     }
 
     public function port()

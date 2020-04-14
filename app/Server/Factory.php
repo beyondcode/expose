@@ -12,6 +12,9 @@ class Factory
     /** @var string */
     protected $host = '127.0.0.1';
 
+    /** @var string */
+    protected $hostname = 'localhost';
+
     /** @var int */
     protected $port = 8080;
 
@@ -44,11 +47,18 @@ class Factory
         return $this;
     }
 
+    public function setHostname(string $hostname)
+    {
+        $this->hostname = $hostname;
+
+        return $this;
+    }
+
     public function createServer()
     {
         $socket = new Server("{$this->host}:{$this->port}", $this->loop);
 
-        $connectionManager = new ConnectionManager($this->host, $this->port);
+        $connectionManager = new ConnectionManager($this->hostname, $this->port);
 
         $app = new Shaft($connectionManager);
 

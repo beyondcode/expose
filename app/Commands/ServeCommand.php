@@ -8,7 +8,7 @@ use LaravelZero\Framework\Commands\Command;
 
 class ServeCommand extends Command
 {
-    protected $signature = 'serve {host=127.0.0.1}';
+    protected $signature = 'serve {host=0.0.0.0} {hostname=localhost}';
 
     protected $description = 'Start the shaft server';
 
@@ -16,6 +16,7 @@ class ServeCommand extends Command
     {
         (new Factory())
             ->setHost($this->argument('host'))
+            ->setHostname($this->argument('hostname'))
             ->createServer()
             ->run();
     }
