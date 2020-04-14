@@ -37,12 +37,10 @@ class Connection
         $appName = config('app.name');
         $appVersion = config('app.version');
 
-        return str_replace(
-            "Host: {$this->subdomain}.{$serverHost}:{$port}\r\n",
-            "Host: {$this->host}\r\n" .
+        $data = preg_replace('/Host: '.$this->subdomain.'.'.$serverHost.'(.*)\r\n/', "Host: {$this->host}\r\n" .
             "X-Tunnel-By: {$appName} {$appVersion}\r\n" .
-            "X-Original-Host: {$this->subdomain}.{$serverHost}:{$port}\r\n",
-            $data
-        );
+            "X-Original-Host: {$this->subdomain}.{$serverHost}:{$port}\r\n", $data);
+
+        return $data;
     }
 }
