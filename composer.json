@@ -22,9 +22,13 @@
         "cboden/ratchet": "^0.4.2",
         "clue/buzz-react": "^2.7",
         "guzzlehttp/guzzle": "^6.5",
+        "illuminate/http": "5.8.*|^6.0|^7.0",
         "laminas/laminas-http": "^2.11",
         "laravel-zero/framework": "^7.0",
+        "namshi/cuzzle": "^2.0",
         "react/socket": "^1.4",
+        "symfony/http-kernel": "^4.0|^5.0",
+        "symfony/psr-http-message-bridge": "^1.1|^2.0",
         "riverline/multipart-parser": "^2.0"
     },
     "require-dev": {
@@ -53,5 +57,5 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["phunnel"]
+    "bin": ["expose"]
 }

@@ -51,7 +51,14 @@ class RequestLogger
         return $this->requests;
     }
 
-    protected function pushLogs()
+    public function clear()
+    {
+        $this->requests = [];
+
+        $this->pushLogs();
+    }
+
+    public function pushLogs()
     {
         $this
             ->client

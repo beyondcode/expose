@@ -71,4 +71,11 @@ class Connection
             ],
         ]));
     }
+
+    public function ping()
+    {
+        $this->socket->write(json_encode([
+            'event' => 'pong',
+        ]));
+    }
 }

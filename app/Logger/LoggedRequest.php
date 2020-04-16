@@ -7,7 +7,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
+use Namshi\Cuzzle\Formatter\CurlFormatter;
 use Riverline\MultiPartParser\StreamedPart;
+use function GuzzleHttp\Psr7\parse_request;
 
 class LoggedRequest implements \JsonSerializable
 {
@@ -35,12 +37,15 @@ class LoggedRequest implements \JsonSerializable
     /** @var string */
     protected $subdomain;
 
+    /** @var array */
+    protected $additionalData = [];
+
     public function __construct(string $rawRequest, Request $parsedRequest)
     {
-        $this->id = (string)Str::uuid();
         $this->startTime = now();
         $this->rawRequest = $rawRequest;
         $this->parsedRequest = $parsedRequest;
+        $this->id = $this->getRequestId();
     }
 
     /**
@@ -61,6 +66,8 @@ class LoggedRequest implements \JsonSerializable
                 'body' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->parsedRequest->getContent(),
                 'query' => $this->parsedRequest->getQuery()->toArray(),
                 'post' => $this->getPost(),
+                'curl' => (new CurlFormatter())->format(parse_request($this->rawRequest)),
+                'additional_data' => $this->additionalData,
             ],
         ];
 
@@ -75,6 +82,11 @@ class LoggedRequest implements \JsonSerializable
         }
 
         return $data;
+    }
+
+    public function setAdditionalData(array $data)
+    {
+        $this->additionalData = array_merge($this->additionalData, $data);
     }
 
     protected function isBinary(string $string): bool
@@ -173,5 +185,10 @@ class LoggedRequest implements \JsonSerializable
     protected function detectSubdomain()
     {
         return Arr::get($this->parsedRequest->getHeaders()->toArray(), 'X-Original-Host');
+    }
+
+    protected function getRequestId()
+    {
+        return Arr::get($this->parsedRequest->getHeaders()->toArray(), 'X-Expose-Request-ID', (string)Str::uuid());
     }
 }

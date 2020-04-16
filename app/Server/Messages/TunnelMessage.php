@@ -69,9 +69,9 @@ class TunnelMessage implements Message
 
     private function copyDataToClient(Connection $clientConnection)
     {
-        $data = $clientConnection->rewriteHostInformation($this->connectionManager->host(), $this->connectionManager->port(), $this->connection->buffer);
-
         $requestId = uniqid();
+
+        $data = $clientConnection->rewriteHostInformation($this->connectionManager->host(), $this->connectionManager->port(), $requestId, $this->connection->buffer);
 
         // Ask client to create a new proxy
         $clientConnection->socket->send(json_encode([

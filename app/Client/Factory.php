@@ -3,6 +3,8 @@
 namespace App\Client;
 
 use App\HttpServer\App;
+use App\HttpServer\Controllers\AttachDataToLogController;
+use App\HttpServer\Controllers\ClearLogsController;
 use App\HttpServer\Controllers\DashboardController;
 use App\HttpServer\Controllers\LogController;
 use App\HttpServer\Controllers\ReplayLogController;
@@ -67,6 +69,8 @@ class Factory
         $logRoute = new Route('/logs', ['_controller' => new LogController()], [], [], null, [], ['GET']);
         $storeLogRoute = new Route('/logs', ['_controller' => new StoreLogController()], [], [], null, [], ['POST']);
         $replayLogRoute = new Route('/replay/{log}', ['_controller' => new ReplayLogController()], [], [], null, [], ['GET']);
+        $attachLogDataRoute = new Route('/logs/{request_id}/data', ['_controller' => new AttachDataToLogController()], [], [], null, [], ['POST']);
+        $clearLogsRoute = new Route('/logs/clear', ['_controller' => new ClearLogsController()], [], [], null, [], ['GET']);
 
         $this->app->route('/socket', new WsServer(new Socket()), ['*']);
 
@@ -74,19 +78,32 @@ class Factory
         $this->app->routes->add('logs', $logRoute);
         $this->app->routes->add('storeLogs', $storeLogRoute);
         $this->app->routes->add('replayLog', $replayLogRoute);
+        $this->app->routes->add('attachLogData', $attachLogDataRoute);
+        $this->app->routes->add('clearLogs', $clearLogsRoute);
+    }
+
+    protected function detectNextFreeDashboardPort($port = 4040): int
+    {
+        while (is_resource(@fsockopen('127.0.0.1', $port))) {
+            $port++;
+        }
+
+        return $port;
     }
 
     public function createHttpServer()
     {
-        $this->loop->futureTick(function () {
-            $dashboardUrl = 'http://127.0.0.1:4040/';
+        $dashboardPort = $this->detectNextFreeDashboardPort();
 
-            echo('Started Dashboard on port 4040'. PHP_EOL);
+        $this->loop->futureTick(function () use ($dashboardPort) {
+            $dashboardUrl = "http://127.0.0.1:{$dashboardPort}/";
 
-            echo('If the dashboard does not automatically open, visit: '.$dashboardUrl . PHP_EOL);
+            echo("Started Dashboard on port {$dashboardPort}" . PHP_EOL);
+
+            echo('If the dashboard does not automatically open, visit: ' . $dashboardUrl . PHP_EOL);
         });
 
-        $this->app = new App('127.0.0.1', 4040, '0.0.0.0', $this->loop);
+        $this->app = new App('127.0.0.1', $dashboardPort, '0.0.0.0', $this->loop);
 
         $this->addRoutes();
 

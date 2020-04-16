@@ -12,6 +12,7 @@ class Client
     protected $loop;
     protected $host;
     protected $port;
+    public static $subdomains = [];
 
     public function __construct(LoopInterface $loop, $host, $port)
     {
@@ -31,6 +32,7 @@ class Client
                     $connection->authenticate($sharedUrl, $subdomain);
 
                     $clientConnection->on('authenticated', function ($data) {
+                        static::$subdomains[] = "$data->subdomain.{$this->host}:{$this->port}";
                         dump("Connected to http://$data->subdomain.{$this->host}:{$this->port}");
                     });
                 });

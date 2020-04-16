@@ -5,6 +5,7 @@ namespace App\Commands;
 use App\Server\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
+use React\EventLoop\LoopInterface;
 
 class ServeCommand extends Command
 {
@@ -15,6 +16,7 @@ class ServeCommand extends Command
     public function handle()
     {
         (new Factory())
+            ->setLoop(app(LoopInterface::class))
             ->setHost($this->argument('host'))
             ->setHostname($this->argument('hostname'))
             ->createServer()

@@ -32,14 +32,17 @@ class Connection
         return array_pop($this->proxies);
     }
 
-    public function rewriteHostInformation($serverHost, $port, string $data)
+    public function rewriteHostInformation($serverHost, $port, $requestId, string $data)
     {
         $appName = config('app.name');
         $appVersion = config('app.version');
 
+        $originalHost = "{$this->subdomain}.{$serverHost}:{$port}";
+
         $data = preg_replace('/Host: '.$this->subdomain.'.'.$serverHost.'(.*)\r\n/', "Host: {$this->host}\r\n" .
-            "X-Tunnel-By: {$appName} {$appVersion}\r\n" .
-            "X-Original-Host: {$this->subdomain}.{$serverHost}:{$port}\r\n", $data);
+            "X-Exposed-By: {$appName} {$appVersion}\r\n" .
+            "X-Expose-Request-ID: {$requestId}\r\n" .
+            "X-Original-Host: {$originalHost}\r\n", $data);
 
         return $data;
     }

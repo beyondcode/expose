@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(RequestLogger::class, function () {
             $browser = new Browser(app(LoopInterface::class));
+
             return new RequestLogger($browser);
         });
     }

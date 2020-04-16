@@ -10,7 +10,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use function GuzzleHttp\Psr7\parse_request;
 
-class Shaft implements MessageComponentInterface
+class Expose implements MessageComponentInterface
 {
     protected $connectionManager;
 

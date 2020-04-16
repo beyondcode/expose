@@ -5,6 +5,7 @@ namespace App\Server\Messages;
 use App\Server\Connections\ConnectionManager;
 use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
+use React\EventLoop\LoopInterface;
 use stdClass;
 
 class ControlMessage implements Message
@@ -45,6 +46,13 @@ class ControlMessage implements Message
             'subdomain' => $connectionInfo->subdomain,
             'client_id' => $connectionInfo->client_id
         ]));
+
+        $loop = app(LoopInterface::class);
+        $timer = $loop->addPeriodicTimer(5, function () use ($connection) {
+            $connection->send(json_encode([
+                'event' => 'ping'
+            ]));
+        });
     }
 
     protected function registerProxy(ConnectionInterface $connection, $data)
