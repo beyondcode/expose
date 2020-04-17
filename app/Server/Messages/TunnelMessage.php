@@ -35,16 +35,15 @@ class TunnelMessage implements Message
 
     public function respond()
     {
-        $clientConnection = $this->connectionManager->findConnectionForSubdomain($this->detectSubdomain());
-
-        if (is_null($clientConnection)) {
-//            $this->connection->send(\GuzzleHttp\Psr7\str(new Response(404, [], 'Not found')));
-//            $this->connection->close();
-//            dump("No clinet connection");
-            return;
-        }
-
         if ($this->hasBufferedAllData()) {
+            $clientConnection = $this->connectionManager->findConnectionForSubdomain($this->detectSubdomain());
+
+            if (is_null($clientConnection)) {
+                $this->connection->send(\GuzzleHttp\Psr7\str(new Response(404, [], 'Not found')));
+                $this->connection->close();
+                return;
+            }
+
             $this->copyDataToClient($clientConnection);
         }
     }

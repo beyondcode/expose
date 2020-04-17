@@ -15,6 +15,7 @@ class ShareCommand extends Command
 
     public function handle()
     {
+        // TODO: Hacky workaround just to see if it works haha
         if ($this->option('auth')) {
             $GLOBALS['expose.auth'] = $this->option('auth');
         }
