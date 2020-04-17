@@ -62,7 +62,5 @@ class ControlMessage implements Message
         $connectionInfo->socket->getConnection()->emit('proxy_ready_'.$data->request_id, [
             $connection,
         ]);
-
-        $connectionInfo->setProxy($connection);
     }
 }

@@ -11,7 +11,6 @@ class IoConnection implements ConnectionInterface {
      */
     protected $conn;
 
-
     /**
      * @param \React\Socket\ConnectionInterface $conn
      */

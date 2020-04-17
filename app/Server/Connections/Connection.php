@@ -2,8 +2,10 @@
 
 namespace App\Server\Connections;
 
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
+use React\Stream\Util;
 
 class Connection
 {
@@ -22,28 +24,23 @@ class Connection
         $this->client_id = $clientId;
     }
 
-    public function setProxy(ConnectionInterface $proxy)
+    public function registerProxy($requestId)
     {
-        $this->proxies[] = $proxy;
+        $this->socket->send(json_encode([
+            'event' => 'createProxy',
+            'request_id' => $requestId,
+            'client_id' => $this->client_id,
+        ]) . "||");
     }
 
-    public function getProxy(): ?ConnectionInterface
+    public function pipeRequestThroughProxy(HttpRequestConnection $httpConnection, string $requestId, Request $request)
     {
-        return array_pop($this->proxies);
-    }
+        $this->registerProxy($requestId);
 
-    public function rewriteHostInformation($serverHost, $port, $requestId, string $data)
-    {
-        $appName = config('app.name');
-        $appVersion = config('app.version');
+        $this->socket->getConnection()->once('proxy_ready_' . $requestId, function (IoConnection $proxy) use ($request, $requestId, $httpConnection) {
+            Util::pipe($proxy->getConnection(), $httpConnection->getConnection());
 
-        $originalHost = "{$this->subdomain}.{$serverHost}:{$port}";
-
-        $data = preg_replace('/Host: '.$this->subdomain.'.'.$serverHost.'(.*)\r\n/', "Host: {$this->host}\r\n" .
-            "X-Exposed-By: {$appName} {$appVersion}\r\n" .
-            "X-Expose-Request-ID: {$requestId}\r\n" .
-            "X-Original-Host: {$originalHost}\r\n", $data);
-
-        return $data;
+            $proxy->send(\GuzzleHttp\Psr7\str($request));
+        });
     }
 }

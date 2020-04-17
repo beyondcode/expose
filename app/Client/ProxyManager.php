@@ -56,20 +56,6 @@ class ProxyManager
         });
     }
 
-    private function parseResponse(string $response)
-    {
-        try {
-            return gPsr\parse_response($response);
-        } catch (\Throwable $e) {
-            return null;
-        }
-    }
-
-    private function parseRequest($data)
-    {
-        return gPsr\parse_request($data);
-    }
-
     protected function getContentLength($proxyConnection): ?int
     {
         $request = parse_request($proxyConnection->buffer);

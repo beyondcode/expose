@@ -4,8 +4,11 @@ namespace App\Server\Messages;
 
 use App\Server\Connections\Connection;
 use App\Server\Connections\ConnectionManager;
+use App\Server\Connections\HttpRequestConnection;
 use App\Server\Connections\IoConnection;
+use App\Server\Messages\RequestModifiers\ModifyHostHeader;
 use BFunky\HttpParser\HttpRequestParser;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -15,19 +18,18 @@ use function GuzzleHttp\Psr7\parse_request;
 
 class TunnelMessage implements Message
 {
-    /** string */
-    protected $payload;
-
-    /** @var \Ratchet\ConnectionInterface */
+    /** @var HttpRequestConnection */
     protected $connection;
 
     /** @var ConnectionManager */
     private $connectionManager;
 
-    public function __construct($payload, ConnectionInterface $connection, ConnectionManager $connectionManager)
-    {
-        $this->payload = $payload;
+    protected $requestModifiers = [
+        ModifyHeaders::class,
+    ];
 
+    public function __construct(HttpRequestConnection $connection, ConnectionManager $connectionManager)
+    {
         $this->connection = $connection;
 
         $this->connectionManager = $connectionManager;
@@ -35,7 +37,7 @@ class TunnelMessage implements Message
 
     public function respond()
     {
-        if ($this->hasBufferedAllData()) {
+        if ($this->connection->hasBufferedAllData()) {
             $clientConnection = $this->connectionManager->findConnectionForSubdomain($this->detectSubdomain());
 
             if (is_null($clientConnection)) {
@@ -48,52 +50,32 @@ class TunnelMessage implements Message
         }
     }
 
-    protected function getContentLength(): ?int
-    {
-        $request = parse_request($this->connection->buffer);
-
-        return Arr::first($request->getHeader('Content-Length'));
-    }
-
     protected function detectSubdomain(): ?string
     {
-        $subdomain = '';
+        $host = $this->connection->getRequest()->getHeader('Host')[0];
 
-        $headers = collect(explode("\r\n", $this->connection->buffer))->map(function ($header) use (&$subdomain) {
-            $headerData = explode(':', $header);
-            if ($headerData[0] === 'Host') {
-                $domainParts = explode('.', $headerData[1]);
-                $subdomain = trim($domainParts[0]);
-            }
-        });
+        $domainParts = explode('.', $host);
 
-        return $subdomain;
+        return trim($domainParts[0]);
     }
 
-    private function copyDataToClient(Connection $clientConnection)
+    protected function passRequestThroughModifiers(string $requestId, Request $request, Connection $clientConnection): Request
+    {
+        foreach ($this->requestModifiers as $requestModifier) {
+            $request = app($requestModifier)->modify($request, $requestId, $clientConnection, $this->connectionManager);
+        }
+
+        return $request;
+    }
+
+    protected function copyDataToClient(Connection $clientConnection)
     {
         $requestId = uniqid();
 
-        $data = $clientConnection->rewriteHostInformation($this->connectionManager->host(), $this->connectionManager->port(), $requestId, $this->connection->buffer);
+        $request = $this->passRequestThroughModifiers($requestId, $this->connection->getRequest(), $clientConnection);
 
-        // Ask client to create a new proxy
-        $clientConnection->socket->send(json_encode([
-                'event' => 'createProxy',
-                'request_id' => $requestId,
-                'client_id' => $clientConnection->client_id,
-            ]) . "||");
-
-        $clientConnection->socket->getConnection()->once('proxy_ready_' . $requestId, function (IoConnection $proxy) use ($data, $requestId) {
-            Util::pipe($proxy->getConnection(), $this->connection->getConnection());
-
-            $proxy->send($data);
-        });
+        $clientConnection->pipeRequestThroughProxy($this->connection, $requestId, $request);
 
         unset($this->connection->buffer);
-    }
-
-    protected function hasBufferedAllData()
-    {
-        return is_null($this->getContentLength()) || strlen(Str::after($this->connection->buffer, "\r\n\r\n")) === $this->getContentLength();
     }
 }

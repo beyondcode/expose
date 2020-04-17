@@ -3,6 +3,7 @@
 namespace App\Server;
 
 use App\Server\Connections\ConnectionManager;
+use App\Server\Connections\HttpRequestConnection;
 use App\Server\Messages\ControlMessage;
 use App\Server\Messages\MessageFactory;
 use App\Server\Messages\TunnelMessage;
@@ -42,12 +43,7 @@ class Expose implements MessageComponentInterface
             $message = new ControlMessage($payload, $connection, $this->connectionManager);
             $message->respond();
         } else {
-            if (! isset($connection->buffer)) {
-                $connection->buffer = '';
-            }
-            $connection->buffer .= $message;
-
-            $message = new TunnelMessage($connection->buffer, $connection, $this->connectionManager);
+            $message = new TunnelMessage(HttpRequestConnection::wrap($connection, $message), $this->connectionManager);
             $message->respond();
         }
     }
