@@ -6,6 +6,7 @@ use App\Server\Connections\Connection;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Connections\IoConnection;
 use BFunky\HttpParser\HttpRequestParser;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
@@ -37,6 +38,9 @@ class TunnelMessage implements Message
         $clientConnection = $this->connectionManager->findConnectionForSubdomain($this->detectSubdomain());
 
         if (is_null($clientConnection)) {
+//            $this->connection->send(\GuzzleHttp\Psr7\str(new Response(404, [], 'Not found')));
+//            $this->connection->close();
+//            dump("No clinet connection");
             return;
         }
 

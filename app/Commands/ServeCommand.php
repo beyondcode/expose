@@ -3,7 +3,6 @@
 namespace App\Commands;
 
 use App\Server\Factory;
-use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 use React\EventLoop\LoopInterface;
 

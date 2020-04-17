@@ -100,13 +100,19 @@
     <div class="p-5 flex flex-row">
         <div class="w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                        <span class="inline-flex rounded-md shadow-sm mb-4">
+                <div class="flex mb-4">
+                        <span class="h-8 inline-flex rounded-md shadow-sm">
                               <button @click.prevent="clearLogs"
                                       type="button"
                                       class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 Clear
                               </button>
                         </span>
+
+                        <div class="ml-4 flex-grow relative rounded-md shadow-sm">
+                            <input class="h-8 form-input block w-full sm:text-sm sm:leading-5" v-model="search" placeholder="Search" />
+                        </div>
+                </div>
                 <div
                     class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
                     <table class="min-w-full">
@@ -124,7 +130,7 @@
                         </tr>
                         </thead>
                         <tbody class="bg-white">
-                        <tr v-for="log in logs"
+                        <tr v-for="log in filteredLogs"
                             :class="{'bg-gray-100': currentLog === log}"
                             @click="setLog(log)">
                             <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
@@ -302,15 +308,7 @@
                             Response
                         </dt>
                         <div>
-                            <div class="sm:hidden">
-                                <select class="form-select block w-full">
-                                    <option>My Account</option>
-                                    <option>Company</option>
-                                    <option selected>Team Members</option>
-                                    <option>Billing</option>
-                                </select>
-                            </div>
-                            <div class="hidden sm:block">
+                            <div>
                                 <nav class="flex">
                                     <a href="#"
                                        @click.prevent="setActiveTab('raw')"
@@ -345,10 +343,22 @@
         el: '#app',
 
         data: {
+            search: '',
             currentLog: null,
             view: 'request',
             activeTab: 'raw',
             logs: [],
+        },
+
+        computed: {
+            filteredLogs: function() {
+                if (this.search === '') {
+                    return this.logs;
+                }
+                return this.logs.filter(log => {
+                    return log.request.uri.indexOf(this.search) !== -1;
+                });
+            },
         },
 
         methods: {
