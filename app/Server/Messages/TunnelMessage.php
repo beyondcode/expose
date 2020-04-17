@@ -6,7 +6,7 @@ use App\Server\Connections\Connection;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Connections\HttpRequestConnection;
 use App\Server\Connections\IoConnection;
-use App\Server\Messages\RequestModifiers\ModifyHostHeader;
+use App\Server\Messages\RequestModifiers\ModifyHeaders;
 use BFunky\HttpParser\HttpRequestParser;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;

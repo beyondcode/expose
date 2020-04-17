@@ -5,13 +5,14 @@ namespace App\Server\Messages\RequestModifiers;
 use App\Server\Connections\Connection;
 use App\Server\Connections\ConnectionManager;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface;
 use function GuzzleHttp\Psr7\modify_request;
 
 class ModifyHeaders implements RequestModifier
 {
-    public function modify(Request $request, string $requestId, Connection $clientConnection, ConnectionManager $connectionManager): Request
+    public function modify(RequestInterface $request, string $requestId, Connection $clientConnection, ConnectionManager $connectionManager): RequestInterface
     {
-        $request = modify_request($request, [
+        return modify_request($request, [
             'set_headers' => [
                 'Host' => $clientConnection->host,
                 'X-Expose-Request-ID' => $requestId,
@@ -19,7 +20,5 @@ class ModifyHeaders implements RequestModifier
                 'X-Original-Host' => "{$clientConnection->subdomain}.{$connectionManager->host()}:{$connectionManager->port()}",
             ]
         ]);
-
-        return $request;
     }
 }

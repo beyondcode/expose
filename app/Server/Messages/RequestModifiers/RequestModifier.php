@@ -4,9 +4,9 @@ namespace App\Server\Messages\RequestModifiers;
 
 use App\Server\Connections\Connection;
 use App\Server\Connections\ConnectionManager;
-use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface;
 
 interface RequestModifier
 {
-    public function modify(Request $request, string $requestId, Connection $clientConnection, ConnectionManager $connectionManager): Request;
+    public function modify(RequestInterface $request, string $requestId, Connection $clientConnection, ConnectionManager $connectionManager): RequestInterface;
 }
