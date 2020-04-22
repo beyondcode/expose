@@ -16,14 +16,10 @@ class ProxyManager
     /** @var LoopInterface */
     protected $loop;
 
-    /** @var HttpClient */
-    protected $httpClient;
-
-    public function __construct(Configuration $configuration, LoopInterface $loop, HttpClient $httpClient)
+    public function __construct(Configuration $configuration, LoopInterface $loop)
     {
         $this->configuration = $configuration;
         $this->loop = $loop;
-        $this->httpClient = $httpClient;
     }
 
     public function createProxy(string $clientId, $connectionData)
@@ -48,6 +44,6 @@ class ProxyManager
 
     protected function performRequest(WebSocket $proxyConnection, $requestId, string $requestData)
     {
-        $this->httpClient->performRequest((string)$requestData, $proxyConnection, $requestId);
+        app(HttpClient::class)->performRequest((string)$requestData, $proxyConnection, $requestId);
     }
 }

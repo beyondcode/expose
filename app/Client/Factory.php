@@ -75,8 +75,8 @@ class Factory
 
     protected function bindProxyManager()
     {
-        app()->singleton(ProxyManager::class, function ($app) {
-            return new ProxyManager($app->make(Configuration::class), $this->loop, $app->make(HttpClient::class));
+        app()->bind(ProxyManager::class, function ($app) {
+            return new ProxyManager($app->make(Configuration::class), $this->loop);
         });
     }
 

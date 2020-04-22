@@ -17,7 +17,6 @@ abstract class PostController extends Controller
 
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
-        dump(memory_get_usage(true));
         $connection->contentLength = $this->findContentLength($request->getHeaders());
 
         $connection->requestBuffer = (string) $request->getBody();

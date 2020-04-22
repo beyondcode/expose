@@ -18,7 +18,7 @@ class CheckBasicAuthentication
         $this->configuration = $configuration;
     }
 
-    public function handle(RequestInterface $request, WebSocket $proxyConnection): ?RequestInterface
+    public function handle(RequestInterface $request, ?WebSocket $proxyConnection): ?RequestInterface
     {
         if (! $this->requiresAuthentication() || is_null($proxyConnection)) {
             return $request;

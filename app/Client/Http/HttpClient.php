@@ -49,15 +49,9 @@ class HttpClient
 
         dump($this->request->getMethod() . ' ' . $this->request->getUri()->getPath());
 
-        /**
-         * Modifiers can already send a response to the proxy connection,
-         * which would result in the request being null.
-         */
-        if (is_null($request)) {
-            return;
-        }
-
-        $this->sendRequestToApplication($request, $proxyConnection);
+        transform($request, function ($request) use ($proxyConnection) {
+            $this->sendRequestToApplication($request, $proxyConnection);
+        });
     }
 
     protected function passRequestThroughModifiers(RequestInterface $request, ?WebSocket $proxyConnection = null): ?RequestInterface
@@ -103,7 +97,7 @@ class HttpClient
                 /* @var $body \React\Stream\ReadableStreamInterface */
                 $body = $response->getBody();
 
-                $this->logResponse($response->buffer);
+                $this->logResponse(str($response));
 
                 $body->on('data', function ($chunk) use ($proxyConnection, $response) {
                     $response->buffer .= $chunk;
@@ -127,12 +121,10 @@ class HttpClient
 
     protected function sendChunkToServer(string $chunk, ?WebSocket $proxyConnection = null)
     {
-        if (is_null($proxyConnection)) {
-            return;
-        }
-
-        $binaryMsg = new Frame($chunk, true, Frame::OP_BINARY);
-        $proxyConnection->send($binaryMsg);
+        transform($proxyConnection, function ($proxyConnection) use ($chunk) {
+            $binaryMsg = new Frame($chunk, true, Frame::OP_BINARY);
+            $proxyConnection->send($binaryMsg);
+        });
     }
 
     protected function logResponse(string $rawResponse)
