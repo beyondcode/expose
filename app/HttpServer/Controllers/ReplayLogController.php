@@ -2,7 +2,7 @@
 
 namespace App\HttpServer\Controllers;
 
-use App\Client\TunnelConnection;
+use App\Client\Http\HttpClient;
 use App\HttpServer\QueryParameters;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
@@ -12,15 +12,25 @@ use Psr\Http\Message\RequestInterface;
 
 class ReplayLogController extends Controller
 {
+    /** @var RequestLogger */
+    protected $requestLogger;
+
+    /** @var HttpClient */
+    protected $httpClient;
+
+    public function __construct(RequestLogger $requestLogger, HttpClient $httpClient)
+    {
+        $this->requestLogger = $requestLogger;
+        $this->httpClient = $httpClient;
+    }
+
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
         /** @var RequestLogger $logger */
-        $logger = app(RequestLogger::class);
-        $requestData = $logger->findLoggedRequest(QueryParameters::create($request)->get('log'))->getRequestData();
+        $requestData = $this->requestLogger->findLoggedRequest(QueryParameters::create($request)->get('log'))->getRequestData();
 
-        /** @var TunnelConnection $tunnel */
-        $tunnel = app(TunnelConnection::class);
-        $tunnel->performRequest($requestData);
+        /** @var HttpClient $tunnel */
+        $this->httpClient->performRequest($requestData);
 
         $connection->send(
             str(new Response(

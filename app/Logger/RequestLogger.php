@@ -34,13 +34,13 @@ class RequestLogger
         $this->pushLogs();
     }
 
-    public function logResponse(Request $request, string $rawResponse, Response $response)
+    public function logResponse(Request $request, string $rawResponse)
     {
         $loggedRequest = collect($this->requests)->first(function (LoggedRequest $loggedRequest) use ($request) {
             return $loggedRequest->getRequest() === $request;
         });
         if ($loggedRequest) {
-            $loggedRequest->setResponse($rawResponse, $response);
+            $loggedRequest->setResponse($rawResponse, Response::fromString($rawResponse));
 
             $this->pushLogs();
         }

@@ -2,40 +2,51 @@
 
 namespace App\Client;
 
+use App\Client\Connections\ControlConnection;
+use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
-use React\Socket\ConnectionInterface;
-use React\Socket\Connector;
+use function Ratchet\Client\connect;
 
 class Client
 {
     /** @var LoopInterface */
     protected $loop;
-    protected $host;
-    protected $port;
+
+    /** @var Configuration */
+    protected $configuration;
+
     public static $subdomains = [];
 
-    public function __construct(LoopInterface $loop, $host, $port)
+    public function __construct(LoopInterface $loop, Configuration $configuration)
     {
         $this->loop = $loop;
-        $this->host = $host;
-        $this->port = $port;
+        $this->configuration = $configuration;
     }
 
-    public function share($sharedUrl, array $subdomains = [])
+    public function share(string $sharedUrl, array $subdomains = [])
     {
         foreach ($subdomains as $subdomain) {
-            $connector = new Connector($this->loop);
-
-            $connector->connect("{$this->host}:{$this->port}")
-                ->then(function (ConnectionInterface $clientConnection) use ($sharedUrl, $subdomain) {
-                    $connection = Connection::create($clientConnection, new ProxyManager($this->host, $this->port, $this->loop));
-                    $connection->authenticate($sharedUrl, $subdomain);
-
-                    $clientConnection->on('authenticated', function ($data) {
-                        static::$subdomains[] = "$data->subdomain.{$this->host}:{$this->port}";
-                        dump("Connected to http://$data->subdomain.{$this->host}:{$this->port}");
-                    });
-                });
+            $this->connectToServer($sharedUrl, $subdomain);
         }
+    }
+
+    protected function connectToServer(string $sharedUrl, $subdomain)
+    {
+        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__", [], [
+            'X-Expose-Control' => 'enabled',
+        ], $this->loop)
+            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
+                $connection = ControlConnection::create($clientConnection);
+
+                $connection->authenticate($sharedUrl, $subdomain);
+
+                $connection->on('authenticated', function ($data) {
+                    dump("Connected to http://$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}");
+                    static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";
+                });
+
+            }, function ($e) {
+                echo "Could not connect: {$e->getMessage()}\n";
+            });
     }
 }

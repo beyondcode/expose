@@ -2,59 +2,76 @@
 
 namespace App\Server\Connections;
 
-use Illuminate\Support\Str;
+use App\Contracts\ConnectionManager as ConnectionManagerContract;
+use App\Contracts\SubdomainGenerator;
 use Ratchet\ConnectionInterface;
 
-class ConnectionManager
+class ConnectionManager implements ConnectionManagerContract
 {
     /** @var array */
     protected $connections = [];
-    protected $hostname;
-    protected $port;
 
-    public function __construct($hostname, $port)
+    /** @var array */
+    protected $httpConnections = [];
+
+    /** @var SubdomainGenerator */
+    protected $subdomainGenerator;
+
+    public function __construct(SubdomainGenerator $subdomainGenerator)
     {
-        $this->hostname = $hostname;
-        $this->port = $port;
+        $this->subdomainGenerator = $subdomainGenerator;
     }
 
-    public function storeConnection(string $host, ?string $subdomain, IoConnection $connection)
+    public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection
     {
         $clientId = (string)uniqid();
 
-        $storedConnection = new Connection($connection, $host, $subdomain ?? $this->generateSubdomain(), $clientId);
+        $connection->client_id = $clientId;
+
+        $storedConnection = new ControlConnection($connection, $host, $subdomain ?? $this->subdomainGenerator->generateSubdomain(), $clientId);
 
         $this->connections[] = $storedConnection;
 
         return $storedConnection;
     }
 
-    public function findConnectionForSubdomain($subdomain): ?Connection
+    public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): ConnectionInterface
+    {
+        $this->httpConnections[$requestId] = $httpConnection;
+
+        return $httpConnection;
+    }
+
+    public function getHttpConnectionForRequestId(string $requestId): ?ConnectionInterface
+    {
+        return $this->httpConnections[$requestId] ?? null;
+    }
+
+    public function removeControlConnection($connection)
+    {
+        if (isset($this->httpConnections[$connection->request_id])) {
+            unset($this->httpConnections[$connection->request_id]);
+        }
+
+        if (isset($connection->client_id)) {
+            $clientId = $connection->client_id;
+            $this->collections = collect($this->connections)->reject(function ($connection) use ($clientId) {
+                return $connection->client_id == $clientId;
+            })->toArray();
+        }
+    }
+
+    public function findControlConnectionForSubdomain($subdomain): ?ControlConnection
     {
         return collect($this->connections)->last(function ($connection) use ($subdomain) {
             return $connection->subdomain == $subdomain;
         });
     }
 
-    public function findConnectionForClientId(string $clientId): ?Connection
+    public function findControlConnectionForClientId(string $clientId): ?ControlConnection
     {
         return collect($this->connections)->last(function ($connection) use ($clientId) {
             return $connection->client_id == $clientId;
         });
-    }
-
-    protected function generateSubdomain(): string
-    {
-        return strtolower(Str::random(10));
-    }
-
-    public function host()
-    {
-        return $this->hostname;
-    }
-
-    public function port()
-    {
-        return $this->port;
     }
 }

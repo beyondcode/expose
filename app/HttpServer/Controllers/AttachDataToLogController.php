@@ -4,19 +4,26 @@ namespace App\HttpServer\Controllers;
 
 use Illuminate\Http\Request;
 use App\Logger\RequestLogger;
+use Ratchet\ConnectionInterface;
 
 class AttachDataToLogController extends PostController
 {
-    public function handle(Request $request)
+    /** @var RequestLogger */
+    protected $requestLogger;
+
+    public function __construct(RequestLogger $requestLogger)
     {
-        /** @var RequestLogger $requestLogger */
-        $requestLogger = app(RequestLogger::class);
-        $loggedRequest = $requestLogger->findLoggedRequest($request->get('request_id', ''));
+        $this->requestLogger = $requestLogger;
+    }
+
+    public function handle(Request $request, ConnectionInterface $httpConnection)
+    {
+        $loggedRequest = $this->requestLogger->findLoggedRequest($request->get('request_id', ''));
 
         if (! is_null($loggedRequest)) {
             $loggedRequest->setAdditionalData((array)$request->get('data', []));
 
-            $requestLogger->pushLogs();
+            $this->requestLogger->pushLogs();
         }
     }
 }

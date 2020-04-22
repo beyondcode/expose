@@ -10,16 +10,21 @@ use Psr\Http\Message\RequestInterface;
 
 class LogController extends Controller
 {
+    /** @var RequestLogger */
+    protected $requestLogger;
+
+    public function __construct(RequestLogger $requestLogger)
+    {
+        $this->requestLogger = $requestLogger;
+    }
+
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
-        /** @var RequestLogger $logger */
-        $logger = app(RequestLogger::class);
-
         $connection->send(
             str(new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                json_encode($logger->getData(), JSON_INVALID_UTF8_IGNORE)
+                json_encode($this->requestLogger->getData(), JSON_INVALID_UTF8_IGNORE)
             ))
         );
 

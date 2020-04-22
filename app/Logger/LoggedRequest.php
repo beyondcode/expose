@@ -66,18 +66,23 @@ class LoggedRequest implements \JsonSerializable
                 'body' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->parsedRequest->getContent(),
                 'query' => $this->parsedRequest->getQuery()->toArray(),
                 'post' => $this->getPost(),
-                'curl' => (new CurlFormatter())->format(parse_request($this->rawRequest)),
+                'curl' => '', //(new CurlFormatter())->format(parse_request($this->rawRequest)),
                 'additional_data' => $this->additionalData,
             ],
         ];
 
         if ($this->parsedResponse) {
+            try {
+                $body = $this->parsedResponse->getBody();
+            } catch (\Exception $e) {
+                $body = '';
+            }
             $data['response'] = [
                 'raw' => $this->shouldReturnBody() ? $this->rawResponse : 'BINARY',
                 'status' => $this->parsedResponse->getStatusCode(),
                 'headers' => $this->parsedResponse->getHeaders()->toArray(),
                 'reason' => $this->parsedResponse->getReasonPhrase(),
-                'body' => $this->shouldReturnBody() ? $this->parsedResponse->getBody() : 'BINARY',
+                'body' => $this->shouldReturnBody() ? $body : 'BINARY',
             ];
         }
 
@@ -112,7 +117,9 @@ class LoggedRequest implements \JsonSerializable
 
         $this->rawResponse = $rawResponse;
 
-        $this->stopTime = now();
+        if (is_null($this->stopTime)) {
+            $this->stopTime = now();
+        }
     }
 
     public function id()

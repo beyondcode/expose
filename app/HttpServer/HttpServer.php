@@ -10,6 +10,6 @@ class HttpServer extends \Ratchet\Http\HttpServer
     {
         parent::__construct($component);
 
-        $this->_reqParser->maxSize = 15242880;
+        $this->_reqParser->maxSize = 15242880000;
     }
 }

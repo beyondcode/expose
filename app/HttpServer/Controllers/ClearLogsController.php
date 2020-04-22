@@ -2,7 +2,7 @@
 
 namespace App\HttpServer\Controllers;
 
-use App\Client\TunnelConnection;
+use App\Client\Http\HttpClient;
 use App\HttpServer\QueryParameters;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
@@ -12,11 +12,17 @@ use Psr\Http\Message\RequestInterface;
 
 class ClearLogsController extends Controller
 {
+    /** @var RequestLogger */
+    protected $requestLogger;
+
+    public function __construct(RequestLogger $requestLogger)
+    {
+        $this->requestLogger = $requestLogger;
+    }
+
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
-        /** @var RequestLogger $logger */
-        $logger = app(RequestLogger::class);
-        $logger->clear();
+        $this->requestLogger->clear();
 
         $connection->send(
             str(new Response(

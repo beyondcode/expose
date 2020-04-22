@@ -9,11 +9,15 @@ use Illuminate\Support\Collection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use function GuzzleHttp\Psr7\parse_request;
 
 abstract class PostController extends Controller
 {
+    protected $keepConnectionOpen = false;
+
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
+        dump(memory_get_usage(true));
         $connection->contentLength = $this->findContentLength($request->getHeaders());
 
         $connection->requestBuffer = (string) $request->getBody();
@@ -25,7 +29,14 @@ abstract class PostController extends Controller
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $from->requestBuffer .= $msg;
+        if (! isset($from->requestBuffer)) {
+            $request = parse_request($msg);
+            $from->contentLength = $this->findContentLength($request->getHeaders());
+            $from->request = $request;
+            $from->requestBuffer = (string) $request->getBody();
+        } else {
+            $from->requestBuffer .= $msg;
+        }
 
         $this->checkContentLength($from);
     }
@@ -42,9 +53,11 @@ abstract class PostController extends Controller
         if (strlen($connection->requestBuffer) === $connection->contentLength) {
             $laravelRequest = $this->createLaravelRequest($connection);
 
-            $this->handle($laravelRequest);
+            $this->handle($laravelRequest, $connection);
 
-            $connection->close();
+            if (! $this->keepConnectionOpen) {
+                $connection->close();
+            }
 
             unset($connection->requestBuffer);
             unset($connection->contentLength);
@@ -52,7 +65,7 @@ abstract class PostController extends Controller
         }
     }
 
-    abstract public function handle(Request $request);
+    abstract public function handle(Request $request, ConnectionInterface $httpConnection);
 
     protected function createLaravelRequest(ConnectionInterface $connection): Request
     {

@@ -15,15 +15,11 @@ class ShareCommand extends Command
 
     public function handle()
     {
-        // TODO: Hacky workaround just to see if it works haha
-        if ($this->option('auth')) {
-            $GLOBALS['expose.auth'] = $this->option('auth');
-        }
-
         (new Factory())
             ->setLoop(app(LoopInterface::class))
 //            ->setHost('beyond.sh') // TODO: Read from (local/global) config file
 //            ->setPort(8080) // TODO: Read from (local/global) config file
+            ->setAuth($this->option('auth'))
             ->createClient($this->argument('host'), explode(',', $this->option('subdomain')))
             ->createHttpServer()
             ->run();

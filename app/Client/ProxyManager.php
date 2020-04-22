@@ -2,69 +2,52 @@
 
 namespace App\Client;
 
-use App\Logger\RequestLogger;
-use BFunky\HttpParser\HttpRequestParser;
-use BFunky\HttpParser\HttpResponseParser;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use React\Socket\ConnectionInterface;
-use React\Socket\Connector;
-use React\Stream\ThroughStream;
-use React\Stream\Util;
-use React\Stream\WritableResourceStream;
-use GuzzleHttp\Psr7 as gPsr;
-use function GuzzleHttp\Psr7\parse_request;
+use App\Client\Http\HttpClient;
+use Ratchet\Client\WebSocket;
+use Ratchet\ConnectionInterface;
+use React\EventLoop\LoopInterface;
+use function Ratchet\Client\connect;
 
 class ProxyManager
 {
-    private $host;
-    private $port;
-    private $loop;
+    /** @var Configuration */
+    protected $configuration;
 
-    public function __construct($host, $port, $loop)
+    /** @var LoopInterface */
+    protected $loop;
+
+    /** @var HttpClient */
+    protected $httpClient;
+
+    public function __construct(Configuration $configuration, LoopInterface $loop, HttpClient $httpClient)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->configuration = $configuration;
         $this->loop = $loop;
+        $this->httpClient = $httpClient;
     }
 
-    public function createProxy(ConnectionInterface $clientConnection, $connectionData)
+    public function createProxy(string $clientId, $connectionData)
     {
-        $connector = new Connector($this->loop);
-        $connector->connect("{$this->host}:{$this->port}")->then(function (ConnectionInterface $proxyConnection) use ($clientConnection, $connector, $connectionData) {
-            $proxyConnection->write(json_encode([
-                'event' => 'registerProxy',
-                'data' => [
-                    'request_id' => $connectionData->request_id ?? null,
-                    'client_id' => $clientConnection->_id,
-                ],
-            ]));
+        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__", [], [
+            'X-Expose-Control' => 'enabled',
+        ], $this->loop)
+            ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {
+                $proxyConnection->on('message', function ($message) use ($proxyConnection, $connectionData) {
+                    $this->performRequest($proxyConnection, $connectionData->request_id, (string)$message);
+                });
 
-            $proxyConnection->on('data', function ($data) use (&$proxyData, $proxyConnection, $connector) {
-                if (!isset($proxyConnection->buffer)) {
-                    $proxyConnection->buffer = '';
-                }
-
-                $proxyConnection->buffer .= $data;
-
-                if ($this->hasBufferedAllData($proxyConnection)) {
-                    $tunnel = app(TunnelConnection::class);
-
-                    $tunnel->performRequest($proxyConnection->buffer, $proxyConnection);
-                }
+                $proxyConnection->send(json_encode([
+                    'event' => 'registerProxy',
+                    'data' => [
+                        'request_id' => $connectionData->request_id ?? null,
+                        'client_id' => $clientId,
+                    ],
+                ]));
             });
-        });
     }
 
-    protected function getContentLength($proxyConnection): ?int
+    protected function performRequest(WebSocket $proxyConnection, $requestId, string $requestData)
     {
-        $request = parse_request($proxyConnection->buffer);
-
-        return Arr::first($request->getHeader('Content-Length'));
-    }
-
-    protected function hasBufferedAllData($proxyConnection)
-    {
-        return is_null($this->getContentLength($proxyConnection)) || strlen(Str::after($proxyConnection->buffer, "\r\n\r\n")) >= $this->getContentLength($proxyConnection);
+        $this->httpClient->performRequest((string)$requestData, $proxyConnection, $requestId);
     }
 }

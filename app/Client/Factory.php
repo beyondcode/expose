@@ -2,6 +2,7 @@
 
 namespace App\Client;
 
+use App\Client\Http\HttpClient;
 use App\HttpServer\App;
 use App\HttpServer\Controllers\AttachDataToLogController;
 use App\HttpServer\Controllers\ClearLogsController;
@@ -22,6 +23,9 @@ class Factory
 
     /** @var int */
     protected $port = 8080;
+
+    /** @var string */
+    protected $auth = '';
 
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
@@ -48,6 +52,13 @@ class Factory
         return $this;
     }
 
+    public function setAuth(string $auth)
+    {
+        $this->auth = $auth;
+
+        return $this;
+    }
+
     public function setLoop(LoopInterface $loop)
     {
         $this->loop = $loop;
@@ -55,22 +66,39 @@ class Factory
         return $this;
     }
 
-    public function createClient($sharedUrl, $subdomain = null)
+    protected function bindConfiguration()
     {
-        $client = new Client($this->loop, $this->host, $this->port);
-        $client->share($sharedUrl, $subdomain);
+        app()->singleton(Configuration::class, function ($app) {
+            return new Configuration($this->host, $this->port, $this->auth);
+        });
+    }
+
+    protected function bindProxyManager()
+    {
+        app()->singleton(ProxyManager::class, function ($app) {
+            return new ProxyManager($app->make(Configuration::class), $this->loop, $app->make(HttpClient::class));
+        });
+    }
+
+    public function createClient($sharedUrl, $subdomain = null, $auth = null)
+    {
+        $this->bindConfiguration();
+
+        $this->bindProxyManager();
+
+        app(Client::class)->share($sharedUrl, $subdomain);
 
         return $this;
     }
 
     protected function addRoutes()
     {
-        $dashboardRoute = new Route('/', ['_controller' => new DashboardController()], [], [], null, [], ['GET']);
-        $logRoute = new Route('/logs', ['_controller' => new LogController()], [], [], null, [], ['GET']);
-        $storeLogRoute = new Route('/logs', ['_controller' => new StoreLogController()], [], [], null, [], ['POST']);
-        $replayLogRoute = new Route('/replay/{log}', ['_controller' => new ReplayLogController()], [], [], null, [], ['GET']);
-        $attachLogDataRoute = new Route('/logs/{request_id}/data', ['_controller' => new AttachDataToLogController()], [], [], null, [], ['POST']);
-        $clearLogsRoute = new Route('/logs/clear', ['_controller' => new ClearLogsController()], [], [], null, [], ['GET']);
+        $dashboardRoute = new Route('/', ['_controller' => app(DashboardController::class)], [], [], null, [], ['GET']);
+        $logRoute = new Route('/logs', ['_controller' => app(LogController::class)], [], [], null, [], ['GET']);
+        $storeLogRoute = new Route('/logs', ['_controller' => app(StoreLogController::class)], [], [], null, [], ['POST']);
+        $replayLogRoute = new Route('/replay/{log}', ['_controller' => app(ReplayLogController::class)], [], [], null, [], ['GET']);
+        $attachLogDataRoute = new Route('/logs/{request_id}/data', ['_controller' => app(AttachDataToLogController::class)], [], [], null, [], ['POST']);
+        $clearLogsRoute = new Route('/logs/clear', ['_controller' => app(ClearLogsController::class)], [], [], null, [], ['GET']);
 
         $this->app->route('/socket', new WsServer(new Socket()), ['*']);
 
