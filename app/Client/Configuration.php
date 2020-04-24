@@ -13,18 +13,13 @@ class Configuration
     /** @var string|null */
     protected $auth;
 
-    /** @var string|null */
-    protected $authToken;
-
-    public function __construct(string $host, int $port, ?string $auth = null, string $authToken = null)
+    public function __construct(string $host, int $port, ?string $auth = null)
     {
         $this->host = $host;
 
         $this->port = $port;
 
         $this->auth = $auth;
-
-        $this->authToken = $authToken;
     }
 
     public function host(): string
@@ -40,10 +35,5 @@ class Configuration
     public function port(): int
     {
         return $this->port;
-    }
-
-    public function authToken()
-    {
-        return $this->authToken;
     }
 }

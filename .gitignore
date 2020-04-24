@@ -2,6 +2,7 @@
 /.idea
 /.vscode
 /.vagrant
+/composer.lock
 .phpunit.result.cache
 expose.php
 database/expose.db

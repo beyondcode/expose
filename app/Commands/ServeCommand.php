@@ -14,8 +14,15 @@ class ServeCommand extends Command
 
     public function handle()
     {
+        /** @var LoopInterface $loop */
+        $loop = app(LoopInterface::class);
+
+        $loop->futureTick(function () {
+            $this->info("Expose server running.");
+        });
+
         (new Factory())
-            ->setLoop(app(LoopInterface::class))
+            ->setLoop($loop)
             ->setHost($this->argument('host'))
             ->setHostname($this->argument('hostname'))
             ->validateAuthTokens($this->option('validateAuthTokens'))

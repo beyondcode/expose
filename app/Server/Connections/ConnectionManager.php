@@ -74,4 +74,9 @@ class ConnectionManager implements ConnectionManagerContract
             return $connection->client_id == $clientId;
         });
     }
+
+    public function getConnections(): array
+    {
+        return $this->connections;
+    }
 }

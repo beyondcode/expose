@@ -18,4 +18,6 @@ interface ConnectionManager
     public function findControlConnectionForSubdomain($subdomain): ?ControlConnection;
 
     public function findControlConnectionForClientId(string $clientId): ?ControlConnection;
+
+    public function getConnections(): array;
 }

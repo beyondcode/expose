@@ -30,6 +30,7 @@ class ControlConnection
         $this->host = $host;
         $this->subdomain = $subdomain;
         $this->client_id = $clientId;
+        $this->shared_at = now()->toDateTimeString();
     }
 
     public function registerProxy($requestId)

@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ShareCommand extends Command
 {
-    protected $signature = 'share {host} {--subdomain=} {--auth=} {--token=}';
+    protected $signature = 'share {host} {--subdomain=} {--auth=}';
 
     protected $description = 'Share a local url with a remote shaft server';
 
@@ -33,7 +33,6 @@ class ShareCommand extends Command
 //            ->setHost('beyond.sh') // TODO: Read from (local/global) config file
 //            ->setPort(8080) // TODO: Read from (local/global) config file
             ->setAuth($this->option('auth'))
-            ->setAuthToken($this->option('token'))
             ->createClient($this->argument('host'), explode(',', $this->option('subdomain')))
             ->createHttpServer()
             ->run();

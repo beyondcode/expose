@@ -39,13 +39,20 @@ class Client
 
     protected function connectToServer(string $sharedUrl, $subdomain)
     {
-        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__?authToken={$this->configuration->authToken()}", [], [
+        $token = config('expose.auth_token');
+
+        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__?authToken={$token}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
                 $connection = ControlConnection::create($clientConnection);
 
                 $connection->authenticate($sharedUrl, $subdomain);
+
+                $clientConnection->on('close', function() {
+                    $this->logger->error('Connection to server closed.');
+                    exit(1);
+                });
 
                 $connection->on('authenticationFailed', function ($data) {
                     $this->logger->error("Authentication failed. Please check your authentication token and try again.");

@@ -30,7 +30,6 @@ class ControlMessageController implements MessageComponentInterface
      */
     function onOpen(ConnectionInterface $connection)
     {
-        $this->verifyAuthToken($connection);
     }
 
     /**
@@ -75,6 +74,10 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function authenticate(ConnectionInterface $connection, $data)
     {
+        if (config('expose.validate_auth_tokens') === true) {
+            $this->verifyAuthToken($connection);
+        }
+
         $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
         $connection->send(json_encode([

@@ -7,6 +7,7 @@ use App\Contracts\SubdomainGenerator;
 use App\HttpServer\HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
+use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
@@ -113,6 +114,12 @@ class Factory
                 '_controller' => app(DeleteUsersController::class),
             ], [], [], null, [], ['DELETE'])
         );
+
+        $this->routes->add('admin.sites.index',
+            new Route('/expose/sites', [
+                '_controller' => app(ListSitesController::class),
+            ], [], [], null, [], ['GET'])
+        );
     }
 
     protected function bindConfiguration()
@@ -190,7 +197,7 @@ class Factory
 
     public function validateAuthTokens(bool $validate)
     {
-        dump($validate);
+        config()->set('expose.validate_auth_tokens', $validate);
 
         return $this;
     }
