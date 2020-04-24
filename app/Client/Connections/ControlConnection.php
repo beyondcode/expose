@@ -34,9 +34,8 @@ class ControlConnection
         $this->socket->on('message', function (Message $message) {
             $decodedEntry = json_decode($message);
 
+            $this->emit($decodedEntry->event ?? '', [$decodedEntry]);
             if (method_exists($this, $decodedEntry->event ?? '')) {
-                $this->emit($decodedEntry->event, [$decodedEntry]);
-
                 call_user_func([$this, $decodedEntry->event], $decodedEntry);
             }
         });

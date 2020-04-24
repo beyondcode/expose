@@ -3,3 +3,5 @@
 /.vscode
 /.vagrant
 .phpunit.result.cache
+expose.php
+database/expose.db

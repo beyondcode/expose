@@ -10,12 +10,19 @@ use function GuzzleHttp\Psr7\stream_for;
 
 class RequestLogger
 {
+    /** @var array */
     protected $requests = [];
+
+    /** @var array */
     protected $responses = [];
 
-    public function __construct(Browser $browser)
+    /** @var CliRequestLogger */
+    protected $cliRequestLogger;
+
+    public function __construct(Browser $browser, CliRequestLogger $cliRequestLogger)
     {
         $this->client = $browser;
+        $this->cliRequestLogger = $cliRequestLogger;
     }
 
     public function findLoggedRequest(string $id): ?LoggedRequest
@@ -27,9 +34,13 @@ class RequestLogger
 
     public function logRequest(string $rawRequest, Request $request)
     {
-        array_unshift($this->requests, new LoggedRequest($rawRequest, $request));
+        $loggedRequest = new LoggedRequest($rawRequest, $request);
+
+        array_unshift($this->requests, $loggedRequest);
 
         $this->requests = array_slice($this->requests, 0, 10);
+
+        $this->cliRequestLogger->logRequest($loggedRequest);
 
         $this->pushLogs();
     }
@@ -41,6 +52,8 @@ class RequestLogger
         });
         if ($loggedRequest) {
             $loggedRequest->setResponse($rawResponse, Response::fromString($rawResponse));
+
+            $this->cliRequestLogger->logRequest($loggedRequest);
 
             $this->pushLogs();
         }

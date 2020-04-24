@@ -6,15 +6,21 @@ use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use App\HttpServer\HttpServer;
 use App\Server\Connections\ConnectionManager;
+use App\Server\Http\Controllers\Admin\DeleteUsersController;
+use App\Server\Http\Controllers\Admin\ListUsersController;
+use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
 use App\Server\SubdomainGenerator\RandomSubdomainGenerator;
+use Clue\React\SQLite\DatabaseInterface;
 use Ratchet\Http\Router;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use React\Socket\Server;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Factory as LoopFactory;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -34,9 +40,13 @@ class Factory
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
 
+    /** @var RouteCollection */
+    protected $routes;
+
     public function __construct()
     {
         $this->loop = LoopFactory::create();
+        $this->routes = new RouteCollection();
     }
 
     public function setHost(string $host)
@@ -67,25 +77,42 @@ class Factory
         return $this;
     }
 
-    protected function getRoutes(): RouteCollection
+    protected function addExposeRoutes()
     {
-        $routes = new RouteCollection();
-
-        $routes->add('control',
+        $this->routes->add('control',
             new Route('/__expose_control__', [
                 '_controller' => new WsServer(app(ControlMessageController::class))
             ], [], [], null, [], []
             )
         );
 
-        $routes->add('tunnel',
+        $this->routes->add('tunnel',
             new Route('/{__catchall__}', [
                 '_controller' => app(TunnelMessageController::class),
             ], [
                 '__catchall__' => '.*'
             ]));
+    }
 
-        return $routes;
+    protected function addAdminRoutes()
+    {
+        $this->routes->add('admin.users.index',
+            new Route('/expose/users', [
+                '_controller' => app(ListUsersController::class),
+            ], [], [], null, [], ['GET'])
+        );
+
+        $this->routes->add('admin.users.store',
+            new Route('/expose/users', [
+                '_controller' => app(StoreUsersController::class),
+            ], [], [], null, [], ['POST'])
+        );
+
+        $this->routes->add('admin.users.delete',
+            new Route('/expose/users/delete/{id}', [
+                '_controller' => app(DeleteUsersController::class),
+            ], [], [], null, [], ['DELETE'])
+        );
     }
 
     protected function bindConfiguration()
@@ -117,15 +144,55 @@ class Factory
 
         $this->bindSubdomainGenerator();
 
+        $this->bindDatabase();
+
+        $this->ensureDatabaseIsInitialized();
+
         $this->bindConnectionManager();
 
-        $urlMatcher = new UrlMatcher($this->getRoutes(), new RequestContext);
+        $this->addAdminRoutes();
+
+        $this->addExposeRoutes();
+
+        $urlMatcher = new UrlMatcher($this->routes, new RequestContext);
 
         $router = new Router($urlMatcher);
 
         $http = new HttpServer($router);
 
         return new IoServer($http, $socket, $this->loop);
+    }
+
+    protected function bindDatabase()
+    {
+        app()->singleton(DatabaseInterface::class, function() {
+            $factory = new \Clue\React\SQLite\Factory($this->loop);
+            return $factory->openLazy(base_path('database/expose.db'));
+        });
+    }
+
+    protected function ensureDatabaseIsInitialized()
+    {
+        /** @var DatabaseInterface $db */
+        $db = app(DatabaseInterface::class);
+
+        $migrations = (new Finder())
+            ->files()
+            ->ignoreDotFiles(true)
+            ->in(database_path('migrations'))
+            ->name('*.sql');
+
+        /** @var SplFileInfo $migration */
+        foreach ($migrations as $migration) {
+            $db->exec($migration->getContents());
+        }
+    }
+
+    public function validateAuthTokens(bool $validate)
+    {
+        dump($validate);
+
+        return $this;
     }
 
 }

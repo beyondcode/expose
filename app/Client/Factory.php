@@ -27,6 +27,9 @@ class Factory
     /** @var string */
     protected $auth = '';
 
+    /** @var string */
+    protected $authToken = '';
+
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
 
@@ -52,9 +55,16 @@ class Factory
         return $this;
     }
 
-    public function setAuth(string $auth)
+    public function setAuth(?string $auth)
     {
         $this->auth = $auth;
+
+        return $this;
+    }
+
+    public function setAuthToken(?string $authToken)
+    {
+        $this->authToken = $authToken;
 
         return $this;
     }
@@ -69,7 +79,7 @@ class Factory
     protected function bindConfiguration()
     {
         app()->singleton(Configuration::class, function ($app) {
-            return new Configuration($this->host, $this->port, $this->auth);
+            return new Configuration($this->host, $this->port, $this->auth, $this->authToken);
         });
     }
 

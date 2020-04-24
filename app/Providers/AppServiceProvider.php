@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Logger\CliRequestLogger;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use Illuminate\Support\ServiceProvider;
@@ -21,10 +22,8 @@ class AppServiceProvider extends ServiceProvider
             return LoopFactory::create();
         });
 
-        $this->app->singleton(RequestLogger::class, function () {
-            $browser = new Browser(app(LoopInterface::class));
-
-            return new RequestLogger($browser);
+        $this->app->singleton(RequestLogger::class, function ($app) {
+            return new RequestLogger($app->make(Browser::class), $app->make(CliRequestLogger::class));
         });
     }
 }

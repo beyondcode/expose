@@ -3,6 +3,9 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
+use App\HttpServer\QueryParameters;
+use Clue\React\SQLite\DatabaseInterface;
+use Clue\React\SQLite\Result;
 use stdClass;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -13,9 +16,21 @@ class ControlMessageController implements MessageComponentInterface
     /** @var ConnectionManager */
     protected $connectionManager;
 
-    public function __construct(ConnectionManager $connectionManager)
+    /** @var DatabaseInterface */
+    protected $database;
+
+    public function __construct(ConnectionManager $connectionManager, DatabaseInterface $database)
     {
         $this->connectionManager = $connectionManager;
+        $this->database = $database;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    function onOpen(ConnectionInterface $connection)
+    {
+        $this->verifyAuthToken($connection);
     }
 
     /**
@@ -83,16 +98,25 @@ class ControlMessageController implements MessageComponentInterface
     /**
      * @inheritDoc
      */
-    function onOpen(ConnectionInterface $conn)
+    function onError(ConnectionInterface $conn, \Exception $e)
     {
         //
     }
 
-    /**
-     * @inheritDoc
-     */
-    function onError(ConnectionInterface $conn, \Exception $e)
+    protected function verifyAuthToken(ConnectionInterface $connection)
     {
-        //
+        $authToken = QueryParameters::create($connection->httpRequest)->get('authToken');
+
+        $this->database
+            ->query("SELECT * FROM users WHERE auth_token = :token", ['token' => $authToken])
+            ->then(function (Result $result) use ($connection) {
+                if (count($result->rows) === 0) {
+                    $connection->send(json_encode([
+                        'event' => 'authenticationFailed',
+                        'data' => []
+                    ]));
+                    $connection->close();
+                }
+        });
     }
 }

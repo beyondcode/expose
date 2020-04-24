@@ -56,7 +56,7 @@ class LoggedRequest implements \JsonSerializable
         $data = [
             'id' => $this->id,
             'performed_at' => $this->startTime->toDateTimeString(),
-            'duration' => $this->startTime->diffInMilliseconds($this->stopTime, false),
+            'duration' => $this->getDuration(),
             'subdomain' => $this->detectSubdomain(),
             'request' => [
                 'raw' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->rawRequest,
@@ -132,6 +132,11 @@ class LoggedRequest implements \JsonSerializable
         return $this->rawRequest;
     }
 
+    public function getResponse()
+    {
+        return $this->parsedResponse;
+    }
+
     protected function getResponseBody()
     {
         return \Laminas\Http\Response::fromString($this->rawResponse)->getBody();
@@ -197,5 +202,10 @@ class LoggedRequest implements \JsonSerializable
     protected function getRequestId()
     {
         return Arr::get($this->parsedRequest->getHeaders()->toArray(), 'X-Expose-Request-ID', (string)Str::uuid());
+    }
+
+    public function getDuration()
+    {
+        return $this->startTime->diffInMilliseconds($this->stopTime, false);
     }
 }

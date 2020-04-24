@@ -47,8 +47,6 @@ class HttpClient
 
         $request = $this->passRequestThroughModifiers(parse_request($requestData), $proxyConnection);
 
-        dump($this->request->getMethod() . ' ' . $this->request->getUri()->getPath());
-
         transform($request, function ($request) use ($proxyConnection) {
             $this->sendRequestToApplication($request, $proxyConnection);
         });

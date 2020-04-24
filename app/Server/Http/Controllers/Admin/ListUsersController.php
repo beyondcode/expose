@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Server\Http\Controllers\Admin;
+
+use App\HttpServer\Controllers\PostController;
+use Clue\React\SQLite\DatabaseInterface;
+use Clue\React\SQLite\Result;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Request;
+use Ratchet\ConnectionInterface;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+use function GuzzleHttp\Psr7\str;
+use function GuzzleHttp\Psr7\stream_for;
+
+class ListUsersController extends PostController
+{
+    protected $keepConnectionOpen = true;
+
+    /** @var DatabaseInterface */
+    protected $database;
+
+    public function __construct(DatabaseInterface $database)
+    {
+        $this->database = $database;
+    }
+
+    public function handle(Request $request, ConnectionInterface $httpConnection)
+    {
+        $this->database->query('SELECT * FROM users ORDER by created_at DESC')->then(function (Result $result) use ($httpConnection) {
+            $httpConnection->send(
+                respond_html($this->getView(['users' => $result->rows]))
+            );
+
+            $httpConnection->close();
+        }, function (\Exception $exception) use ($httpConnection) {
+            $httpConnection->send(respond_html('Something went wrong: '.$exception->getMessage(), 500));
+
+            $httpConnection->close();
+        });
+    }
+
+    protected function getView(array $data)
+    {
+        $twig = new Environment(
+            new ArrayLoader([
+                'template' => file_get_contents(base_path('resources/views/admin/users/index.twig')),
+            ])
+        );
+
+        return stream_for($twig->render('template', $data));
+    }
+}

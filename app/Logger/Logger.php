@@ -2,64 +2,21 @@
 
 namespace App\Logger;
 
+use Illuminate\Console\Concerns\InteractsWithIO;
+use Illuminate\Console\OutputStyle;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Logger
 {
-    /** @var \Symfony\Component\Console\Output\OutputInterface */
-    protected $consoleOutput;
+    use InteractsWithIO;
 
-    /** @var bool */
-    protected $enabled = false;
+    /** @var ConsoleOutputInterface */
+    protected $output;
 
-    /** @var bool */
-    protected $verbose = false;
-
-    public function __construct(OutputInterface $consoleOutput)
+    public function __construct(ConsoleOutputInterface $consoleOutput)
     {
-        $this->consoleOutput = $consoleOutput;
-    }
-
-    public function enable($enabled = true)
-    {
-        $this->enabled = $enabled;
-
-        return $this;
-    }
-
-    public function verbose($verbose = false)
-    {
-        $this->verbose = $verbose;
-
-        return $this;
-    }
-
-    protected function info(string $message)
-    {
-        $this->line($message, 'info');
-    }
-
-    protected function warn(string $message)
-    {
-        if (! $this->consoleOutput->getFormatter()->hasStyle('warning')) {
-            $style = new OutputFormatterStyle('yellow');
-
-            $this->consoleOutput->getFormatter()->setStyle('warning', $style);
-        }
-
-        $this->line($message, 'warning');
-    }
-
-    protected function error(string $message)
-    {
-        $this->line($message, 'error');
-    }
-
-    protected function line(string $message, string $style)
-    {
-        $styled = $style ? "<$style>$message</$style>" : $message;
-
-        $this->consoleOutput->writeln($styled);
+        $this->output = $consoleOutput;
     }
 }

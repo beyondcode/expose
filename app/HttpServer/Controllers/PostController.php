@@ -68,13 +68,21 @@ abstract class PostController extends Controller
 
     protected function createLaravelRequest(ConnectionInterface $connection): Request
     {
+        try {
+            parse_str($connection->requestBuffer, $bodyParameters);
+        } catch (\Throwable $e) {
+            $bodyParameters = [];
+        }
+
         $serverRequest = (new ServerRequest(
             $connection->request->getMethod(),
             $connection->request->getUri(),
             $connection->request->getHeaders(),
             $connection->requestBuffer,
             $connection->request->getProtocolVersion()
-        ))->withQueryParams(QueryParameters::create($connection->request)->all());
+        ))
+            ->withQueryParams(QueryParameters::create($connection->request)->all())
+            ->withParsedBody($bodyParameters);
 
         return Request::createFromBase((new HttpFoundationFactory)->createRequest($serverRequest));
     }
