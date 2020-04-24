@@ -6,6 +6,7 @@
         "config",
         "vendor"
     ],
+    "exclude-dev-files": false,
     "files": [
         "composer.json"
     ],

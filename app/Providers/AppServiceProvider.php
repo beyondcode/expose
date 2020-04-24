@@ -17,6 +17,16 @@ class AppServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $configFile = implode(DIRECTORY_SEPARATOR, [
+            $_SERVER['HOME'],
+            '.expose',
+            'config.php'
+        ]);
+
+        if (file_exists($configFile)) {
+            config()->set('expose', require_once $configFile);
+        }
+
         $this->app->singleton(LoopInterface::class, function () {
             return LoopFactory::create();
         });
