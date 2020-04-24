@@ -49,13 +49,15 @@ class ConnectionManager implements ConnectionManagerContract
 
     public function removeControlConnection($connection)
     {
-        if (isset($this->httpConnections[$connection->request_id])) {
-            unset($this->httpConnections[$connection->request_id]);
+        if (isset($connection->request_id)) {
+            if (isset($this->httpConnections[$connection->request_id])) {
+                unset($this->httpConnections[$connection->request_id]);
+            }
         }
 
         if (isset($connection->client_id)) {
             $clientId = $connection->client_id;
-            $this->collections = collect($this->connections)->reject(function ($connection) use ($clientId) {
+            $this->connections = collect($this->connections)->reject(function ($connection) use ($clientId) {
                 return $connection->client_id == $clientId;
             })->toArray();
         }
