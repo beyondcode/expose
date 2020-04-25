@@ -27,18 +27,7 @@ class ListSitesController extends PostController
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $httpConnection->send(
-            respond_html($this->getView(['sites' => $this->connectionManager->getConnections()]))
+            respond_html($this->getView('server.sites.index', ['sites' => $this->connectionManager->getConnections()]))
         );
-    }
-
-    protected function getView(array $data)
-    {
-        $twig = new Environment(
-            new ArrayLoader([
-                'template' => file_get_contents(base_path('resources/views/admin/sites/index.twig')),
-            ])
-        );
-
-        return stream_for($twig->render('template', $data));
     }
 }

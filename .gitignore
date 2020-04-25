@@ -6,3 +6,4 @@
 .phpunit.result.cache
 expose.php
 database/expose.db
+.expose.php

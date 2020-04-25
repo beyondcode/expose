@@ -41,7 +41,9 @@ class Client
     {
         $token = config('expose.auth_token');
 
-        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__?authToken={$token}", [], [
+        $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
+
+        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__?authToken={$token}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
@@ -65,8 +67,10 @@ class Client
                     static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";
                 });
 
-            }, function ($e) {
-                echo "Could not connect: {$e->getMessage()}\n";
+            }, function (\Exception $e) {
+                $this->logger->error("Could not connect to the server.");
+                $this->logger->error($e->getMessage());
+                exit(1);
             });
     }
 }

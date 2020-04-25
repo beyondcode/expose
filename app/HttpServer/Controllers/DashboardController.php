@@ -16,19 +16,12 @@ class DashboardController extends Controller
             str(new Response(
                 200,
                 ['Content-Type' => 'text/html'],
-                $this->getView()
+                $this->getView('client.dashboard', [
+                    'subdomains' => Client::$subdomains,
+                ])
             ))
         );
 
         $connection->close();
-    }
-
-    protected function getView(): string
-    {
-        $view = file_get_contents(base_path('resources/views/index.html'));
-
-        $view = str_replace('%subdomains%', implode(' ', Client::$subdomains), $view);
-
-        return $view;
     }
 }

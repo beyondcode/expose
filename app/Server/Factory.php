@@ -80,9 +80,12 @@ class Factory
 
     protected function addExposeRoutes()
     {
+        $wsServer = new WsServer(app(ControlMessageController::class));
+        $wsServer->enableKeepAlive($this->loop);
+
         $this->routes->add('control',
             new Route('/__expose_control__', [
-                '_controller' => new WsServer(app(ControlMessageController::class))
+                '_controller' => $wsServer
             ], [], [], null, [], []
             )
         );

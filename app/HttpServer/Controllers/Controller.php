@@ -5,6 +5,9 @@ namespace App\HttpServer\Controllers;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+use function GuzzleHttp\Psr7\stream_for;
 
 abstract class Controller implements HttpServerInterface
 {
@@ -21,5 +24,18 @@ abstract class Controller implements HttpServerInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
+    }
+
+    protected function getView(string $view, array $data)
+    {
+        $templatePath = implode(DIRECTORY_SEPARATOR, explode('.', $view));
+
+        $twig = new Environment(
+            new ArrayLoader([
+                'template' => file_get_contents(base_path('resources/views/'.$templatePath.'.twig')),
+            ])
+        );
+
+        return stream_for($twig->render('template', $data));
     }
 }

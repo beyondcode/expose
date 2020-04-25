@@ -31,6 +31,14 @@ class AppServiceProvider extends ServiceProvider
 
     protected function loadConfigurationFile()
     {
+        $localConfigFile = getcwd() . DIRECTORY_SEPARATOR . '.expose.php';
+
+        if (file_exists($localConfigFile)) {
+            config()->set('expose', require_once $localConfigFile);
+            return;
+        }
+
+
         $configFile = implode(DIRECTORY_SEPARATOR, [
             $_SERVER['HOME'],
             '.expose',
@@ -39,12 +47,6 @@ class AppServiceProvider extends ServiceProvider
 
         if (file_exists($configFile)) {
             config()->set('expose', require_once $configFile);
-            return;
-        }
-
-        $localConfigFile = getcwd() . DIRECTORY_SEPARATOR . '.expose.php';
-        if (file_exists($localConfigFile)) {
-            config()->set('expose', require_once $localConfigFile);
         }
     }
 }

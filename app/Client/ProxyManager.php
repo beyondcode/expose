@@ -24,7 +24,9 @@ class ProxyManager
 
     public function createProxy(string $clientId, $connectionData)
     {
-        connect("ws://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__", [], [
+        $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
+
+        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {

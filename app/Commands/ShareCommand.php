@@ -30,8 +30,8 @@ class ShareCommand extends Command
 
         (new Factory())
             ->setLoop(app(LoopInterface::class))
-//            ->setHost('beyond.sh') // TODO: Read from (local/global) config file
-//            ->setPort(8080) // TODO: Read from (local/global) config file
+            ->setHost(config('expose.host', 'localhost'))
+            ->setPort(config('expose.port', 8080))
             ->setAuth($this->option('auth'))
             ->createClient($this->argument('host'), explode(',', $this->option('subdomain')))
             ->createHttpServer()

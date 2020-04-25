@@ -91,8 +91,11 @@
         <div class="max-w-screen-xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
             <div class="pr-16 sm:text-center sm:px-16">
                 <p class="font-medium text-white flex justify-center">
-                    <span class="inline-block">Waiting for requests on: <a class="underline" target="_blank"
-                                                                           href="%subdomains%">%subdomains%</a></span>
+                    <span class="inline-block">Waiting for requests on:
+                        {% for subdomain in subdomains %}
+                            <a class="underline" target="_blank" href="http://{{ subdomain }}">{{ subdomain }}</a>
+                        {% endfor %}
+                    </span>
                 </p>
             </div>
         </div>
@@ -135,14 +138,14 @@
                             @click="setLog(log)">
                             <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
                                 <p>
-                                    {{ log.request.method }}
-                                    {{ log.request.uri }}
+                                    @{ log.request.method }
+                                    @{ log.request.uri }
                                 </p>
-                                <span class="text-xs">{{ log.subdomain }}</span>
+                                <span class="text-xs">@{ log.subdomain }</span>
                             </td>
                             <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 <div v-if="log.response">
-                                    {{ log.response.status }} - {{ log.response.reason }}
+                                    @{ log.response.status } - @{ log.response.reason }
                                 </div>
                                 <div v-else>
                                     ...
@@ -150,7 +153,7 @@
                             </td>
                             <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 <div v-if="log.response">
-                                    {{ log.duration }}ms
+                                    @{ log.duration }ms
                                 </div>
                             </td>
                         </tr>
@@ -163,7 +166,7 @@
             <div v-if="currentLog" class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 flex">
-                        {{ currentLog.request.method }} {{ currentLog.request.uri }}
+                        @{ currentLog.request.method } @{ currentLog.request.uri }
                         <div class="flex-grow"></div>
                         <span class="inline-flex rounded-md shadow-sm">
                               <button @click.prevent="replay(currentLog)"
@@ -182,7 +185,7 @@
                         </span>
                     </h3>
                     <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-                        Status code: {{ currentLog.response?.status}}
+                        Status code: @{ currentLog.response?.status}
                     </p>
                 </div>
                 <div>
@@ -223,10 +226,10 @@
                          :key="'query_' + name"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-500">
-                            {{ name }}
+                            @{ name }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ value }}
+                            @{ value }
                         </dd>
                     </div>
 
@@ -239,12 +242,12 @@
                          :key="'post_' + name"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-500">
-                            {{ parameter.name }}
+                            @{ parameter.name }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
                             <span
-                                v-if="parameter.is_file">File: {{ parameter.filename }} ({{ parameter.mime_type }})</span>
-                            <span v-else>{{ parameter.value }}</span>
+                                v-if="parameter.is_file">File: @{ parameter.filename } (@{ parameter.mime_type })</span>
+                            <span v-else>@{ parameter.value }</span>
                         </dd>
                     </div>
 
@@ -257,15 +260,15 @@
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-500">
-                            {{ header }}
+                            @{ header }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ value }}
+                            @{ value }
                         </dd>
                     </div>
 
                     <div>
-                        <pre class="p-6 prettyprint">{{ currentLog.request.body }}</pre>
+                        <pre class="p-6 prettyprint">@{ currentLog.request.body }</pre>
                     </div>
                 </div>
 
@@ -279,10 +282,10 @@
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-500">
-                            {{ header }}
+                            @{ header }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ value }}
+                            @{ value }
                         </dd>
                     </div>
                     <div v-if="currentLog.request.additional_data.length !== 0">
@@ -295,7 +298,7 @@
                              :key="'debug'+key"
                              class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm leading-5 font-medium text-gray-500">
-                                {{ key }}
+                                @{ key }
                             </dt>
                             <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
                                 <div v-html="value">
@@ -327,12 +330,17 @@
                         </div>
                     </div>
                     <div v-if="activeTab === 'raw'">
-                        <pre class="p-6 text-sm">{{ currentLog.response.body }}</pre>
+                        <pre class="p-6 text-sm">@{ currentLog.response.body }</pre>
                     </div>
                     <div v-if="activeTab === 'preview'">
                         <iframe :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
                     </div>
                 </div>
+            </div>
+            <div v-else  class="flex-col bg-white shadow overflow-hidden sm:rounded-lg justify-center items-center flex py-4">
+                <h1 class="text-lg">Waiting for connections...</h1>
+                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=http://{{ subdomains[0] | url_encode }}&choe=UTF-8" />
+                <a class="text-sm" href="http://{{ subdomains[0] }}" target="_blank">http://{{ subdomains[0] }}</a>
             </div>
         </div>
     </div>
@@ -341,6 +349,8 @@
 <script>
     new Vue({
         el: '#app',
+
+        delimiters: ['@{', '}'],
 
         data: {
             search: '',
@@ -367,6 +377,7 @@
             },
             clearLogs: function() {
                 fetch('/logs/clear');
+                this.currentLog = null;
             },
             setLog: function (log) {
                 this.currentLog = log;

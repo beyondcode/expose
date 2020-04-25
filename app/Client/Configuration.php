@@ -34,6 +34,6 @@ class Configuration
 
     public function port(): int
     {
-        return $this->port;
+        return intval($this->port);
     }
 }

@@ -29,7 +29,7 @@ class ListUsersController extends PostController
     {
         $this->database->query('SELECT * FROM users ORDER by created_at DESC')->then(function (Result $result) use ($httpConnection) {
             $httpConnection->send(
-                respond_html($this->getView(['users' => $result->rows]))
+                respond_html($this->getView('server.users.index', ['users' => $result->rows]))
             );
 
             $httpConnection->close();
@@ -38,16 +38,5 @@ class ListUsersController extends PostController
 
             $httpConnection->close();
         });
-    }
-
-    protected function getView(array $data)
-    {
-        $twig = new Environment(
-            new ArrayLoader([
-                'template' => file_get_contents(base_path('resources/views/admin/users/index.twig')),
-            ])
-        );
-
-        return stream_for($twig->render('template', $data));
     }
 }
