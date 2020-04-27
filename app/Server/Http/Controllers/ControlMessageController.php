@@ -6,9 +6,9 @@ use App\Contracts\ConnectionManager;
 use App\HttpServer\QueryParameters;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
+use Ratchet\WebSocket\MessageComponentInterface;
 use stdClass;
 use Ratchet\ConnectionInterface;
-use Ratchet\MessageComponentInterface;
 
 class ControlMessageController implements MessageComponentInterface
 {
