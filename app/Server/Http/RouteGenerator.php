@@ -60,19 +60,6 @@ class RouteGenerator
 
     protected function getRoute(string $method, string $uri, $action, string $condition = ''): Route
     {
-        $action = is_subclass_of($action, MessageComponentInterface::class)
-            ? $this->createWebSocketsServer($action)
-            : app($action);
-
-        return new Route($uri, ['_controller' => $action], [], [], null, [], [$method], $condition);
-    }
-
-    protected function createWebSocketsServer(string $action): WsServer
-    {
-        $wServer = new WsServer(app($action));
-
-        $wServer->enableKeepAlive(app(LoopInterface::class));
-
-        return $wServer;
+        return new Route($uri, ['_controller' => app($action)], [], [], null, [], [$method], $condition);
     }
 }

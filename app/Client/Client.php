@@ -41,9 +41,9 @@ class Client
     {
         $token = config('expose.auth_token');
 
-        $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
+        $wsProtocol = $this->configuration->port() === 443 ? "wss" : "ws";
 
-        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$token}", [], [
+        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$token}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
@@ -67,7 +67,14 @@ class Client
                 });
 
                 $connection->on('authenticated', function ($data) {
-                    $this->logger->info("Connected to http://$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}");
+                    $httpProtocol = $this->configuration->port() === 443 ? "https" : "http";
+                    $host = $this->configuration->host();
+
+                    if ($httpProtocol !== 'https') {
+                        $host .= ":{$this->configuration->port()}";
+                    }
+
+                    $this->logger->info("Connected to {$httpProtocol}://{$data->subdomain}.{$host}");
 
                     static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";
                 });

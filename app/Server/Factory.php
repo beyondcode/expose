@@ -82,16 +82,26 @@ class Factory
         return $this;
     }
 
-    protected function addExposeRoutes()
+    protected function addTunnelRoute()
     {
-        $this->router->get('/expose/control', ControlMessageController::class, 'request.headers.get("x-expose-control") matches "/enabled/i"');
-
         $this->router->addSymfonyRoute('tunnel',
             new Route('/{__catchall__}', [
                 '_controller' => app(TunnelMessageController::class),
             ], [
                 '__catchall__' => '.*'
             ]));
+    }
+
+    protected function addControlConnectionRoute(): WsServer
+    {
+        $wsServer = new WsServer(app(ControlMessageController::class));
+
+        $this->router->addSymfonyRoute('expose-control',
+            new Route('/expose/control', [
+                '_controller' => $wsServer,
+            ], [], [], '', [], [], 'request.headers.get("x-expose-control") matches "/enabled/i"'));
+
+        return $wsServer;
     }
 
     protected function addAdminRoutes()
@@ -143,7 +153,9 @@ class Factory
 
         $this->addAdminRoutes();
 
-        $this->addExposeRoutes();
+        $this->addTunnelRoute();
+
+        $controlConnection = $this->addControlConnectionRoute();
 
         $urlMatcher = new UrlMatcher($this->router->getRoutes(), new RequestContext);
 
@@ -151,7 +163,11 @@ class Factory
 
         $http = new HttpServer($router);
 
-        return new IoServer($http, $socket, $this->loop);
+        $server = new IoServer($http, $socket, $this->loop);
+
+        $controlConnection->enableKeepAlive($this->loop);
+
+        return $server;
     }
 
     protected function bindDatabase()
