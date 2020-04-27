@@ -84,7 +84,7 @@ class Factory
 
     protected function addExposeRoutes()
     {
-        $this->router->get('/__expose_control__', ControlMessageController::class);
+        $this->router->get('/expose/control', ControlMessageController::class, 'request.headers.get("x-expose-control") matches "/enabled/i"');
 
         $this->router->addSymfonyRoute('tunnel',
             new Route('/{__catchall__}', [

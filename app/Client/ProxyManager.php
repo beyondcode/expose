@@ -26,7 +26,7 @@ class ProxyManager
     {
         $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
 
-        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__", [], [
+        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {

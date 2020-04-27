@@ -43,7 +43,7 @@ class Client
 
         $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
 
-        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/__expose_control__?authToken={$token}", [], [
+        connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$token}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
