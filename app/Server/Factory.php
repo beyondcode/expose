@@ -153,9 +153,9 @@ class Factory
 
         $this->addAdminRoutes();
 
-        $this->addTunnelRoute();
-
         $controlConnection = $this->addControlConnectionRoute();
+
+        $this->addTunnelRoute();
 
         $urlMatcher = new UrlMatcher($this->router->getRoutes(), new RequestContext);
 
