@@ -81,7 +81,7 @@ class TunnelMessageController extends PostController
 
     protected function prepareRequest(Request $request, ControlConnection $controlConnection): Request
     {
-        $request::setTrustedProxies([$controlConnection->socket->remoteAddress], Request::HEADER_X_FORWARDED_ALL);
+        $request::setTrustedProxies([$controlConnection->socket->remoteAddress, '127.0.0.1'], Request::HEADER_X_FORWARDED_ALL);
 
         $request->headers->set('Host', $controlConnection->host);
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
