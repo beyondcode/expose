@@ -83,7 +83,11 @@ class TunnelMessageController extends PostController
     {
         $request::setTrustedProxies([$controlConnection->socket->remoteAddress], Request::HEADER_X_FORWARDED_ALL);
 
-        $host = $this->configuration->hostname() . ($this->configuration->port() === 443) ?: ":{$this->configuration->port()}";
+        $host = $this->configuration->hostname();
+
+        if ($this->configuration->port() !== 443) {
+            $host .= ":{$this->configuration->port()}";
+        }
 
         $request->headers->set('Host', $controlConnection->host);
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
