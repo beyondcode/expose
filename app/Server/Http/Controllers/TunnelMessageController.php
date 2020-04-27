@@ -9,6 +9,7 @@ use App\Server\Connections\ControlConnection;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Str;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\Frame;
@@ -37,10 +38,14 @@ class TunnelMessageController extends PostController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($this->detectSubdomain($request));
+        $subdomain = $this->detectSubdomain($request);
+
+        $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
 
         if (is_null($controlConnection)) {
-            $httpConnection->send(str(new Response(404, [], 'Not found')));
+            $httpConnection->send(
+                respond_html($this->getView('server.errors.404', ['subdomain' => $subdomain]))
+            );
             $httpConnection->close();
             return;
         }
@@ -50,9 +55,9 @@ class TunnelMessageController extends PostController
 
     protected function detectSubdomain(Request $request): ?string
     {
-        $domainParts = explode('.', $request->getHost());
+        $subdomain = Str::before($request->getHost(), '.'.$this->configuration->hostname());
 
-        return trim($domainParts[0]);
+        return $subdomain === $request->getHost() ? null : $subdomain;
     }
 
     protected function sendRequestToClient(Request $request, ControlConnection $controlConnection, ConnectionInterface $httpConnection)
@@ -85,7 +90,7 @@ class TunnelMessageController extends PostController
 
         $host = $this->configuration->hostname();
 
-        if (! $request->isSecure()) {
+        if (!$request->isSecure()) {
             $host .= ":{$this->configuration->port()}";
         }
 
@@ -93,7 +98,7 @@ class TunnelMessageController extends PostController
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
         $request->headers->set('X-Expose-Request-ID', uniqid());
         $request->headers->set('Upgrade-Insecure-Requests', 1);
-        $request->headers->set('X-Exposed-By', config('app.name') . ' '. config('app.version'));
+        $request->headers->set('X-Exposed-By', config('app.name') . ' ' . config('app.version'));
         $request->headers->set('X-Original-Host', "{$controlConnection->subdomain}.{$host}");
 
         return $request;

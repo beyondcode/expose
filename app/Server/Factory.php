@@ -106,7 +106,7 @@ class Factory
 
     protected function addAdminRoutes()
     {
-        $adminCondition = 'request.headers.get("Host") matches "/'.config('expose.dashboard_subdomain').'./i"';
+        $adminCondition = 'request.headers.get("Host") matches "/'.config('expose.dashboard_subdomain').'\./i"';
 
         $this->router->get('/', LoginController::class, $adminCondition);
         $this->router->post('/', VerifyLoginController::class, $adminCondition);
@@ -121,6 +121,8 @@ class Factory
         app()->singleton(Configuration::class, function ($app) {
             return new Configuration($this->hostname, $this->port);
         });
+
+        return $this;
     }
 
     protected function bindSubdomainGenerator()
@@ -128,6 +130,8 @@ class Factory
         app()->singleton(SubdomainGenerator::class, function ($app) {
             return $app->make(RandomSubdomainGenerator::class);
         });
+
+        return $this;
     }
 
     protected function bindConnectionManager()
@@ -135,23 +139,20 @@ class Factory
         app()->singleton(ConnectionManagerContract::class, function ($app) {
             return $app->make(ConnectionManager::class);
         });
+
+        return $this;
     }
 
     public function createServer()
     {
         $socket = new Server("{$this->host}:{$this->port}", $this->loop);
 
-        $this->bindConfiguration();
-
-        $this->bindSubdomainGenerator();
-
-        $this->bindDatabase();
-
-        $this->ensureDatabaseIsInitialized();
-
-        $this->bindConnectionManager();
-
-        $this->addAdminRoutes();
+        $this->bindConfiguration()
+            ->bindSubdomainGenerator()
+            ->bindDatabase()
+            ->ensureDatabaseIsInitialized()
+            ->bindConnectionManager()
+            ->addAdminRoutes();
 
         $controlConnection = $this->addControlConnectionRoute();
 
@@ -176,6 +177,8 @@ class Factory
             $factory = new \Clue\React\SQLite\Factory($this->loop);
             return $factory->openLazy(base_path('database/expose.db'));
         });
+
+        return $this;
     }
 
     protected function ensureDatabaseIsInitialized()
@@ -193,6 +196,8 @@ class Factory
         foreach ($migrations as $migration) {
             $db->exec($migration->getContents());
         }
+
+        return $this;
     }
 
     public function validateAuthTokens(bool $validate)
