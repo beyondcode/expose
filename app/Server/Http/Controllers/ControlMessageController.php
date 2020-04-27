@@ -78,6 +78,10 @@ class ControlMessageController implements MessageComponentInterface
             $this->verifyAuthToken($connection);
         }
 
+        if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
+            return;
+        }
+
         $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
         $connection->send(json_encode([
@@ -121,5 +125,25 @@ class ControlMessageController implements MessageComponentInterface
                     $connection->close();
                 }
         });
+    }
+
+    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain): bool
+    {
+        if (! is_null($subdomain)) {
+            $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
+            if (! is_null($controlConnection) || $subdomain === config('expose.dashboard_subdomain')) {
+                $connection->send(json_encode([
+                    'event' => 'subdomainTaken',
+                    'data' => [
+                        'subdomain' => $subdomain,
+                    ]
+                ]));
+                $connection->close();
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

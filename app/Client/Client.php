@@ -61,6 +61,11 @@ class Client
                     exit(1);
                 });
 
+                $connection->on('subdomainTaken', function ($data) {
+                    $this->logger->error("The chosen subdomain \"{$data->data->subdomain}\" is already taken. Please choose a different subdomain.");
+                    exit(1);
+                });
+
                 $connection->on('authenticated', function ($data) {
                     $this->logger->info("Connected to http://$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}");
 

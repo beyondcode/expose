@@ -14,26 +14,12 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class ListSitesController extends PostController
+class LoginController extends PostController
 {
-    /** @var ConnectionManager */
-    protected $connectionManager;
-
-    public function __construct(ConnectionManager $connectionManager)
-    {
-        $this->connectionManager = $connectionManager;
-    }
-
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        try {
-            $sites = $this->getView('server.sites.index', ['sites' => $this->connectionManager->getConnections()]);
-        } catch (\Exception $e) {
-            dump($e->getMessage());
-        }
-
         $httpConnection->send(
-            respond_html($sites)
+            respond_html($this->getView('server.login'))
         );
     }
 }

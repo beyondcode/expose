@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2696eac6d05332230aa69e21a6aee524",
+    "content-hash": "3199f5982eed399c719f72239be99a83",
     "packages": [],
     "packages-dev": [
         {
@@ -107,6 +107,59 @@
                 "websocket"
             ],
             "time": "2020-01-27T23:08:40+00:00"
+        },
+        {
+            "name": "clue/block-react",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/reactphp-block.git",
+                "reference": "2f516b28259c203d67c4c963772dd7e9db652737"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/reactphp-block/zipball/2f516b28259c203d67c4c963772dd7e9db652737",
+                "reference": "2f516b28259c203d67c4c963772dd7e9db652737",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
+                "react/promise": "^2.7 || ^1.2.1",
+                "react/promise-timer": "^1.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Lightweight library that eases integrating async components built for ReactPHP in a traditional, blocking environment.",
+            "homepage": "https://github.com/clue/reactphp-block",
+            "keywords": [
+                "async",
+                "await",
+                "blocking",
+                "event loop",
+                "promise",
+                "reactphp",
+                "sleep",
+                "synchronous"
+            ],
+            "time": "2019-04-09T11:45:04+00:00"
         },
         {
             "name": "clue/buzz-react",
@@ -5437,6 +5490,55 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
+        },
+        {
+            "name": "seregazhuk/react-promise-testing",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/seregazhuk/php-react-promise-testing.git",
+                "reference": "a56481a6feae2cb51f91d554af41a66802a01a37"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/seregazhuk/php-react-promise-testing/zipball/a56481a6feae2cb51f91d554af41a66802a01a37",
+                "reference": "a56481a6feae2cb51f91d554af41a66802a01a37",
+                "shasum": ""
+            },
+            "require": {
+                "clue/block-react": "^1.3",
+                "php": ">=7.2",
+                "phpunit/phpunit": "^8.2",
+                "react/promise": "^2.7"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "^0.4.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "seregazhuk\\React\\PromiseTesting\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Zhuk",
+                    "email": "seregazhuk88@gmail.com"
+                }
+            ],
+            "description": "PHPUnit-based library for testing ReactPHP promises",
+            "homepage": "https://github.com/seregazhuk/php-react-promise-testing",
+            "keywords": [
+                "promise",
+                "reactphp",
+                "test",
+                "testing"
+            ],
+            "time": "2020-03-09T12:02:56+00:00"
         },
         {
             "name": "symfony/cache",

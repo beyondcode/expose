@@ -9,12 +9,15 @@ use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
+use App\Server\Http\Controllers\Admin\LoginController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
+use App\Server\Http\Controllers\Admin\VerifyLoginController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
+use App\Server\Http\RouteGenerator;
+use App\Server\Http\Router;
 use App\Server\SubdomainGenerator\RandomSubdomainGenerator;
 use Clue\React\SQLite\DatabaseInterface;
-use Ratchet\Http\Router;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use React\Socket\Server;
@@ -22,6 +25,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Factory as LoopFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -41,13 +45,13 @@ class Factory
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
 
-    /** @var RouteCollection */
-    protected $routes;
+    /** @var RouteGenerator */
+    protected $router;
 
     public function __construct()
     {
         $this->loop = LoopFactory::create();
-        $this->routes = new RouteCollection();
+        $this->router = new RouteGenerator();
     }
 
     public function setHost(string $host)
@@ -80,17 +84,9 @@ class Factory
 
     protected function addExposeRoutes()
     {
-        $wsServer = new WsServer(app(ControlMessageController::class));
-        $wsServer->enableKeepAlive($this->loop);
+        $this->router->get('/__expose_control__', ControlMessageController::class);
 
-        $this->routes->add('control',
-            new Route('/__expose_control__', [
-                '_controller' => $wsServer
-            ], [], [], null, [], []
-            )
-        );
-
-        $this->routes->add('tunnel',
+        $this->router->addSymfonyRoute('tunnel',
             new Route('/{__catchall__}', [
                 '_controller' => app(TunnelMessageController::class),
             ], [
@@ -100,29 +96,14 @@ class Factory
 
     protected function addAdminRoutes()
     {
-        $this->routes->add('admin.users.index',
-            new Route('/expose/users', [
-                '_controller' => app(ListUsersController::class),
-            ], [], [], null, [], ['GET'])
-        );
+        $adminCondition = 'request.headers.get("Host") matches "/'.config('expose.dashboard_subdomain').'./i"';
 
-        $this->routes->add('admin.users.store',
-            new Route('/expose/users', [
-                '_controller' => app(StoreUsersController::class),
-            ], [], [], null, [], ['POST'])
-        );
-
-        $this->routes->add('admin.users.delete',
-            new Route('/expose/users/delete/{id}', [
-                '_controller' => app(DeleteUsersController::class),
-            ], [], [], null, [], ['DELETE'])
-        );
-
-        $this->routes->add('admin.sites.index',
-            new Route('/expose/sites', [
-                '_controller' => app(ListSitesController::class),
-            ], [], [], null, [], ['GET'])
-        );
+        $this->router->get('/', LoginController::class, $adminCondition);
+        $this->router->post('/', VerifyLoginController::class, $adminCondition);
+        $this->router->get('/users', ListUsersController::class, $adminCondition);
+        $this->router->post('/users', StoreUsersController::class, $adminCondition);
+        $this->router->delete('/users/delete/{id}', DeleteUsersController::class, $adminCondition);
+        $this->router->get('/sites', ListSitesController::class, $adminCondition);
     }
 
     protected function bindConfiguration()
@@ -164,7 +145,7 @@ class Factory
 
         $this->addExposeRoutes();
 
-        $urlMatcher = new UrlMatcher($this->routes, new RequestContext);
+        $urlMatcher = new UrlMatcher($this->router->getRoutes(), new RequestContext);
 
         $router = new Router($urlMatcher);
 

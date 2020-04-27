@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
+use seregazhuk\React\PromiseTesting\TestCase;
 
 class ExampleTest extends TestCase
 {
