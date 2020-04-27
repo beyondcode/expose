@@ -79,7 +79,10 @@ abstract class PostController extends Controller
             $connection->request->getUri(),
             $connection->request->getHeaders(),
             $connection->requestBuffer,
-            $connection->request->getProtocolVersion()
+            $connection->request->getProtocolVersion(),
+            [
+                'REMOTE_ADDR' => $connection->remoteAddress
+            ]
         ))
             ->withQueryParams(QueryParameters::create($connection->request)->all())
             ->withParsedBody($bodyParameters);
