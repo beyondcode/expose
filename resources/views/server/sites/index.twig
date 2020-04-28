@@ -27,13 +27,13 @@
                                 {{ site.host }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                                {{ site.subdomain }}.localhost:8080
+                                {{ site.subdomain }}.{{ configuration.hostname()}}:{{ configuration.port() }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 {{ site.shared_at }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
-                                <a href="http://{{ site.subdomain }}.localhost:8080" target="_blank"
+                                <a href="{{ scheme }}://{{ site.subdomain }}.{{ configuration.hostname()}}:{{ configuration.port() }}" target="_blank"
                                    class="text-indigo-600 hover:text-indigo-900">Visit</a>
                             </td>
                         </tr>

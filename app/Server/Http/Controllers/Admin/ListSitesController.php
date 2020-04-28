@@ -4,6 +4,7 @@ namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\ConnectionManager;
 use App\HttpServer\Controllers\PostController;
+use App\Server\Configuration;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
@@ -18,16 +19,23 @@ class ListSitesController extends PostController
 {
     /** @var ConnectionManager */
     protected $connectionManager;
+    /** @var Configuration */
+    protected $configuration;
 
-    public function __construct(ConnectionManager $connectionManager)
+    public function __construct(ConnectionManager $connectionManager, Configuration $configuration)
     {
         $this->connectionManager = $connectionManager;
+        $this->configuration = $configuration;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         try {
-            $sites = $this->getView('server.sites.index', ['sites' => $this->connectionManager->getConnections()]);
+            $sites = $this->getView('server.sites.index', [
+                'scheme' => $this->configuration->port() === 443 ? 'https' : 'http',
+                'configuration' => $this->configuration,
+                'sites' => $this->connectionManager->getConnections()
+            ]);
         } catch (\Exception $e) {
             dump($e->getMessage());
         }

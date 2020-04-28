@@ -32,6 +32,7 @@ class CliRequestLogger extends Logger
 
     public function logRequest(LoggedRequest $loggedRequest)
     {
+        return;
         if ($this->requests->has($loggedRequest->id())) {
             $this->requests[$loggedRequest->id()] = $loggedRequest;
         } else {

@@ -101,12 +101,6 @@ class HttpClient
                     $response->buffer .= $chunk;
 
                     $this->sendChunkToServer($chunk, $proxyConnection);
-
-                    if ($chunk === "") {
-                        $this->logResponse($response->buffer);
-
-                        optional($proxyConnection)->close();
-                    }
                 });
 
                 $body->on('close', function () use ($proxyConnection, $response) {
