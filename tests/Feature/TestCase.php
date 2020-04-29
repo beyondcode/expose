@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Client;
+namespace Tests\Feature;
 
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
@@ -12,7 +12,7 @@ use function Clue\React\Block\await;
 
 abstract class TestCase extends \Tests\TestCase
 {
-    const AWAIT_TIMEOUT = 1.0;
+    const AWAIT_TIMEOUT = 5.0;
 
     /** @var LoopInterface */
     protected $loop;

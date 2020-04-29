@@ -2,15 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
+use App\Http\Controllers\Concerns\LoadsViews;
+use App\Http\Controllers\Concerns\ParsesIncomingRequest;
+use Illuminate\Http\Request;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\stream_for;
 
 abstract class Controller implements HttpServerInterface
 {
+    use LoadsViews, ParsesIncomingRequest;
+
+    protected $keepConnectionOpen = false;
+
+    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
+    {
+        $connection->contentLength = $this->findContentLength($request->getHeaders());
+
+        $connection->requestBuffer = (string) $request->getBody();
+
+        $connection->request = $request;
+
+        $this->checkContentLength($connection);
+    }
+
     public function onClose(ConnectionInterface $connection)
     {
         unset($connection->requestBuffer);
@@ -18,25 +33,24 @@ abstract class Controller implements HttpServerInterface
         unset($connection->request);
     }
 
-    public function onError(ConnectionInterface $connection, Exception $e)
-    {
-    }
-
     public function onMessage(ConnectionInterface $from, $msg)
     {
+        if (! isset($from->requestBuffer)) {
+            $request = parse_request($msg);
+            $from->contentLength = $this->findContentLength($request->getHeaders());
+            $from->request = $request;
+            $from->requestBuffer = (string) $request->getBody();
+        } else {
+            $from->requestBuffer .= $msg;
+        }
+
+        $this->checkContentLength($from);
     }
 
-    protected function getView(string $view, array $data = [])
+    function onError(ConnectionInterface $conn, \Exception $e)
     {
-        $templatePath = implode(DIRECTORY_SEPARATOR, explode('.', $view));
-
-        $twig = new Environment(
-            new ArrayLoader([
-                'app' => file_get_contents(base_path('resources/views/server/layouts/app.twig')),
-                'template' => file_get_contents(base_path('resources/views/'.$templatePath.'.twig')),
-            ])
-        );
-
-        return stream_for($twig->render('template', $data));
+        //
     }
+
+    abstract public function handle(Request $request, ConnectionInterface $httpConnection);
 }

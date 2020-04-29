@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\QueryParameters;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
 use Psr\Http\Message\RequestInterface;
@@ -25,35 +26,17 @@ class ReplayLogController extends Controller
         $this->httpClient = $httpClient;
     }
 
-    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
+    public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $loggedRequest = $this->requestLogger->findLoggedRequest(QueryParameters::create($request)->get('log'));
+        $loggedRequest = $this->requestLogger->findLoggedRequest($request->get('log'));
 
         if (is_null($loggedRequest)) {
-            $connection->send(
-                str(new Response(
-                    404,
-                    ['Content-Type' => 'application/json'],
-                ))
-            );
-
-            $connection->close();
+            $httpConnection->send(str(new Response(404)));
             return;
         }
 
-        $requestData = $loggedRequest->getRequestData();
+        $this->httpClient->performRequest($loggedRequest->getRequestData());
 
-        /** @var HttpClient $tunnel */
-        $this->httpClient->performRequest($requestData);
-
-        $connection->send(
-            str(new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                ''
-            ))
-        );
-
-        $connection->close();
+        $httpConnection->send(str(new Response(200)));
     }
 }

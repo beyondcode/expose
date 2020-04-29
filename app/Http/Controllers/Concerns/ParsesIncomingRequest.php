@@ -1,45 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Concerns;
 
 use App\Http\QueryParameters;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
-use function GuzzleHttp\Psr7\parse_request;
 
-abstract class PostController extends Controller
+trait ParsesIncomingRequest
 {
-    protected $keepConnectionOpen = false;
-
-    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
-    {
-        $connection->contentLength = $this->findContentLength($request->getHeaders());
-
-        $connection->requestBuffer = (string) $request->getBody();
-
-        $connection->request = $request;
-
-        $this->checkContentLength($connection);
-    }
-
-    public function onMessage(ConnectionInterface $from, $msg)
-    {
-        if (! isset($from->requestBuffer)) {
-            $request = parse_request($msg);
-            $from->contentLength = $this->findContentLength($request->getHeaders());
-            $from->request = $request;
-            $from->requestBuffer = (string) $request->getBody();
-        } else {
-            $from->requestBuffer .= $msg;
-        }
-
-        $this->checkContentLength($from);
-    }
-
     protected function findContentLength(array $headers): int
     {
         return Collection::make($headers)->first(function ($values, $header) {
@@ -47,14 +18,21 @@ abstract class PostController extends Controller
             })[0] ?? 0;
     }
 
+    protected function shouldHandleRequest(Request $request, ConnectionInterface $httpConnection): bool
+    {
+        return true;
+    }
+
     protected function checkContentLength(ConnectionInterface $connection)
     {
         if (strlen($connection->requestBuffer) === $connection->contentLength) {
             $laravelRequest = $this->createLaravelRequest($connection);
 
-            $this->handle($laravelRequest, $connection);
+            if ($this->shouldHandleRequest($laravelRequest, $connection)) {
+                $this->handle($laravelRequest, $connection);
+            }
 
-            if (! $this->keepConnectionOpen) {
+            if (!$this->keepConnectionOpen) {
                 $connection->close();
             }
 
@@ -63,8 +41,6 @@ abstract class PostController extends Controller
             unset($connection->request);
         }
     }
-
-    abstract public function handle(Request $request, ConnectionInterface $httpConnection);
 
     protected function createLaravelRequest(ConnectionInterface $connection): Request
     {

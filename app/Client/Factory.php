@@ -104,7 +104,7 @@ class Factory
         $this->router->post('/logs', PushLogsToDashboardController::class);
         $this->router->get('/replay/{log}', ReplayLogController::class);
         $this->router->post('/logs/{request_id}/data', AttachDataToLogController::class);
-        $this->router->post('/logs/clear', ClearLogsController::class);
+        $this->router->get('/logs/clear', ClearLogsController::class);
 
         $this->app->route('/socket', new WsServer(new Socket()), ['*']);
 

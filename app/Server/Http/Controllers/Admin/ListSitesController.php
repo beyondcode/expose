@@ -3,7 +3,7 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\ConnectionManager;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
@@ -15,7 +15,7 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class ListSitesController extends PostController
+class ListSitesController extends AdminController
 {
     /** @var ConnectionManager */
     protected $connectionManager;

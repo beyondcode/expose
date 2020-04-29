@@ -3,6 +3,7 @@
 namespace App\Client\Http\Modifiers;
 
 use App\Client\Configuration;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\Client\WebSocket;
@@ -28,7 +29,7 @@ class CheckBasicAuthentication
 
         if (is_null($username)) {
             $proxyConnection->send(
-                str(new \GuzzleHttp\Psr7\Response(401, [
+                str(new Response(401, [
                     'WWW-Authenticate' => 'Basic realm=Expose'
                 ], 'Unauthorized'))
             );

@@ -2,14 +2,14 @@
 
 namespace App\Client\Http\Controllers;
 
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\Controller;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use App\Logger\RequestLogger;
 use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
 
-class AttachDataToLogController extends PostController
+class AttachDataToLogController extends Controller
 {
     /** @var RequestLogger */
     protected $requestLogger;

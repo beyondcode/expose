@@ -2,7 +2,7 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\Controller;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
@@ -15,7 +15,7 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class StoreUsersController extends PostController
+class StoreUsersController extends AdminController
 {
     protected $keepConnectionOpen = true;
 

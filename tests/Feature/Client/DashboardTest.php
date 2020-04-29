@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Tests\Feature\TestCase;
 use function GuzzleHttp\Psr7\str;
 
 class DashboardTest extends TestCase

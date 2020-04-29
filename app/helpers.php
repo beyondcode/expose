@@ -8,7 +8,7 @@ function respond_json($responseData, int $statusCode = 200)
     return str(new Response(
         $statusCode,
         ['Content-Type' => 'application/json'],
-        json_encode($responseData)
+        json_encode($responseData, JSON_INVALID_UTF8_IGNORE)
     ));
 }
 

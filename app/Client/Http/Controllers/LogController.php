@@ -5,6 +5,7 @@ namespace App\Client\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
 use Psr\Http\Message\RequestInterface;
@@ -19,16 +20,8 @@ class LogController extends Controller
         $this->requestLogger = $requestLogger;
     }
 
-    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
+    public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $connection->send(
-            str(new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                json_encode($this->requestLogger->getData(), JSON_INVALID_UTF8_IGNORE)
-            ))
-        );
-
-        $connection->close();
+        $httpConnection->send(respond_json($this->requestLogger->getData()));
     }
 }

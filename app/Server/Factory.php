@@ -10,6 +10,7 @@ use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\LoginController;
+use App\Server\Http\Controllers\Admin\RedirectToUsersController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\Admin\VerifyLoginController;
 use App\Server\Http\Controllers\ControlMessageController;
@@ -106,10 +107,9 @@ class Factory
 
     protected function addAdminRoutes()
     {
-        $adminCondition = 'request.headers.get("Host") matches "/'.config('expose.dashboard_subdomain').'\./i"';
+        $adminCondition = 'request.headers.get("Host") matches "/'.config('expose.admin.subdomain').'\./i"';
 
-        $this->router->get('/', LoginController::class, $adminCondition);
-        $this->router->post('/', VerifyLoginController::class, $adminCondition);
+        $this->router->get('/', RedirectToUsersController::class, $adminCondition);
         $this->router->get('/users', ListUsersController::class, $adminCondition);
         $this->router->post('/users', StoreUsersController::class, $adminCondition);
         $this->router->delete('/users/delete/{id}', DeleteUsersController::class, $adminCondition);
