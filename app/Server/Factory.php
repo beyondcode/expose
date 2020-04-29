@@ -49,6 +49,9 @@ class Factory
     /** @var RouteGenerator */
     protected $router;
 
+    /** @var Server */
+    protected $socket;
+
     public function __construct()
     {
         $this->loop = LoopFactory::create();
@@ -145,7 +148,7 @@ class Factory
 
     public function createServer()
     {
-        $socket = new Server("{$this->host}:{$this->port}", $this->loop);
+        $this->socket = new Server("{$this->host}:{$this->port}", $this->loop);
 
         $this->bindConfiguration()
             ->bindSubdomainGenerator()
@@ -164,11 +167,16 @@ class Factory
 
         $http = new HttpServer($router);
 
-        $server = new IoServer($http, $socket, $this->loop);
+        $server = new IoServer($http, $this->socket, $this->loop);
 
         $controlConnection->enableKeepAlive($this->loop);
 
         return $server;
+    }
+
+    public function getSocket(): Server
+    {
+        return $this->socket;
     }
 
     protected function bindDatabase()

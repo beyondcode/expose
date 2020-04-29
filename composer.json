@@ -11,8 +11,14 @@
     },
     "authors": [
         {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
+            "name": "Marcel Pociot",
+            "email": "marcel@beyondco.de"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pestphp/pest"
         }
     ],
     "require": {
@@ -38,7 +44,6 @@
         "ratchet/pawl": "^0.3.4",
         "react/socket": "^1.4",
         "riverline/multipart-parser": "^2.0",
-        "seregazhuk/react-promise-testing": "^0.4.0",
         "symfony/expression-language": "^5.0",
         "symfony/http-kernel": "^4.0|^5.0",
         "symfony/psr-http-message-bridge": "^2.0",
