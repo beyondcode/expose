@@ -4,7 +4,7 @@ namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
-use App\HttpServer\HttpServer;
+use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
@@ -14,7 +14,7 @@ use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\Admin\VerifyLoginController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
-use App\Server\Http\RouteGenerator;
+use App\Http\RouteGenerator;
 use App\Server\Http\Router;
 use App\Server\SubdomainGenerator\RandomSubdomainGenerator;
 use Clue\React\SQLite\DatabaseInterface;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Client\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use App\WebSockets\Socket;
 use GuzzleHttp\Psr7\Response;
@@ -10,7 +11,7 @@ use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
 use Psr\Http\Message\RequestInterface;
 
-class StoreLogController extends Controller
+class PushLogsToDashboardController extends Controller
 {
 
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)

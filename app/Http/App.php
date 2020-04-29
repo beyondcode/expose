@@ -1,6 +1,6 @@
 <?php
 
-namespace App\HttpServer;
+namespace App\Http;
 
 use Ratchet\Http\Router;
 use Ratchet\Server\IoServer;
@@ -12,12 +12,15 @@ use Symfony\Component\Routing\RouteCollection;
 
 class App extends \Ratchet\App
 {
+    /** @var Server */
+    protected $socket;
+
     public function __construct($httpHost, $port, $address, LoopInterface $loop)
     {
         $this->httpHost = $httpHost;
         $this->port = $port;
 
-        $socket = new Reactor($address.':'.$port, $loop);
+        $this->socket = new Reactor($address.':'.$port, $loop);
 
         $this->routes = new RouteCollection;
 
@@ -25,8 +28,13 @@ class App extends \Ratchet\App
 
         $router = new Router($urlMatcher);
 
-        $httpServer = new HttpServer($router);
+        $httpServer = new Server($router);
 
-        $this->_server = new IoServer($httpServer, $socket, $loop);
+        $this->_server = new IoServer($httpServer, $this->socket, $loop);
+    }
+
+    public function close()
+    {
+        $this->socket->close();
     }
 }

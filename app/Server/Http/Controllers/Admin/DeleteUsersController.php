@@ -2,7 +2,7 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
-use App\HttpServer\Controllers\PostController;
+use App\Http\Controllers\PostController;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;

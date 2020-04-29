@@ -1,8 +1,8 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Http\Controllers;
 
-use App\HttpServer\QueryParameters;
+use App\Http\QueryParameters;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;

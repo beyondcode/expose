@@ -19,6 +19,8 @@ class RequestLogger
     /** @var CliRequestLogger */
     protected $cliRequestLogger;
 
+    const MAX_LOGGED_REQUESTS = 10;
+
     public function __construct(Browser $browser, CliRequestLogger $cliRequestLogger)
     {
         $this->client = $browser;
@@ -32,17 +34,19 @@ class RequestLogger
         });
     }
 
-    public function logRequest(string $rawRequest, Request $request)
+    public function logRequest(string $rawRequest, Request $request): LoggedRequest
     {
         $loggedRequest = new LoggedRequest($rawRequest, $request);
 
         array_unshift($this->requests, $loggedRequest);
 
-        $this->requests = array_slice($this->requests, 0, 10);
+        $this->requests = array_slice($this->requests, 0, static::MAX_LOGGED_REQUESTS);
 
         $this->cliRequestLogger->logRequest($loggedRequest);
 
         $this->pushLogs();
+
+        return $loggedRequest;
     }
 
     public function logResponse(Request $request, string $rawResponse)
@@ -59,7 +63,7 @@ class RequestLogger
         }
     }
 
-    public function getData()
+    public function getData(): array
     {
         return $this->requests;
     }
@@ -73,6 +77,7 @@ class RequestLogger
 
     public function pushLogs()
     {
+        // TODO: Make dashboard part configurable
         $this
             ->client
             ->post(

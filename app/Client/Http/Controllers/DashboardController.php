@@ -1,8 +1,9 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Client\Http\Controllers;
 
 use App\Client\Client;
+use App\Http\Controllers\Controller;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;
 use Psr\Http\Message\RequestInterface;

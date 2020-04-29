@@ -3,7 +3,7 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
-use App\HttpServer\Controllers\PostController;
+use App\Http\Controllers\PostController;
 use App\Server\Configuration;
 use App\Server\Connections\ControlConnection;
 use GuzzleHttp\Psr7\Response;

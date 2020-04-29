@@ -94,6 +94,11 @@ class LoggedRequest implements \JsonSerializable
         $this->additionalData = array_merge($this->additionalData, $data);
     }
 
+    public function getAdditionalData(): array
+    {
+        return $this->additionalData;
+    }
+
     protected function isBinary(string $string): bool
     {
         return preg_match('~[^\x20-\x7E\t\r\n]~', $string) > 0;
@@ -122,24 +127,19 @@ class LoggedRequest implements \JsonSerializable
         }
     }
 
-    public function id()
+    public function id(): string
     {
         return $this->id;
     }
 
-    public function getRequestData()
+    public function getRequestData(): ?string
     {
         return $this->rawRequest;
     }
 
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->parsedResponse;
-    }
-
-    protected function getResponseBody()
-    {
-        return \Laminas\Http\Response::fromString($this->rawResponse)->getBody();
     }
 
     protected function getPost()

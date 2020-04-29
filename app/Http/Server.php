@@ -1,10 +1,10 @@
 <?php
 
-namespace App\HttpServer;
+namespace App\Http;
 
 use Ratchet\Http\HttpServerInterface;
 
-class HttpServer extends \Ratchet\Http\HttpServer
+class Server extends \Ratchet\Http\HttpServer
 {
     public function __construct(HttpServerInterface $component)
     {

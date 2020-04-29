@@ -1,6 +1,6 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Http\Controllers;
 
 use Exception;
 use Ratchet\ConnectionInterface;

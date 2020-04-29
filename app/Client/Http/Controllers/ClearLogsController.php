@@ -1,14 +1,17 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Client\Http\Controllers;
 
+use App\Client\Http\HttpClient;
+use App\Http\Controllers\Controller;
+use App\Http\QueryParameters;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
 use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
 use Psr\Http\Message\RequestInterface;
 
-class LogController extends Controller
+class ClearLogsController extends Controller
 {
     /** @var RequestLogger */
     protected $requestLogger;
@@ -20,11 +23,13 @@ class LogController extends Controller
 
     public function onOpen(ConnectionInterface $connection, RequestInterface $request = null)
     {
+        $this->requestLogger->clear();
+
         $connection->send(
             str(new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                json_encode($this->requestLogger->getData(), JSON_INVALID_UTF8_IGNORE)
+                ''
             ))
         );
 

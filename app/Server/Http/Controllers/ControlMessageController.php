@@ -3,7 +3,7 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
-use App\HttpServer\QueryParameters;
+use App\Http\QueryParameters;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use Ratchet\WebSocket\MessageComponentInterface;

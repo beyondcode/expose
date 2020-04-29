@@ -2,7 +2,7 @@
 
 namespace App\Server\Http;
 
-use App\HttpServer\QueryParameters;
+use App\Http\QueryParameters;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;

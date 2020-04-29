@@ -2,14 +2,16 @@
 
 namespace App\Client;
 
+use App\Client\Http\Controllers\PushLogsToDashboardController;
 use App\Client\Http\HttpClient;
-use App\HttpServer\App;
-use App\HttpServer\Controllers\AttachDataToLogController;
-use App\HttpServer\Controllers\ClearLogsController;
-use App\HttpServer\Controllers\DashboardController;
-use App\HttpServer\Controllers\LogController;
-use App\HttpServer\Controllers\ReplayLogController;
-use App\HttpServer\Controllers\StoreLogController;
+use App\Http\App;
+use App\Client\Http\Controllers\AttachDataToLogController;
+use App\Client\Http\Controllers\ClearLogsController;
+use App\Client\Http\Controllers\DashboardController;
+use App\Client\Http\Controllers\LogController;
+use App\Client\Http\Controllers\ReplayLogController;
+use App\Http\Controllers\StoreLogController;
+use App\Http\RouteGenerator;
 use App\WebSockets\Socket;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\LoopInterface;
@@ -33,9 +35,13 @@ class Factory
     /** @var App */
     protected $app;
 
+    /** @var RouteGenerator */
+    protected $router;
+
     public function __construct()
     {
         $this->loop = LoopFactory::create();
+        $this->router = new RouteGenerator();
     }
 
     public function setHost(string $host)
@@ -93,21 +99,18 @@ class Factory
 
     protected function addRoutes()
     {
-        $dashboardRoute = new Route('/', ['_controller' => app(DashboardController::class)], [], [], null, [], ['GET']);
-        $logRoute = new Route('/logs', ['_controller' => app(LogController::class)], [], [], null, [], ['GET']);
-        $storeLogRoute = new Route('/logs', ['_controller' => app(StoreLogController::class)], [], [], null, [], ['POST']);
-        $replayLogRoute = new Route('/replay/{log}', ['_controller' => app(ReplayLogController::class)], [], [], null, [], ['GET']);
-        $attachLogDataRoute = new Route('/logs/{request_id}/data', ['_controller' => app(AttachDataToLogController::class)], [], [], null, [], ['POST']);
-        $clearLogsRoute = new Route('/logs/clear', ['_controller' => app(ClearLogsController::class)], [], [], null, [], ['GET']);
+        $this->router->get('/', DashboardController::class);
+        $this->router->get('/logs', LogController::class);
+        $this->router->post('/logs', PushLogsToDashboardController::class);
+        $this->router->get('/replay/{log}', ReplayLogController::class);
+        $this->router->post('/logs/{request_id}/data', AttachDataToLogController::class);
+        $this->router->post('/logs/clear', ClearLogsController::class);
 
         $this->app->route('/socket', new WsServer(new Socket()), ['*']);
 
-        $this->app->routes->add('dashboard', $dashboardRoute);
-        $this->app->routes->add('logs', $logRoute);
-        $this->app->routes->add('storeLogs', $storeLogRoute);
-        $this->app->routes->add('replayLog', $replayLogRoute);
-        $this->app->routes->add('attachLogData', $attachLogDataRoute);
-        $this->app->routes->add('clearLogs', $clearLogsRoute);
+        foreach ($this->router->getRoutes()->all() as $name => $route) {
+            $this->app->routes->add($name, $route);
+        }
     }
 
     protected function detectNextFreeDashboardPort($port = 4040): int
@@ -136,6 +139,11 @@ class Factory
         $this->addRoutes();
 
         return $this;
+    }
+
+    public function getApp(): App
+    {
+        return $this->app;
     }
 
     public function run()

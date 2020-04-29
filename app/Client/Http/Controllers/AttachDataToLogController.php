@@ -1,10 +1,13 @@
 <?php
 
-namespace App\HttpServer\Controllers;
+namespace App\Client\Http\Controllers;
 
+use App\Http\Controllers\PostController;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use App\Logger\RequestLogger;
 use Ratchet\ConnectionInterface;
+use function GuzzleHttp\Psr7\str;
 
 class AttachDataToLogController extends PostController
 {
@@ -24,6 +27,11 @@ class AttachDataToLogController extends PostController
             $loggedRequest->setAdditionalData((array)$request->get('data', []));
 
             $this->requestLogger->pushLogs();
+
+            $httpConnection->send(str(new Response(200)));
+            return;
         }
+
+        $httpConnection->send(str(new Response(404)));
     }
 }
