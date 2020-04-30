@@ -34,7 +34,6 @@ class Configuration
 
     public function __get($key)
     {
-        dump(config('expose.admin'));
         return $this->$key ?? config('expose.admin.'.$key);
     }
 }
