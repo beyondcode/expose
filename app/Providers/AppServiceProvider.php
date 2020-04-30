@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
 
         $configFile = implode(DIRECTORY_SEPARATOR, [
-            $_SERVER['HOME'],
+            $_SERVER['HOME'] ?? __DIR__,
             '.expose',
             'config.php'
         ]);
