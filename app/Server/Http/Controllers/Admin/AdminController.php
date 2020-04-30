@@ -25,7 +25,7 @@ abstract class AdminController extends Controller
         } catch (\Throwable $e) {
             $httpConnection->send(str(new Response(401, [
                 'WWW-Authenticate' => 'Basic realm="Expose"'
-            ], 'foo')));
+            ])));
         }
         return false;
     }
