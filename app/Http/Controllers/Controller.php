@@ -12,7 +12,8 @@ use function GuzzleHttp\Psr7\parse_request;
 
 abstract class Controller implements HttpServerInterface
 {
-    use LoadsViews, ParsesIncomingRequest;
+    use LoadsViews;
+    use ParsesIncomingRequest;
 
     protected $keepConnectionOpen = false;
 
@@ -29,6 +30,7 @@ abstract class Controller implements HttpServerInterface
 
     public function onClose(ConnectionInterface $connection)
     {
+        unset($connection->laravelRequest);
         unset($connection->requestBuffer);
         unset($connection->contentLength);
         unset($connection->request);

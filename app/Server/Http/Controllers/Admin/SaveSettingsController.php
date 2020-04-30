@@ -15,10 +15,11 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class ListSitesController extends AdminController
+class SaveSettingsController extends AdminController
 {
     /** @var ConnectionManager */
     protected $connectionManager;
+
     /** @var Configuration */
     protected $configuration;
 
@@ -30,18 +31,10 @@ class ListSitesController extends AdminController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        try {
-            $sites = $this->getView($httpConnection, 'server.sites.index', [
-                'scheme' => $this->configuration->port() === 443 ? 'https' : 'http',
-                'configuration' => $this->configuration,
-                'sites' => $this->connectionManager->getConnections()
-            ]);
-        } catch (\Exception $e) {
-            dump($e->getMessage());
-        }
+        config()->set('expose.admin.validate_auth_tokens', $request->has('validate_auth_tokens'));
 
-        $httpConnection->send(
-            respond_html($sites)
-        );
+        $httpConnection->send(str(new Response(301, [
+            'Location' => '/settings'
+        ])));
     }
 }

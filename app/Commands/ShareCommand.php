@@ -33,7 +33,8 @@ class ShareCommand extends Command
             ->setHost(config('expose.host', 'localhost'))
             ->setPort(config('expose.port', 8080))
             ->setAuth($this->option('auth'))
-            ->createClient($this->argument('host'), explode(',', $this->option('subdomain')))
+            ->createClient()
+            ->share($this->argument('host'), explode(',', $this->option('subdomain')))
             ->createHttpServer()
             ->run();
     }

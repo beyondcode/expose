@@ -2,10 +2,14 @@
 
 return [
     'host' => 'expose.dev',
-    'port' => 8080,
+    'port' => 443,
     'auth_token' => '',
 
     'admin' => [
+
+        'database' => base_path('database/expose.db'),
+
+        'validate_auth_tokens' => false,
 
         /*
         |--------------------------------------------------------------------------

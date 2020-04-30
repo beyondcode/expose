@@ -26,10 +26,10 @@ trait ParsesIncomingRequest
     protected function checkContentLength(ConnectionInterface $connection)
     {
         if (strlen($connection->requestBuffer) === $connection->contentLength) {
-            $laravelRequest = $this->createLaravelRequest($connection);
+            $connection->laravelRequest = $this->createLaravelRequest($connection);
 
-            if ($this->shouldHandleRequest($laravelRequest, $connection)) {
-                $this->handle($laravelRequest, $connection);
+            if ($this->shouldHandleRequest($connection->laravelRequest, $connection)) {
+                $this->handle($connection->laravelRequest, $connection);
             }
 
             if (!$this->keepConnectionOpen) {

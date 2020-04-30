@@ -42,6 +42,7 @@
         "nyholm/psr7": "^1.2",
         "phpunit/phpunit": "^8.5",
         "ratchet/pawl": "^0.3.4",
+        "react/http": "^0.8.6",
         "react/socket": "^1.4",
         "riverline/multipart-parser": "^2.0",
         "symfony/expression-language": "^5.0",

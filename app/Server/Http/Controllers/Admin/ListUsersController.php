@@ -29,7 +29,7 @@ class ListUsersController extends AdminController
     {
         $this->database->query('SELECT * FROM users ORDER by created_at DESC')->then(function (Result $result) use ($httpConnection) {
             $httpConnection->send(
-                respond_html($this->getView('server.users.index', ['users' => $result->rows]))
+                respond_html($this->getView($httpConnection, 'server.users.index', ['users' => $result->rows]))
             );
 
             $httpConnection->close();

@@ -2,11 +2,15 @@
 
 namespace Tests\Feature\Server;
 
+use App\Contracts\ConnectionManager;
 use App\Http\Server;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
+use Ratchet\Server\IoConnection;
 use React\Socket\Connector;
 use Tests\Feature\TestCase;
 
@@ -49,10 +53,6 @@ class AdminTest extends TestCase
     /** @test */
     public function it_accepts_valid_credentials()
     {
-        $this->app['config']['expose.admin.users'] = [
-            'username' => 'secret',
-        ];
-
         /** @var ResponseInterface $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080', [
             'Host' => 'expose.localhost',
@@ -61,8 +61,67 @@ class AdminTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    /** @test */
+    public function it_allows_saving_settings()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
+        /** @var ResponseInterface $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/settings', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ], json_encode([
+            'validate_auth_tokens' => true,
+        ])));
+
+        $this->assertTrue(config('expose.admin.validate_auth_tokens'));
+    }
+
+    /** @test */
+    public function it_can_create_users()
+    {
+        $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        $this->assertDatabaseHasResults('SELECT * FROM users WHERE name = "Marcel"');
+    }
+
+    /** @test */
+    public function it_can_list_all_currently_connected_sites()
+    {
+        /** @var ConnectionManager $connectionManager */
+        $connectionManager = app(ConnectionManager::class);
+
+        $connection = \Mockery::mock(IoConnection::class);
+        $connectionManager->storeConnection('some-host.text', 'fixed-subdomain', $connection);
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/sites', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ]));
+
+        $body = $response->getBody()->getContents();
+
+        $this->assertTrue(Str::contains($body, 'some-host.text'));
+        $this->assertTrue(Str::contains($body, 'fixed-subdomain'));
+    }
+
     protected function startServer()
     {
+        $this->app['config']['expose.admin.database'] = ':memory:';
+
+        $this->app['config']['expose.admin.users'] = [
+            'username' => 'secret',
+        ];
+
         $this->serverFactory = new Factory();
 
         $this->serverFactory->setLoop($this->loop)

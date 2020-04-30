@@ -86,12 +86,17 @@ class Factory
         });
     }
 
-    public function createClient($sharedUrl, $subdomain = null, $auth = null)
+    public function createClient()
     {
         $this->bindConfiguration();
 
         $this->bindProxyManager();
 
+        return $this;
+    }
+
+    public function share($sharedUrl, $subdomain = null)
+    {
         app(Client::class)->share($sharedUrl, $subdomain);
 
         return $this;
@@ -131,7 +136,7 @@ class Factory
 
             echo("Started Dashboard on port {$dashboardPort}" . PHP_EOL);
 
-            echo('If the dashboard does not automatically open, visit: ' . $dashboardUrl . PHP_EOL);
+            echo('You can visit the dashboard at: ' . $dashboardUrl . PHP_EOL);
         });
 
         $this->app = new App('127.0.0.1', $dashboardPort, '0.0.0.0', $this->loop);

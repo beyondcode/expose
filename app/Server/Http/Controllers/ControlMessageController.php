@@ -74,7 +74,7 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function authenticate(ConnectionInterface $connection, $data)
     {
-        if (config('expose.validate_auth_tokens') === true) {
+        if (config('expose.admin.validate_auth_tokens') === true) {
             $this->verifyAuthToken($connection);
         }
 

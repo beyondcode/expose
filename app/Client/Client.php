@@ -6,6 +6,7 @@ use App\Client\Connections\ControlConnection;
 use App\Logger\CliRequestLogger;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use function Ratchet\Client\connect;
 
 class Client
@@ -37,8 +38,11 @@ class Client
         }
     }
 
-    protected function connectToServer(string $sharedUrl, $subdomain)
+    public function connectToServer(string $sharedUrl, $subdomain): PromiseInterface
     {
+        $deferred = new \React\Promise\Deferred();
+        $promise = $deferred->promise();
+
         $token = config('expose.auth_token');
 
         $wsProtocol = $this->configuration->port() === 443 ? "wss" : "ws";
@@ -46,7 +50,7 @@ class Client
         connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$token}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
-            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain) {
+            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $deferred) {
                 $connection = ControlConnection::create($clientConnection);
 
                 $connection->authenticate($sharedUrl, $subdomain);
@@ -66,7 +70,7 @@ class Client
                     exit(1);
                 });
 
-                $connection->on('authenticated', function ($data) {
+                $connection->on('authenticated', function ($data) use ($deferred) {
                     $httpProtocol = $this->configuration->port() === 443 ? "https" : "http";
                     $host = $this->configuration->host();
 
@@ -77,12 +81,19 @@ class Client
                     $this->logger->info("Connected to {$httpProtocol}://{$data->subdomain}.{$host}");
 
                     static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";
+
+                    $deferred->resolve();
                 });
 
-            }, function (\Exception $e) {
+            }, function (\Exception $e) use ($deferred) {
                 $this->logger->error("Could not connect to the server.");
                 $this->logger->error($e->getMessage());
+
+                $deferred->reject();
+
                 exit(1);
             });
+
+        return $promise;
     }
 }

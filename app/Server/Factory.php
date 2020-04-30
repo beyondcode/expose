@@ -11,6 +11,8 @@ use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\LoginController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
+use App\Server\Http\Controllers\Admin\SaveSettingsController;
+use App\Server\Http\Controllers\Admin\ShowSettingsController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\Admin\VerifyLoginController;
 use App\Server\Http\Controllers\ControlMessageController;
@@ -114,6 +116,8 @@ class Factory
 
         $this->router->get('/', RedirectToUsersController::class, $adminCondition);
         $this->router->get('/users', ListUsersController::class, $adminCondition);
+        $this->router->get('/settings', ShowSettingsController::class, $adminCondition);
+        $this->router->post('/settings', SaveSettingsController::class, $adminCondition);
         $this->router->post('/users', StoreUsersController::class, $adminCondition);
         $this->router->delete('/users/delete/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
@@ -183,7 +187,7 @@ class Factory
     {
         app()->singleton(DatabaseInterface::class, function() {
             $factory = new \Clue\React\SQLite\Factory($this->loop);
-            return $factory->openLazy(base_path('database/expose.db'));
+            return $factory->openLazy(config('expose.admin.database', ':memory:'));
         });
 
         return $this;
@@ -210,7 +214,7 @@ class Factory
 
     public function validateAuthTokens(bool $validate)
     {
-        config()->set('expose.validate_auth_tokens', $validate);
+        config()->set('expose.admin.validate_auth_tokens', $validate);
 
         return $this;
     }

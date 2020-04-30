@@ -26,4 +26,15 @@ class Configuration
     {
         return $this->port;
     }
+
+    public function __isset($key)
+    {
+        return property_exists($this, $key) || ! is_null(config('expose.admin.'.$key));
+    }
+
+    public function __get($key)
+    {
+        dump(config('expose.admin'));
+        return $this->$key ?? config('expose.admin.'.$key);
+    }
 }

@@ -44,7 +44,7 @@ class TunnelMessageController extends Controller
 
         if (is_null($controlConnection)) {
             $httpConnection->send(
-                respond_html($this->getView('server.errors.404', ['subdomain' => $subdomain]))
+                respond_html($this->getView($httpConnection, 'server.errors.404', ['subdomain' => $subdomain]), 404)
             );
             $httpConnection->close();
             return;

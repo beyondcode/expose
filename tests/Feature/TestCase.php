@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use Clue\React\SQLite\DatabaseInterface;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ResponseInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\StreamSelectLoop;
@@ -32,5 +36,14 @@ abstract class TestCase extends \Tests\TestCase
     protected function await(PromiseInterface $promise, LoopInterface $loop = null, $timeout = null)
     {
         return await($promise, $loop ?? $this->loop, $timeout ?? static::AWAIT_TIMEOUT);
+    }
+
+    protected function assertDatabaseHasResults($query)
+    {
+        $database = app(DatabaseInterface::class);
+
+        $result = $this->await($database->query($query));
+
+        $this->assertGreaterThanOrEqual(1, count($result->rows));
     }
 }

@@ -15,7 +15,7 @@ class DashboardController extends Controller
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $httpConnection->send(respond_html($this->getView('client.dashboard', [
+        $httpConnection->send(respond_html($this->getView($httpConnection, 'client.dashboard', [
             'subdomains' => Client::$subdomains,
         ])));
     }

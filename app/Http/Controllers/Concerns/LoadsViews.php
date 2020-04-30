@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use Ratchet\ConnectionInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\stream_for;
 
 trait LoadsViews
 {
-    protected function getView(string $view, array $data = [])
+    protected function getView(ConnectionInterface $connection, string $view, array $data = [])
     {
         $templatePath = implode(DIRECTORY_SEPARATOR, explode('.', $view));
 
@@ -18,6 +19,10 @@ trait LoadsViews
                 'template' => file_get_contents(base_path('resources/views/'.$templatePath.'.twig')),
             ])
         );
+
+        $data = array_merge($data, [
+            'request' => $connection->laravelRequest ?? null,
+        ]);
 
         return stream_for($twig->render('template', $data));
     }
