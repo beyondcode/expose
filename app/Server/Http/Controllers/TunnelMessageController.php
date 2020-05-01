@@ -6,6 +6,7 @@ use App\Contracts\ConnectionManager;
 use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use App\Server\Connections\ControlConnection;
+use App\Server\Connections\HttpConnection;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\Frame;
+use React\Promise\Deferred;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use function GuzzleHttp\Psr7\str;
 
@@ -22,13 +24,11 @@ class TunnelMessageController extends Controller
     protected $connectionManager;
 
     /** @var Configuration */
-    private $configuration;
+    protected $configuration;
 
     protected $keepConnectionOpen = true;
 
-    protected $middleware = [
-
-    ];
+    protected $modifiers = [];
 
     public function __construct(ConnectionManager $connectionManager, Configuration $configuration)
     {
@@ -62,26 +62,38 @@ class TunnelMessageController extends Controller
 
     protected function sendRequestToClient(Request $request, ControlConnection $controlConnection, ConnectionInterface $httpConnection)
     {
-        (new Pipeline(app()))
-            ->send($this->prepareRequest($request, $controlConnection))
-            ->through($this->middleware)
-            ->then(function ($request) use ($controlConnection, $httpConnection) {
-                $requestId = $request->header('X-Expose-Request-ID');
+        $request = $this->prepareRequest($request, $controlConnection);
 
-                $this->connectionManager->storeHttpConnection($httpConnection, $requestId);
+        $requestId = $request->header('X-Expose-Request-ID');
 
-                $controlConnection->once('proxy_ready_' . $requestId, function (ConnectionInterface $proxy) use ($request) {
-                    // Convert the Laravel request into a PSR7 request
-                    $psr17Factory = new Psr17Factory();
-                    $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-                    $request = $psrHttpFactory->createRequest($request);
+        $httpConnection = $this->connectionManager->storeHttpConnection($httpConnection, $requestId);
 
-                    $binaryMsg = new Frame(str($request), true, Frame::OP_BINARY);
-                    $proxy->send($binaryMsg);
-                });
+        transform($this->passRequestThroughModifiers($request, $httpConnection), function (Request $request) use ($controlConnection, $httpConnection, $requestId) {
+            $controlConnection->once('proxy_ready_' . $requestId, function (ConnectionInterface $proxy) use ($request) {
+                // Convert the Laravel request into a PSR7 request
+                $psr17Factory = new Psr17Factory();
+                $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+                $request = $psrHttpFactory->createRequest($request);
 
-                $controlConnection->registerProxy($requestId);
+                $binaryMsg = new Frame(str($request), true, Frame::OP_BINARY);
+                $proxy->send($binaryMsg);
             });
+
+            $controlConnection->registerProxy($requestId);
+        });
+    }
+
+    protected function passRequestThroughModifiers(Request $request, HttpConnection $httpConnection): ?Request
+    {
+        foreach ($this->modifiers as $modifier) {
+            $request = app($modifier)->handle($request, $httpConnection);
+
+            if (is_null($request)) {
+                break;
+            }
+        }
+
+        return $request;
     }
 
     protected function prepareRequest(Request $request, ControlConnection $controlConnection): Request

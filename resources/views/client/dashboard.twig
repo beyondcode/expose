@@ -238,8 +238,8 @@
                             Post Parameters
                         </dt>
                     </div>
-                    <div v-for="(parameter, name) in currentLog.request.post"
-                         :key="'post_' + name"
+                    <div v-for="parameter in currentLog.request.post"
+                         :key="'post_' + parameter.name"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-500">
                             @{ parameter.name }

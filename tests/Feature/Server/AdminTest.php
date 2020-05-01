@@ -27,6 +27,9 @@ class AdminTest extends TestCase
         parent::setUp();
 
         $this->browser = new Browser($this->loop);
+        $this->browser = $this->browser->withOptions([
+            'followRedirects' => false,
+        ]);
 
         $this->startServer();
     }
@@ -54,11 +57,11 @@ class AdminTest extends TestCase
     public function it_accepts_valid_credentials()
     {
         /** @var ResponseInterface $response */
-        $response = $this->await($this->browser->get('http://127.0.0.1:8080', [
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
         ]));
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(301, $response->getStatusCode());
     }
 
     /** @test */
@@ -116,6 +119,7 @@ class AdminTest extends TestCase
 
     protected function startServer()
     {
+        $this->app['config']['expose.admin.subdomain'] = 'expose';
         $this->app['config']['expose.admin.database'] = ':memory:';
 
         $this->app['config']['expose.admin.users'] = [

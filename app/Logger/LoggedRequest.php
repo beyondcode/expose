@@ -65,7 +65,7 @@ class LoggedRequest implements \JsonSerializable
                 'headers' => $this->parsedRequest->getHeaders()->toArray(),
                 'body' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->parsedRequest->getContent(),
                 'query' => $this->parsedRequest->getQuery()->toArray(),
-                'post' => $this->getPost(),
+                'post' => $this->getPostData(),
                 'curl' => '', //(new CurlFormatter())->format(parse_request($this->rawRequest)),
                 'additional_data' => $this->additionalData,
             ],
@@ -142,7 +142,7 @@ class LoggedRequest implements \JsonSerializable
         return $this->parsedResponse;
     }
 
-    protected function getPost()
+    public function getPostData()
     {
         $postData = [];
 
@@ -151,7 +151,7 @@ class LoggedRequest implements \JsonSerializable
         switch ($contentType) {
             case 'application/x-www-form-urlencoded':
                 parse_str($this->parsedRequest->getContent(), $postData);
-                $postData = collect($postData)->map(function ($key, $value) {
+                $postData = collect($postData)->map(function ($value, $key) {
                     return [
                         'name' => $key,
                         'value' => $value,
@@ -159,12 +159,12 @@ class LoggedRequest implements \JsonSerializable
                 })->toArray();
                 break;
             case 'application/json':
-                $postData = collect(json_decode($this->parsedRequest->getContent(), true))->map(function ($key, $value) {
+                $postData = collect(json_decode($this->parsedRequest->getContent(), true))->map(function ($value, $key) {
                     return [
                         'name' => $key,
                         'value' => $value,
                     ];
-                })->toArray();
+                })->values()->toArray();
 
                 break;
             default:

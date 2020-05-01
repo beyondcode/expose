@@ -28,6 +28,7 @@
     "require-dev": {
         "bfunky/http-parser": "^2.2",
         "cboden/ratchet": "^0.4.2",
+        "clue/block-react": "^1.3",
         "clue/buzz-react": "^2.7",
         "clue/reactphp-sqlite": "^1.0",
         "guzzlehttp/guzzle": "^6.5",

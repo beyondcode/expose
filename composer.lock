@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "801c0ab8f694ff370f2eefea409a7fcc",
+    "content-hash": "710c897a2bbd37c60950d540b46ba1b5",
     "packages": [],
     "packages-dev": [
         {
@@ -2561,21 +2561,22 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.32.2",
+            "version": "2.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "f10e22cf546704fab1db4ad4b9dedbc5c797a0dc"
+                "reference": "4d93cb95a80d9ffbff4018fe58ae3b7dd7f4b99b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/f10e22cf546704fab1db4ad4b9dedbc5c797a0dc",
-                "reference": "f10e22cf546704fab1db4ad4b9dedbc5c797a0dc",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/4d93cb95a80d9ffbff4018fe58ae3b7dd7f4b99b",
+                "reference": "4d93cb95a80d9ffbff4018fe58ae3b7dd7f4b99b",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^7.1.8 || ^8.0",
+                "symfony/polyfill-mbstring": "^1.0",
                 "symfony/translation": "^3.4 || ^4.0 || ^5.0"
             },
             "require-dev": {
@@ -2628,7 +2629,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2020-03-31T13:43:19+00:00"
+            "time": "2020-04-20T15:05:43+00:00"
         },
         {
             "name": "nunomaduro/collision",
@@ -5535,55 +5536,6 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
-        },
-        {
-            "name": "seregazhuk/react-promise-testing",
-            "version": "0.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/seregazhuk/php-react-promise-testing.git",
-                "reference": "a56481a6feae2cb51f91d554af41a66802a01a37"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/seregazhuk/php-react-promise-testing/zipball/a56481a6feae2cb51f91d554af41a66802a01a37",
-                "reference": "a56481a6feae2cb51f91d554af41a66802a01a37",
-                "shasum": ""
-            },
-            "require": {
-                "clue/block-react": "^1.3",
-                "php": ">=7.2",
-                "phpunit/phpunit": "^8.2",
-                "react/promise": "^2.7"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "^0.4.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "seregazhuk\\React\\PromiseTesting\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sergey Zhuk",
-                    "email": "seregazhuk88@gmail.com"
-                }
-            ],
-            "description": "PHPUnit-based library for testing ReactPHP promises",
-            "homepage": "https://github.com/seregazhuk/php-react-promise-testing",
-            "keywords": [
-                "promise",
-                "reactphp",
-                "test",
-                "testing"
-            ],
-            "time": "2020-03-09T12:02:56+00:00"
         },
         {
             "name": "symfony/cache",

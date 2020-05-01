@@ -35,14 +35,14 @@ class ConnectionManager implements ConnectionManagerContract
         return $storedConnection;
     }
 
-    public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): ConnectionInterface
+    public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection
     {
-        $this->httpConnections[$requestId] = $httpConnection;
+        $this->httpConnections[$requestId] = new HttpConnection($httpConnection);
 
-        return $httpConnection;
+        return $this->httpConnections[$requestId];
     }
 
-    public function getHttpConnectionForRequestId(string $requestId): ?ConnectionInterface
+    public function getHttpConnectionForRequestId(string $requestId): ?HttpConnection
     {
         return $this->httpConnections[$requestId] ?? null;
     }

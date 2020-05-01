@@ -51,7 +51,7 @@ class ControlMessageController implements MessageComponentInterface
     function onMessage(ConnectionInterface $connection, $msg)
     {
         if (isset($connection->request_id)) {
-            return $this->sendRequestToHttpConnection($connection->request_id, $msg);
+            return $this->sendResponseToHttpConnection($connection->request_id, $msg);
         }
 
         try {
@@ -66,10 +66,11 @@ class ControlMessageController implements MessageComponentInterface
         }
     }
 
-    protected function sendRequestToHttpConnection(string $requestId, $request)
+    protected function sendResponseToHttpConnection(string $requestId, $response)
     {
         $httpConnection = $this->connectionManager->getHttpConnectionForRequestId($requestId);
-        $httpConnection->send($request);
+
+        $httpConnection->send($response);
     }
 
     protected function authenticate(ConnectionInterface $connection, $data)

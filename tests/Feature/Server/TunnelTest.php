@@ -33,6 +33,13 @@ class TunnelTest extends TestCase
         $this->startServer();
     }
 
+    public function tearDown(): void
+    {
+        $this->serverFactory->getSocket()->close();
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_returns_404_for_non_existing_clients()
     {

@@ -3,15 +3,16 @@
 namespace App\Contracts;
 
 use App\Server\Connections\ControlConnection;
+use App\Server\Connections\HttpConnection;
 use Ratchet\ConnectionInterface;
 
 interface ConnectionManager
 {
     public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection;
 
-    public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): ConnectionInterface;
+    public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection;
 
-    public function getHttpConnectionForRequestId(string $requestId): ?ConnectionInterface;
+    public function getHttpConnectionForRequestId(string $requestId): ?HttpConnection;
 
     public function removeControlConnection($connection);
 

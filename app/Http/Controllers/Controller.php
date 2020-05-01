@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
+use React\Promise\PromiseInterface;
 use function GuzzleHttp\Psr7\parse_request;
 
 abstract class Controller implements HttpServerInterface
