@@ -2,9 +2,8 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
+use App\Contracts\UserRepository;
 use App\Http\Controllers\Controller;
-use Clue\React\SQLite\DatabaseInterface;
-use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -19,20 +18,20 @@ class DeleteUsersController extends AdminController
 {
     protected $keepConnectionOpen = true;
 
-    /** @var DatabaseInterface */
-    protected $database;
+    /** @var UserRepository */
+    protected $userRepository;
 
-    public function __construct(DatabaseInterface $database)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->database = $database;
+        $this->userRepository = $userRepository;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $this->database->query("DELETE FROM users WHERE id = :id", ['id' => $request->id])
-                ->then(function (Result $result) use ($httpConnection) {
-                    $httpConnection->send(respond_json(['deleted' => true], 200));
-                    $httpConnection->close();
-                });
+        $this->userRepository->deleteUser($request->get('id'))
+            ->then(function() use ($httpConnection) {
+                $httpConnection->send(respond_json(['deleted' => true], 200));
+                $httpConnection->close();
+            });
     }
 }

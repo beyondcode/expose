@@ -11,6 +11,20 @@ return [
 
         'validate_auth_tokens' => false,
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Maximum session length
+        |--------------------------------------------------------------------------
+        |
+        | If you want to limit the amount of time that a single connection can
+        | stay connected to the expose server, you can specify the maximum
+        | session length in minutes here. A maximum length of 0 means that
+        | clients can stay connected as long as they want.
+        |
+        */
+        'maximum_session_length' => 0,
+
         /*
         |--------------------------------------------------------------------------
         | Subdomain
@@ -25,6 +39,18 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Subdomain Generator
+        |--------------------------------------------------------------------------
+        |
+        | This is the subdomain generator that will be used, when no specific
+        | subdomain was provided. The default implementation simply generates
+        | a random string for you. Feel free to change this.
+        |
+        */
+        'subdomain_generator' => \App\Server\SubdomainGenerator\RandomSubdomainGenerator::class,
+
+        /*
+        |--------------------------------------------------------------------------
         | Users
         |--------------------------------------------------------------------------
         |
@@ -35,6 +61,18 @@ return [
         */
         'users' => [
             'username' => 'password'
-        ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | User Repository
+        |--------------------------------------------------------------------------
+        |
+        | This is the user repository, which by default loads and saves all authorized
+        | users in a SQLite database. You can implement your own user repository
+        | if you want to store your users in a different store (Redis, MySQL, etc.)
+        |
+        */
+        'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
     ]
 ];

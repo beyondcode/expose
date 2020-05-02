@@ -4,8 +4,10 @@ namespace App\Client;
 
 use App\Client\Connections\ControlConnection;
 use App\Logger\CliRequestLogger;
+use Carbon\Carbon;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
+use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use function Ratchet\Client\connect;
 
@@ -19,6 +21,9 @@ class Client
 
     /** @var CliRequestLogger */
     protected $logger;
+
+    /** @var int */
+    protected $timeConnected = 0;
 
     public static $subdomains = [];
 
@@ -34,20 +39,18 @@ class Client
         $this->logger->info("Sharing http://{$sharedUrl}");
 
         foreach ($subdomains as $subdomain) {
-            $this->connectToServer($sharedUrl, $subdomain);
+            $this->connectToServer($sharedUrl, $subdomain, config('expose.auth_token'));
         }
     }
 
-    public function connectToServer(string $sharedUrl, $subdomain): PromiseInterface
+    public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
     {
         $deferred = new \React\Promise\Deferred();
         $promise = $deferred->promise();
 
-        $token = config('expose.auth_token');
-
         $wsProtocol = $this->configuration->port() === 443 ? "wss" : "ws";
 
-        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$token}", [], [
+        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $deferred) {
@@ -55,19 +58,32 @@ class Client
 
                 $connection->authenticate($sharedUrl, $subdomain);
 
-                $clientConnection->on('close', function() {
+                $clientConnection->on('close', function() use ($deferred) {
                     $this->logger->error('Connection to server closed.');
-                    exit(1);
+
+                    $this->exit($deferred);
                 });
 
-                $connection->on('authenticationFailed', function ($data) {
+                $connection->on('authenticationFailed', function ($data) use ($deferred) {
                     $this->logger->error("Authentication failed. Please check your authentication token and try again.");
-                    exit(1);
+
+                    $this->exit($deferred);
                 });
 
-                $connection->on('subdomainTaken', function ($data) {
+                $connection->on('subdomainTaken', function ($data) use ($deferred) {
                     $this->logger->error("The chosen subdomain \"{$data->data->subdomain}\" is already taken. Please choose a different subdomain.");
-                    exit(1);
+
+                    $this->exit($deferred);
+                });
+
+                $connection->on('setMaximumConnectionLength', function ($data) {
+                    $this->loop->addPeriodicTimer(1, function() use ($data) {
+                        $this->timeConnected++;
+
+                        $carbon = Carbon::createFromFormat('s', str_pad($data->length * 60 - $this->timeConnected, 2, 0, STR_PAD_LEFT));
+
+                        $this->logger->info('Remaining time: '.$carbon->format('H:i:s'));
+                    });
                 });
 
                 $connection->on('authenticated', function ($data) use ($deferred) {
@@ -89,11 +105,18 @@ class Client
                 $this->logger->error("Could not connect to the server.");
                 $this->logger->error($e->getMessage());
 
-                $deferred->reject();
-
-                exit(1);
+                $this->exit($deferred);
             });
 
         return $promise;
+    }
+
+    protected function exit(Deferred $deferred)
+    {
+        $deferred->reject();
+
+        $this->loop->futureTick(function(){
+            exit(1);
+        });
     }
 }

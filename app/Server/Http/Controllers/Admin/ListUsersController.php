@@ -2,8 +2,8 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
+use App\Contracts\UserRepository;
 use App\Http\Controllers\Controller;
-use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
@@ -17,26 +17,24 @@ class ListUsersController extends AdminController
 {
     protected $keepConnectionOpen = true;
 
-    /** @var DatabaseInterface */
-    protected $database;
+    /** @var UserRepository */
+    protected $userRepository;
 
-    public function __construct(DatabaseInterface $database)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->database = $database;
+        $this->userRepository = $userRepository;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $this->database->query('SELECT * FROM users ORDER by created_at DESC')->then(function (Result $result) use ($httpConnection) {
-            $httpConnection->send(
-                respond_html($this->getView($httpConnection, 'server.users.index', ['users' => $result->rows]))
-            );
+        $this->userRepository
+            ->getUsers()
+            ->then(function ($users) use ($httpConnection) {
+                $httpConnection->send(
+                    respond_html($this->getView($httpConnection, 'server.users.index', ['users' => $users]))
+                );
 
-            $httpConnection->close();
-        }, function (\Exception $exception) use ($httpConnection) {
-            $httpConnection->send(respond_html('Something went wrong: '.$exception->getMessage(), 500));
-
-            $httpConnection->close();
-        });
+                $httpConnection->close();
+            });
     }
 }

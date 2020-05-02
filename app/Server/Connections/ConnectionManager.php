@@ -5,6 +5,7 @@ namespace App\Server\Connections;
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use Ratchet\ConnectionInterface;
+use React\EventLoop\LoopInterface;
 
 class ConnectionManager implements ConnectionManagerContract
 {
@@ -17,9 +18,26 @@ class ConnectionManager implements ConnectionManagerContract
     /** @var SubdomainGenerator */
     protected $subdomainGenerator;
 
-    public function __construct(SubdomainGenerator $subdomainGenerator)
+    /** @var LoopInterface */
+    protected $loop;
+
+    public function __construct(SubdomainGenerator $subdomainGenerator, LoopInterface $loop)
     {
         $this->subdomainGenerator = $subdomainGenerator;
+        $this->loop = $loop;
+    }
+
+    public function limitConnectionLength(ControlConnection $connection, int $maximumConnectionLength)
+    {
+        if ($maximumConnectionLength === 0) {
+            return;
+        }
+
+        $connection->setMaximumConnectionLength($maximumConnectionLength);
+
+        $this->loop->addTimer($maximumConnectionLength * 60, function() use ($connection) {
+            $connection->socket->close();
+        });
     }
 
     public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection

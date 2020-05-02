@@ -24,6 +24,9 @@ class TunnelTest extends TestCase
     /** @var Factory */
     protected $serverFactory;
 
+    /** @var \React\Socket\Server */
+    protected $testHttpServer;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -36,6 +39,10 @@ class TunnelTest extends TestCase
     public function tearDown(): void
     {
         $this->serverFactory->getSocket()->close();
+
+        if (isset($this->testHttpServer)) {
+            $this->testHttpServer->close();
+        }
 
         parent::tearDown();
     }
@@ -74,6 +81,39 @@ class TunnelTest extends TestCase
         $this->assertSame('Hello World!', $response->getBody()->getContents());
     }
 
+    /** @test */
+    public function it_rejects_clients_with_invalid_auth_tokens()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $this->createTestHttpServer();
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server
+         */
+        $client = $this->createClient();
+        $result = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
+    }
+
+    /** @test */
+    public function it_allows_clients_with_valid_auth_tokens()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $this->createTestHttpServer();
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server
+         */
+        $client = $this->createClient();
+        $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
+    }
 
     protected function startServer()
     {
@@ -104,7 +144,7 @@ class TunnelTest extends TestCase
             return new Response(200, ['Content-Type' => 'text/plain'], "Hello World!");
         });
 
-        $socket = new \React\Socket\Server(8085, $this->loop);
-        $server->listen($socket);
+        $this->testHttpServer = new \React\Socket\Server(8085, $this->loop);
+        $server->listen($this->testHttpServer);
     }
 }

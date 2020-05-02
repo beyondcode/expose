@@ -61,7 +61,7 @@
 
             methods: {
                 deleteUser(user) {
-                    fetch('/expose/users/delete/' + user.id, {
+                    fetch('/expose/users/' + user.id, {
                         method: 'DELETE',
                     }).then((response) => {
                         return response.json();

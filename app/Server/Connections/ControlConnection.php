@@ -33,6 +33,14 @@ class ControlConnection
         $this->shared_at = now()->toDateTimeString();
     }
 
+    public function setMaximumConnectionLength(int $maximumConnectionLength)
+    {
+        $this->socket->send(json_encode([
+            'event' => 'setMaximumConnectionLength',
+            'length' => $maximumConnectionLength,
+        ]));
+    }
+
     public function registerProxy($requestId)
     {
         $this->socket->send(json_encode([

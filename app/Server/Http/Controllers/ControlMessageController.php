@@ -3,10 +3,12 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
+use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
-use Clue\React\SQLite\DatabaseInterface;
-use Clue\React\SQLite\Result;
 use Ratchet\WebSocket\MessageComponentInterface;
+use React\Promise\Deferred;
+use React\Promise\FulfilledPromise;
+use React\Promise\PromiseInterface;
 use stdClass;
 use Ratchet\ConnectionInterface;
 
@@ -16,13 +18,13 @@ class ControlMessageController implements MessageComponentInterface
     /** @var ConnectionManager */
     protected $connectionManager;
 
-    /** @var DatabaseInterface */
-    protected $database;
+    /** @var UserRepository */
+    protected $userRepository;
 
-    public function __construct(ConnectionManager $connectionManager, DatabaseInterface $database)
+    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository)
     {
         $this->connectionManager = $connectionManager;
-        $this->database = $database;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -75,21 +77,28 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function authenticate(ConnectionInterface $connection, $data)
     {
-        if (config('expose.admin.validate_auth_tokens') === true) {
-            $this->verifyAuthToken($connection);
-        }
+        $this->verifyAuthToken($connection)
+            ->then(function () use ($connection, $data) {
+                if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
+                    return;
+                }
 
-        if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
-            return;
-        }
+                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
-        $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
+                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_session_length'));
 
-        $connection->send(json_encode([
-            'event' => 'authenticated',
-            'subdomain' => $connectionInfo->subdomain,
-            'client_id' => $connectionInfo->client_id
-        ]));
+                $connection->send(json_encode([
+                    'event' => 'authenticated',
+                    'subdomain' => $connectionInfo->subdomain,
+                    'client_id' => $connectionInfo->client_id
+                ]));
+            }, function () use ($connection) {
+                $connection->send(json_encode([
+                    'event' => 'authenticationFailed',
+                    'data' => []
+                ]));
+                $connection->close();
+            });
     }
 
     protected function registerProxy(ConnectionInterface $connection, $data)
@@ -111,28 +120,34 @@ class ControlMessageController implements MessageComponentInterface
         //
     }
 
-    protected function verifyAuthToken(ConnectionInterface $connection)
+    protected function verifyAuthToken(ConnectionInterface $connection): PromiseInterface
     {
+        if (config('expose.admin.validate_auth_tokens') !== true) {
+            return new FulfilledPromise();
+        }
+
+        $deferred = new Deferred();
+
         $authToken = QueryParameters::create($connection->httpRequest)->get('authToken');
 
-        $this->database
-            ->query("SELECT * FROM users WHERE auth_token = :token", ['token' => $authToken])
-            ->then(function (Result $result) use ($connection) {
-                if (count($result->rows) === 0) {
-                    $connection->send(json_encode([
-                        'event' => 'authenticationFailed',
-                        'data' => []
-                    ]));
-                    $connection->close();
+        $this->userRepository
+            ->getUserByToken($authToken)
+            ->then(function ($user) use ($connection, $deferred) {
+                if (is_null($user)) {
+                    $deferred->reject();
+                } else {
+                    $deferred->resolve($user);
                 }
-        });
+            });
+
+        return $deferred->promise();
     }
 
     protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain): bool
     {
-        if (! is_null($subdomain)) {
+        if (!is_null($subdomain)) {
             $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
-            if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
+            if (!is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
                 $connection->send(json_encode([
                     'event' => 'subdomainTaken',
                     'data' => [

@@ -4,6 +4,7 @@ namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
+use App\Contracts\UserRepository;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
@@ -117,7 +118,7 @@ class Factory
         $this->router->get('/settings', ShowSettingsController::class, $adminCondition);
         $this->router->post('/settings', SaveSettingsController::class, $adminCondition);
         $this->router->post('/users', StoreUsersController::class, $adminCondition);
-        $this->router->delete('/users/delete/{id}', DeleteUsersController::class, $adminCondition);
+        $this->router->delete('/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
     }
 
@@ -133,7 +134,7 @@ class Factory
     protected function bindSubdomainGenerator()
     {
         app()->singleton(SubdomainGenerator::class, function ($app) {
-            return $app->make(RandomSubdomainGenerator::class);
+            return $app->make(config('expose.admin.subdomain_generator'));
         });
 
         return $this;
@@ -154,6 +155,7 @@ class Factory
 
         $this->bindConfiguration()
             ->bindSubdomainGenerator()
+            ->bindUserRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
             ->bindConnectionManager()
@@ -179,6 +181,15 @@ class Factory
     public function getSocket(): Server
     {
         return $this->socket;
+    }
+
+    protected function bindUserRepository()
+    {
+        app()->singleton(UserRepository::class, function() {
+            return app(config('expose.admin.user_repository'));
+        });
+
+        return $this;
     }
 
     protected function bindDatabase()

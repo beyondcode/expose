@@ -84,6 +84,25 @@ class AdminTest extends TestCase
     /** @test */
     public function it_can_create_users()
     {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        $responseData = json_decode($response->getBody()->getContents());
+        $this->assertSame('Marcel', $responseData->user->name);
+
+        $this->assertDatabaseHasResults('SELECT * FROM users WHERE name = "Marcel"');
+    }
+
+    /** @test */
+    public function it_can_delete_users()
+    {
+        /** @var Response $response */
         $this->await($this->browser->post('http://127.0.0.1:8080/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
@@ -92,7 +111,38 @@ class AdminTest extends TestCase
             'name' => 'Marcel',
         ])));
 
-        $this->assertDatabaseHasResults('SELECT * FROM users WHERE name = "Marcel"');
+
+        $this->await($this->browser->delete('http://127.0.0.1:8080/users/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ]));
+
+        $this->assertDatabaseHasNoResults('SELECT * FROM users WHERE name = "Marcel"');
+    }
+
+    /** @test */
+    public function it_can_list_all_users()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode("username:secret"),
+            'Content-Type' => 'application/json'
+        ]));
+
+        $body = $response->getBody()->getContents();
+
+        $this->assertTrue(Str::contains($body, 'Marcel'));
     }
 
     /** @test */

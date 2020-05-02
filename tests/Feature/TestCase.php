@@ -46,4 +46,13 @@ abstract class TestCase extends \Tests\TestCase
 
         $this->assertGreaterThanOrEqual(1, count($result->rows));
     }
+
+    protected function assertDatabaseHasNoResults($query)
+    {
+        $database = app(DatabaseInterface::class);
+
+        $result = $this->await($database->query($query));
+
+        $this->assertEmpty($result->rows);
+    }
 }

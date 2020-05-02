@@ -2,8 +2,8 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
+use App\Contracts\UserRepository;
 use App\Http\Controllers\Controller;
-use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
@@ -19,12 +19,12 @@ class StoreUsersController extends AdminController
 {
     protected $keepConnectionOpen = true;
 
-    /** @var DatabaseInterface */
-    protected $database;
+    /** @var UserRepository */
+    protected $userRepository;
 
-    public function __construct(DatabaseInterface $database)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->database = $database;
+        $this->userRepository = $userRepository;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
@@ -47,16 +47,11 @@ class StoreUsersController extends AdminController
             'auth_token' => (string)Str::uuid()
         ];
 
-        $this->database->query("
-            INSERT INTO users (name, auth_token, created_at)
-            VALUES (:name, :auth_token, DATETIME('now'))
-        ", $insertData)
-                ->then(function (Result $result) use ($httpConnection) {
-                    $this->database->query("SELECT * FROM users WHERE id = :id", ['id' => $result->insertId])
-                        ->then(function (Result $result) use ($httpConnection) {
-                            $httpConnection->send(respond_json(['user' => $result->rows[0]], 200));
-                            $httpConnection->close();
-                        });
-                });
+        $this->userRepository
+            ->storeUser($insertData)
+            ->then(function ($user) use ($httpConnection) {
+                $httpConnection->send(respond_json(['user' => $user], 200));
+                $httpConnection->close();
+            });
     }
 }

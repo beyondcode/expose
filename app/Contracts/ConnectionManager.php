@@ -10,6 +10,8 @@ interface ConnectionManager
 {
     public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection;
 
+    public function limitConnectionLength(ControlConnection $connection, int $maximumConnectionLength);
+
     public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection;
 
     public function getHttpConnectionForRequestId(string $requestId): ?HttpConnection;
