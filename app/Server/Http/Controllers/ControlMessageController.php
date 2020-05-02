@@ -85,7 +85,7 @@ class ControlMessageController implements MessageComponentInterface
 
                 $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
-                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_session_length'));
+                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
                 $connection->send(json_encode([
                     'event' => 'authenticated',

@@ -14,16 +14,16 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Maximum session length
+        | Maximum connection length
         |--------------------------------------------------------------------------
         |
         | If you want to limit the amount of time that a single connection can
         | stay connected to the expose server, you can specify the maximum
-        | session length in minutes here. A maximum length of 0 means that
+        | connection length in minutes here. A maximum length of 0 means that
         | clients can stay connected as long as they want.
         |
         */
-        'maximum_session_length' => 0,
+        'maximum_connection_length' => 0,
 
         /*
         |--------------------------------------------------------------------------
