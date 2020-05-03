@@ -65,13 +65,13 @@ class Client
                 });
 
                 $connection->on('authenticationFailed', function ($data) use ($deferred) {
-                    $this->logger->error("Authentication failed. Please check your authentication token and try again.");
+                    $this->logger->error($data->data->message);
 
                     $this->exit($deferred);
                 });
 
                 $connection->on('subdomainTaken', function ($data) use ($deferred) {
-                    $this->logger->error("The chosen subdomain \"{$data->data->subdomain}\" is already taken. Please choose a different subdomain.");
+                    $this->logger->error($data->data->message);
 
                     $this->exit($deferred);
                 });

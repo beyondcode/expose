@@ -9,8 +9,7 @@ return [
 
         'database' => base_path('database/expose.db'),
 
-        'validate_auth_tokens' => false,
-
+        'validate_auth_tokens' => true,
 
         /*
         |--------------------------------------------------------------------------
@@ -74,5 +73,11 @@ return [
         |
         */
         'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
+
+        'messages' => [
+            'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',
+
+            'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
+        ]
     ]
 ];

@@ -95,7 +95,9 @@ class ControlMessageController implements MessageComponentInterface
             }, function () use ($connection) {
                 $connection->send(json_encode([
                     'event' => 'authenticationFailed',
-                    'data' => []
+                    'data' => [
+                        'message' => config('expose.admin.messages.invalid_auth_token')
+                    ]
                 ]));
                 $connection->close();
             });
@@ -148,10 +150,13 @@ class ControlMessageController implements MessageComponentInterface
         if (!is_null($subdomain)) {
             $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
             if (!is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
+                $message = config('expose.admin.messages.subdomain_taken');
+                $message = str_replace(':subdomain', $subdomain, $message);
+
                 $connection->send(json_encode([
                     'event' => 'subdomainTaken',
                     'data' => [
-                        'subdomain' => $subdomain,
+                        'message' => $message,
                     ]
                 ]));
                 $connection->close();
