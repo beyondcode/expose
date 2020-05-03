@@ -15,7 +15,7 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class SaveSettingsController extends AdminController
+class StoreSettingsController extends AdminController
 {
     /** @var Configuration */
     protected $configuration;

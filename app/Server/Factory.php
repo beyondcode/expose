@@ -15,7 +15,7 @@ use App\Server\Http\Controllers\Admin\GetUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
-use App\Server\Http\Controllers\Admin\SaveSettingsController;
+use App\Server\Http\Controllers\Admin\StoreSettingsController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
@@ -123,7 +123,7 @@ class Factory
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
 
         $this->router->get('/api/settings', GetSettingsController::class, $adminCondition);
-        $this->router->post('/api/settings', SaveSettingsController::class, $adminCondition);
+        $this->router->post('/api/settings', StoreSettingsController::class, $adminCondition);
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
