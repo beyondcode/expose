@@ -75,6 +75,8 @@ return [
         'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
 
         'messages' => [
+            'message_of_the_day' => 'Thank you for using expose.',
+
             'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',

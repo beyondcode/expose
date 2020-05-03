@@ -5,6 +5,8 @@ namespace App\Client;
 use App\Client\Connections\ControlConnection;
 use App\Logger\CliRequestLogger;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
@@ -38,9 +40,26 @@ class Client
     {
         $this->logger->info("Sharing http://{$sharedUrl}");
 
+        $sharedUrl = $this->prepareSharedUrl($sharedUrl);
+
         foreach ($subdomains as $subdomain) {
             $this->connectToServer($sharedUrl, $subdomain, config('expose.auth_token'));
         }
+    }
+
+    protected function prepareSharedUrl(string $sharedUrl): string
+    {
+        if (! $parsedUrl = parse_url($sharedUrl)) {
+            return $sharedUrl;
+        }
+
+        $url = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path'));
+
+        if (Arr::get($parsedUrl, 'scheme') === 'https') {
+            $url .= ':443';
+        }
+
+        return $url;
     }
 
     public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
