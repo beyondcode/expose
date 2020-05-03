@@ -9,7 +9,7 @@ return [
 
         'database' => base_path('database/expose.db'),
 
-        'validate_auth_tokens' => true,
+        'validate_auth_tokens' => false,
 
         /*
         |--------------------------------------------------------------------------
