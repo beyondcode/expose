@@ -11,7 +11,9 @@
                                 <div role="group" aria-labelledby="label-email">
                                     <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
                                         <div>
-                                            <div class="text-base leading-6 font-medium text-gray-900 sm:text-sm sm:leading-5 sm:text-gray-700" id="label-email">
+                                            <div
+                                                class="text-base leading-6 font-medium text-gray-900 sm:text-sm sm:leading-5 sm:text-gray-700"
+                                                id="label-email">
                                                 Authentication
                                             </div>
                                         </div>
@@ -23,15 +25,69 @@
                                                                type="checkbox"
                                                                name="validate_auth_tokens"
                                                                value="1"
-                                                               {% if configuration.validate_auth_tokens %} checked="checked" {% endif %}
-                                                               class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+                                                            {% if configuration.validate_auth_tokens %} checked="checked" {% endif %}
+                                                               class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"/>
                                                     </div>
                                                     <div class="pl-7 text-sm leading-5">
-                                                        <label for="authentication" class="font-medium text-gray-700">Require authentication tokens</label>
-                                                        <p class="text-gray-500">Only allow connection from clients with valid authentication tokens</p>
+                                                        <label for="authentication" class="font-medium text-gray-700">Require
+                                                            authentication tokens</label>
+                                                        <p class="text-gray-500">Only allow connection from clients with
+                                                            valid authentication tokens</p>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="motd"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            Message of the day
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="motd" name="motd" rows="3"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.message_of_the_day') }}</textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
+                                                successful connection can be established.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="invalid_auth_token"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            Authentication Failed
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="invalid_auth_token"
+                                                          name="invalid_auth_token"
+                                                          rows="3"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.invalid_auth_token') }}</textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
+                                                user tries to connect with an invalid authentication token.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="subdomain_taken"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            Subdomain taken
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="subdomain_taken" name="subdomain_taken" rows="3"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.subdomain_taken') }}</textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
+                                                user tries to connect with an already registered subdomain. You can use
+                                                <code class="font-mono bg-gray-500 text-white p-1">:subdomain</code> as
+                                                a placeholder.</p>
                                         </div>
                                     </div>
                                 </div>

@@ -65,13 +65,13 @@ class Client
                 });
 
                 $connection->on('authenticationFailed', function ($data) use ($deferred) {
-                    $this->logger->error($data->data->message);
+                    $this->logger->error($data->message);
 
                     $this->exit($deferred);
                 });
 
                 $connection->on('subdomainTaken', function ($data) use ($deferred) {
-                    $this->logger->error($data->data->message);
+                    $this->logger->error($data->message);
 
                     $this->exit($deferred);
                 });
@@ -94,6 +94,7 @@ class Client
                         $host .= ":{$this->configuration->port()}";
                     }
 
+                    $this->logger->info($data->message);
                     $this->logger->info("Connected to {$httpProtocol}://{$data->subdomain}.{$host}");
 
                     static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";

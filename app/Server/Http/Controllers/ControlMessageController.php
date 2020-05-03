@@ -89,8 +89,11 @@ class ControlMessageController implements MessageComponentInterface
 
                 $connection->send(json_encode([
                     'event' => 'authenticated',
-                    'subdomain' => $connectionInfo->subdomain,
-                    'client_id' => $connectionInfo->client_id
+                    'data' => [
+                        'message' => config('expose.admin.messages.message_of_the_day'),
+                        'subdomain' => $connectionInfo->subdomain,
+                        'client_id' => $connectionInfo->client_id
+                    ],
                 ]));
             }, function () use ($connection) {
                 $connection->send(json_encode([

@@ -34,10 +34,10 @@ class ControlConnection
         $this->socket->on('message', function (Message $message) {
             $decodedEntry = json_decode($message);
 
-            $this->emit($decodedEntry->event ?? '', [$decodedEntry]);
+            $this->emit($decodedEntry->event ?? '', [$decodedEntry->data]);
 
             if (method_exists($this, $decodedEntry->event ?? '')) {
-                call_user_func([$this, $decodedEntry->event], $decodedEntry);
+                call_user_func([$this, $decodedEntry->event], $decodedEntry->data);
             }
         });
     }
