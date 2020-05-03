@@ -25,7 +25,7 @@
                                                                type="checkbox"
                                                                name="validate_auth_tokens"
                                                                value="1"
-                                                            {% if configuration.validate_auth_tokens %} checked="checked" {% endif %}
+                                                               v-model="configuration.validate_auth_tokens"
                                                                class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"/>
                                                     </div>
                                                     <div class="pl-7 text-sm leading-5">
@@ -48,7 +48,8 @@
                                         <div class="mt-1 sm:mt-0 sm:col-span-2">
                                             <div class="max-w-lg flex rounded-md shadow-sm">
                                                 <textarea id="motd" name="motd" rows="3"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.message_of_the_day') }}</textarea>
+                                                          v-model="configuration.messages.message_of_the_day"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
                                                 successful connection can be established.</p>
@@ -66,7 +67,8 @@
                                                 <textarea id="invalid_auth_token"
                                                           name="invalid_auth_token"
                                                           rows="3"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.invalid_auth_token') }}</textarea>
+                                                          v-model="configuration.messages.invalid_auth_token"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
                                                 user tries to connect with an invalid authentication token.</p>
@@ -82,7 +84,8 @@
                                         <div class="mt-1 sm:mt-0 sm:col-span-2">
                                             <div class="max-w-lg flex rounded-md shadow-sm">
                                                 <textarea id="subdomain_taken" name="subdomain_taken" rows="3"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">{{ attribute(configuration, 'messages.subdomain_taken') }}</textarea>
+                                                          v-model="configuration.messages.subdomain_taken"
+                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown, when a
                                                 user tries to connect with an already registered subdomain. You can use
@@ -97,14 +100,9 @@
                 </div>
                 <div class="mt-8 border-t border-gray-200 pt-5">
                     <div class="flex justify-end">
-      <span class="inline-flex rounded-md shadow-sm">
-        <button type="button"
-                class="py-2 px-4 border border-gray-300 rounded-md text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800 transition duration-150 ease-in-out">
-          Cancel
-        </button>
-      </span>
                         <span class="ml-3 inline-flex rounded-md shadow-sm">
         <button type="submit"
+                @click.prevent="saveSettings"
                 class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
           Save
         </button>
@@ -114,4 +112,33 @@
             </form>
         </div>
     </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        new Vue({
+            el: '#app',
+
+            delimiters: ['@{', '}'],
+
+            data: {
+                configuration: {{ configuration|json_encode|raw }}
+            },
+
+            methods: {
+                saveSettings() {
+                    fetch('/api/settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.configuration)
+                    }).then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        this.configuration = data.configuration;
+                    });
+                }
+            }
+        })
+    </script>
 {% endblock %}

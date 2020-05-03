@@ -58,7 +58,7 @@
 
             methods: {
                 disconnectSite(id) {
-                    fetch('/sites/' + id, {
+                    fetch('/api/sites/' + id, {
                         method: 'DELETE',
                     }).then((response) => {
                         return response.json();

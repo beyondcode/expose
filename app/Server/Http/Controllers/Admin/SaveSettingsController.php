@@ -8,6 +8,7 @@ use App\Server\Configuration;
 use Clue\React\SQLite\Result;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -16,15 +17,11 @@ use function GuzzleHttp\Psr7\stream_for;
 
 class SaveSettingsController extends AdminController
 {
-    /** @var ConnectionManager */
-    protected $connectionManager;
-
     /** @var Configuration */
     protected $configuration;
 
-    public function __construct(ConnectionManager $connectionManager, Configuration $configuration)
+    public function __construct(Configuration $configuration)
     {
-        $this->connectionManager = $connectionManager;
         $this->configuration = $configuration;
     }
 
@@ -32,14 +29,18 @@ class SaveSettingsController extends AdminController
     {
         config()->set('expose.admin.validate_auth_tokens', $request->has('validate_auth_tokens'));
 
-        config()->set('expose.admin.messages.invalid_auth_token', $request->get('invalid_auth_token'));
+        $messages = $request->get('messages');
 
-        config()->set('expose.admin.messages.subdomain_taken', $request->get('subdomain_taken'));
+        config()->set('expose.admin.messages.invalid_auth_token', Arr::get($messages, 'invalid_auth_token'));
 
-        config()->set('expose.admin.messages.message_of_the_day', $request->get('motd'));
+        config()->set('expose.admin.messages.subdomain_taken', Arr::get($messages, 'subdomain_taken'));
 
-        $httpConnection->send(str(new Response(301, [
-            'Location' => '/settings'
-        ])));
+        config()->set('expose.admin.messages.message_of_the_day', Arr::get($messages, 'message_of_the_day'));
+
+        $httpConnection->send(
+            respond_json([
+                'configuration' => $this->configuration,
+            ])
+        );
     }
 }

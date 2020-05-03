@@ -97,7 +97,7 @@
 
                 methods: {
                     deleteUser(user) {
-                        fetch('/users/' + user.id, {
+                        fetch('/api/users/' + user.id, {
                             method: 'DELETE',
                         }).then((response) => {
                             return response.json();
@@ -106,7 +106,7 @@
                         });
                     },
                     saveUser() {
-                        fetch('/users', {
+                        fetch('/api/users', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'

@@ -9,6 +9,9 @@ use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
+use App\Server\Http\Controllers\Admin\GetSettingsController;
+use App\Server\Http\Controllers\Admin\GetSitesController;
+use App\Server\Http\Controllers\Admin\GetUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
@@ -117,11 +120,15 @@ class Factory
         $this->router->get('/', RedirectToUsersController::class, $adminCondition);
         $this->router->get('/users', ListUsersController::class, $adminCondition);
         $this->router->get('/settings', ShowSettingsController::class, $adminCondition);
-        $this->router->post('/settings', SaveSettingsController::class, $adminCondition);
-        $this->router->post('/users', StoreUsersController::class, $adminCondition);
-        $this->router->delete('/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
-        $this->router->delete('/sites/{id}', DisconnectSiteController::class, $adminCondition);
+
+        $this->router->get('/api/settings', GetSettingsController::class, $adminCondition);
+        $this->router->post('/api/settings', SaveSettingsController::class, $adminCondition);
+        $this->router->get('/api/users', GetUsersController::class, $adminCondition);
+        $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
+        $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
+        $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
+        $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
     }
 
     protected function bindConfiguration()
