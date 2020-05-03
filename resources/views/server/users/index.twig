@@ -60,7 +60,7 @@
 
             methods: {
                 deleteUser(user) {
-                    fetch('/expose/users/delete/'+user.id, {
+                    fetch('/users/delete/'+user.id, {
                         method: 'DELETE',
                     }).then((response) => {
                         return response.json();
@@ -69,7 +69,7 @@
                     });
                 },
                 saveUser() {
-                    fetch('/expose/users', {
+                    fetch('/users', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

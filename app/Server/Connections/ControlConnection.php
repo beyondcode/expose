@@ -51,4 +51,9 @@ class ControlConnection
             ],
         ]));
     }
+
+    public function close()
+    {
+        $this->socket->close();
+    }
 }

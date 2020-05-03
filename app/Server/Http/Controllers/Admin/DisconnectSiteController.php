@@ -5,6 +5,7 @@ namespace App\Server\Http\Controllers\Admin;
 use App\Contracts\ConnectionManager;
 use App\Http\Controllers\Controller;
 use App\Server\Configuration;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 use Twig\Environment;
@@ -12,29 +13,31 @@ use Twig\Loader\ArrayLoader;
 use function GuzzleHttp\Psr7\str;
 use function GuzzleHttp\Psr7\stream_for;
 
-class ListSitesController extends AdminController
+class DisconnectSiteController extends AdminController
 {
     /** @var ConnectionManager */
     protected $connectionManager;
+
     /** @var Configuration */
     protected $configuration;
 
-    public function __construct(ConnectionManager $connectionManager, Configuration $configuration)
+    public function __construct(ConnectionManager $connectionManager)
     {
         $this->connectionManager = $connectionManager;
-        $this->configuration = $configuration;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $sites = $this->getView($httpConnection, 'server.sites.index', [
-            'scheme' => $this->configuration->port() === 443 ? 'https' : 'http',
-            'configuration' => $this->configuration,
-            'sites' => $this->connectionManager->getConnections()
-        ]);
+        $connection = $this->connectionManager->findControlConnectionForClientId($request->get('id'));
 
-        $httpConnection->send(
-            respond_html($sites)
-        );
+        if (! is_null($connection)) {
+            $connection->close();
+
+            $this->connectionManager->removeControlConnection($connection);
+        }
+
+        $httpConnection->send(respond_json([
+            'sites' => $this->connectionManager->getConnections()
+        ]));
     }
 }

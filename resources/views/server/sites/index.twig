@@ -21,23 +21,24 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white">
-                    {% for site in sites %}
-                        <tr>
+                        <tr v-for="site in sites">
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
-                                {{ site.host }}
+                                @{ site.host }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                                {{ site.subdomain }}.{{ configuration.hostname()}}:{{ configuration.port() }}
+                                @{ site.subdomain }.{{ configuration.hostname()}}:{{ configuration.port() }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                                {{ site.shared_at }}
+                                @{ site.shared_at }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
-                                <a href="{{ scheme }}://{{ site.subdomain }}.{{ configuration.hostname()}}:{{ configuration.port() }}" target="_blank"
+                                <a :href="'{{ scheme|raw }}://'+site.subdomain+'.{{ configuration.hostname()}}:{{ configuration.port() }}'" target="_blank"
                                    class="text-indigo-600 hover:text-indigo-900">Visit</a>
+                                <a href="#"
+                                   @click.prevent="disconnectSite(site.client_id)"
+                                   class="pl-2 text-red-600 hover:text-red-900">Disconnect</a>
                             </td>
                         </tr>
-                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -52,40 +53,17 @@
             delimiters: ['@{', '}'],
 
             data: {
-                userForm: {
-                    name: '',
-                    errors: {},
-                },
-                users: {{ users|json_encode|raw }}
+                sites: {{ sites|json_encode|raw }}
             },
 
             methods: {
-                deleteUser(user) {
-                    fetch('/expose/users/' + user.id, {
+                disconnectSite(id) {
+                    fetch('/sites/' + id, {
                         method: 'DELETE',
                     }).then((response) => {
                         return response.json();
                     }).then((data) => {
-                        this.users = this.users.filter(u => u.id !== user.id);
-                    });
-                },
-                saveUser() {
-                    fetch('/expose/users', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(this.userForm)
-                    }).then((response) => {
-                        return response.json();
-                    }).then((data) => {
-                        if (data.user) {
-                            this.userForm.errors = {};
-                            this.users.unshift(data.user);
-                        }
-                        if (data.errors) {
-                            this.userForm.errors = data.errors;
-                        }
+                        this.sites = data.sites;
                     });
                 }
             }

@@ -8,6 +8,7 @@ use App\Contracts\UserRepository;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
+use App\Server\Http\Controllers\Admin\DisconnectSiteController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
@@ -120,6 +121,7 @@ class Factory
         $this->router->post('/users', StoreUsersController::class, $adminCondition);
         $this->router->delete('/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
+        $this->router->delete('/sites/{id}', DisconnectSiteController::class, $adminCondition);
     }
 
     protected function bindConfiguration()
