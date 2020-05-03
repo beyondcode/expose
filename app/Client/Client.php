@@ -96,12 +96,15 @@ class Client
                 });
 
                 $connection->on('setMaximumConnectionLength', function ($data) {
-                    $this->loop->addPeriodicTimer(1, function() use ($data) {
+                    $timeoutSection = $this->logger->getOutput()->section();
+
+                    $this->loop->addPeriodicTimer(1, function() use ($data, $timeoutSection) {
                         $this->timeConnected++;
 
                         $carbon = Carbon::createFromFormat('s', str_pad($data->length * 60 - $this->timeConnected, 2, 0, STR_PAD_LEFT));
 
-                        $this->logger->info('Remaining time: '.$carbon->format('H:i:s'));
+                        $timeoutSection->clear();
+                        $timeoutSection->writeln('Remaining time: '.$carbon->format('H:i:s'));
                     });
                 });
 

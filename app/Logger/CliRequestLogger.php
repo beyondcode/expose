@@ -30,6 +30,14 @@ class CliRequestLogger extends Logger
         $this->requests = new Collection();
     }
 
+    /**
+     * @return ConsoleOutputInterface
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
+
     public function logRequest(LoggedRequest $loggedRequest)
     {
         if ($this->requests->has($loggedRequest->id())) {

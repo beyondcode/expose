@@ -37,7 +37,9 @@ class ControlConnection
     {
         $this->socket->send(json_encode([
             'event' => 'setMaximumConnectionLength',
-            'length' => $maximumConnectionLength,
+            'data' => [
+                'length' => $maximumConnectionLength,
+            ],
         ]));
     }
 
