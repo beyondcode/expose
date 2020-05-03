@@ -1,93 +1,131 @@
 {% extends "app" %}
 {% block title %}Users{% endblock %}
 {% block content %}
-    <div class="flex flex-col py-8">
-        <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-            <div
-                class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
-                <table class="min-w-full">
-                    <thead>
-                    <tr>
-                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                        </th>
-                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                            Auth-Token
-                        </th>
-                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                            Created At
-                        </th>
-                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white">
-                    <tr v-for="user in users">
-                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
-                            @{ user.name }
-                        </td>
-                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                            @{ user.auth_token }
-                        </td>
-                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                            @{ user.created_at }
-                        </td>
-                        <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                            <a href="#" @click.prevent="deleteUser(user)"
-                               class="pl-4 text-red-600 hover:text-red-900">Delete</a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+<form class="flex flex-col py-8">
+    <form>
+        <div>
+            <div>
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Add new user
+                    </h3>
+                </div>
+                <div class="mt-6 sm:mt-5">
+                    <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                        <label for="username"
+                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                            Username
+                        </label>
+                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                <input id="username"
+                                       v-model="userForm.name"
+                                       class="flex-1 form-input block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 border-t border-gray-200 pt-5">
+                    <div class="flex justify-end">
+                            <span class="ml-3 inline-flex rounded-md shadow-sm">
+        <button type="submit"
+                @click.prevent="saveUser"
+                class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+          Save
+        </button>
+      </span>
+                    </div>
+                </div>
             </div>
         </div>
+    </form>
+    <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div
+            class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+            <table class="min-w-full">
+                <thead>
+                <tr>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                    </th>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                        Auth-Token
+                    </th>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                        Created At
+                    </th>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
+                </tr>
+                </thead>
+                <tbody class="bg-white">
+                <tr v-for="user in users">
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
+                        @{ user.name }
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                        @{ user.auth_token }
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                        @{ user.created_at }
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
+                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                        <a href="#" @click.prevent="deleteUser(user)"
+                           class="pl-4 text-red-600 hover:text-red-900">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-{% endblock %}
-{% block scripts %}
-    <script>
-        new Vue({
-            el: '#app',
+    </div>
+    {% endblock %}
+    {% block scripts %}
+        <script>
+            new Vue({
+                el: '#app',
 
-            delimiters: ['@{', '}'],
+                delimiters: ['@{', '}'],
 
-            data: {
-                userForm: {
-                    name: '',
-                    errors: {},
+                data: {
+                    userForm: {
+                        name: '',
+                        errors: {},
+                    },
+                    users: {{ users|json_encode|raw }}
                 },
-                users: {{ users|json_encode|raw }}
-            },
 
-            methods: {
-                deleteUser(user) {
-                    fetch('/users/delete/'+user.id, {
-                        method: 'DELETE',
-                    }).then((response) => {
-                        return response.json();
-                    }).then((data) => {
-                        this.users = this.users.filter(u => u.id !== user.id);
-                    });
-                },
-                saveUser() {
-                    fetch('/users', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(this.userForm)
-                    }).then((response) => {
-                        return response.json();
-                    }).then((data) => {
-                        if (data.user) {
-                            this.userForm.errors = {};
-                            this.users.unshift(data.user);
-                        }
-                        if (data.errors) {
-                            this.userForm.errors = data.errors;
-                        }
-                    });
+                methods: {
+                    deleteUser(user) {
+                        fetch('/users/' + user.id, {
+                            method: 'DELETE',
+                        }).then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                            this.users = this.users.filter(u => u.id !== user.id);
+                        });
+                    },
+                    saveUser() {
+                        fetch('/users', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.userForm)
+                        }).then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                            if (data.user) {
+                                this.userForm.name = '';
+                                this.userForm.errors = {};
+                                this.users.unshift(data.user);
+                            }
+                            if (data.errors) {
+                                this.userForm.errors = data.errors;
+                            }
+                        });
+                    }
                 }
-            }
-        })
-    </script>
-{% endblock %}
+            })
+        </script>
+    {% endblock %}
