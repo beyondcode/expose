@@ -196,12 +196,18 @@ class LoggedRequest implements \JsonSerializable
 
     protected function detectSubdomain()
     {
-        return Arr::get($this->parsedRequest->getHeaders()->toArray(), 'X-Original-Host');
+        return collect($this->parsedRequest->getHeaders()->toArray())
+            ->mapWithKeys(function ($value, $key) {
+                return [strtolower($key) => $value];
+            })->get('x-original-host');
     }
 
     protected function getRequestId()
     {
-        return Arr::get($this->parsedRequest->getHeaders()->toArray(), 'X-Expose-Request-ID', (string)Str::uuid());
+        return collect($this->parsedRequest->getHeaders()->toArray())
+            ->mapWithKeys(function ($value, $key) {
+                return [strtolower($key) => $value];
+            })->get('x-expose-request-id', (string)Str::uuid());
     }
 
     public function getDuration()
