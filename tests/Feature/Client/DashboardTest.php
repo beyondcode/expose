@@ -74,7 +74,7 @@ class DashboardTest extends TestCase
         $this->logRequest($request);
 
         $this->assertSame(200,
-            $this->await($this->browser->get("http://127.0.0.1:4040/replay/request-one"))
+            $this->await($this->browser->get("http://127.0.0.1:4040/api/replay/request-one"))
                 ->getStatusCode()
         );
     }
@@ -87,7 +87,7 @@ class DashboardTest extends TestCase
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(404);
 
-        $this->await($this->browser->get("http://127.0.0.1:4040/replay/invalid-request"));
+        $this->await($this->browser->get("http://127.0.0.1:4040/api/replay/invalid-request"));
     }
 
     /** @test */
@@ -101,8 +101,7 @@ class DashboardTest extends TestCase
 
         $this->assertCount(3, $this->requestLogger->getData());
 
-        $this->await($this->browser->get("http://127.0.0.1:4040/logs/clear"));
-
+        $this->await($this->browser->get("http://127.0.0.1:4040/api/logs/clear"));
         $this->assertCount(0, $this->requestLogger->getData());
     }
 
@@ -113,7 +112,7 @@ class DashboardTest extends TestCase
 
         $loggedRequest = $this->logRequest(new Request('GET', '/foo'));
 
-        $this->await($this->browser->post("http://127.0.0.1:4040/logs/{$loggedRequest->id()}/data", [
+        $this->await($this->browser->post("http://127.0.0.1:4040/api/logs/{$loggedRequest->id()}/data", [
             'Content-Type' => 'application/json'
         ], json_encode([
             'data' => [
