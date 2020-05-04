@@ -81,7 +81,7 @@ class RequestLogger
         $this
             ->client
             ->post(
-                'http://127.0.0.1:4040/logs',
+                'http://127.0.0.1:4040/api/logs',
                 ['Content-Type' => 'application/json'],
                 json_encode($this->getData(), JSON_INVALID_UTF8_IGNORE)
             );

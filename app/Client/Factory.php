@@ -115,12 +115,13 @@ class Factory
     protected function addRoutes()
     {
         $this->router->get('/', DashboardController::class);
-        $this->router->post('/tunnel', CreateTunnelController::class);
-        $this->router->get('/logs', LogController::class);
-        $this->router->post('/logs', PushLogsToDashboardController::class);
-        $this->router->get('/replay/{log}', ReplayLogController::class);
-        $this->router->post('/logs/{request_id}/data', AttachDataToLogController::class);
-        $this->router->get('/logs/clear', ClearLogsController::class);
+
+        $this->router->post('/api/tunnel', CreateTunnelController::class);
+        $this->router->get('/api/logs', LogController::class);
+        $this->router->post('/api/logs', PushLogsToDashboardController::class);
+        $this->router->get('/api/replay/{log}', ReplayLogController::class);
+        $this->router->post('/api/logs/{request_id}/data', AttachDataToLogController::class);
+        $this->router->get('/api/logs/clear', ClearLogsController::class);
 
         $this->app->route('/socket', new WsServer(new Socket()), ['*']);
 

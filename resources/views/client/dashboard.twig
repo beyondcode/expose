@@ -407,7 +407,7 @@
                 this.activeTab = tab;
             },
             clearLogs: function() {
-                fetch('/logs/clear');
+                fetch('/api/logs/clear');
                 this.currentLog = null;
             },
             setLog: function (log) {
@@ -421,7 +421,7 @@
                 this.view = view;
             },
             replay: function (log) {
-                fetch('/replay/' + log.id);
+                fetch('/api/replay/' + log.id);
             },
             connect: function () {
                 let conn = new ReconnectingWebSocket(`ws://${window.location.hostname}:${window.location.port}/socket`);
@@ -431,7 +431,7 @@
                 };
             },
             loadLogs: function (log) {
-                fetch('/logs')
+                fetch('/api/logs')
                     .then((response) => {
                         return response.json();
                     })
