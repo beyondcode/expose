@@ -1,14 +1,10 @@
 {
     "name": "beyondcode/expose",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
-    "homepage": "https://laravel-zero.com",
+    "description": "Expose",
+    "keywords": [],
+    "homepage": "https://expose.dev",
     "type": "project",
     "license": "MIT",
-    "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
-    },
     "authors": [
         {
             "name": "Marcel Pociot",
