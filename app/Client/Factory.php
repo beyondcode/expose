@@ -143,13 +143,7 @@ class Factory
     {
         $dashboardPort = $this->detectNextFreeDashboardPort();
 
-        $this->loop->futureTick(function () use ($dashboardPort) {
-            $dashboardUrl = "http://127.0.0.1:{$dashboardPort}/";
-
-            echo("Started Dashboard on port {$dashboardPort}" . PHP_EOL);
-
-            echo('You can visit the dashboard at: ' . $dashboardUrl . PHP_EOL);
-        });
+        config()->set('expose.dashboard_port', $dashboardPort);
 
         $this->app = new App('127.0.0.1', $dashboardPort, '0.0.0.0', $this->loop);
 

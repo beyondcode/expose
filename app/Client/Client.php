@@ -43,8 +43,6 @@ class Client
 
     public function share(string $sharedUrl, array $subdomains = [])
     {
-        $this->logger->info("Sharing http://{$sharedUrl}");
-
         $sharedUrl = $this->prepareSharedUrl($sharedUrl);
 
         foreach ($subdomains as $subdomain) {
@@ -115,7 +113,7 @@ class Client
                     });
                 });
 
-                $connection->on('authenticated', function ($data) use ($deferred) {
+                $connection->on('authenticated', function ($data) use ($deferred, $sharedUrl) {
                     $httpProtocol = $this->configuration->port() === 443 ? "https" : "http";
                     $host = $this->configuration->host();
 
@@ -124,7 +122,10 @@ class Client
                     }
 
                     $this->logger->info($data->message);
-                    $this->logger->info("Connected to {$httpProtocol}://{$data->subdomain}.{$host}");
+                    $this->logger->info("Local-URL:\t\t{$sharedUrl}");
+                    $this->logger->info("Dashboard-URL:\t\thttp://127.0.0.1:".config()->get('expose.dashboard_port'));
+                    $this->logger->info("Expose-URL:\t\t{$httpProtocol}://{$data->subdomain}.{$host}");
+                    $this->logger->line('');
 
                     static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";
 
