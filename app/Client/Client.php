@@ -126,9 +126,9 @@ class Client
                     $this->logger->info($data->message);
                     $this->logger->info("Connected to {$httpProtocol}://{$data->subdomain}.{$host}");
 
-                    static::$subdomains[] = "$data->subdomain.{$this->configuration->host()}:{$this->configuration->port()}";
+                    static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";
 
-                    $deferred->resolve();
+                    $deferred->resolve($data);
                 });
 
             }, function (\Exception $e) use ($deferred, $sharedUrl, $subdomain, $authToken) {

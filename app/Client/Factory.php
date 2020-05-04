@@ -2,6 +2,7 @@
 
 namespace App\Client;
 
+use App\Client\Http\Controllers\CreateTunnelController;
 use App\Client\Http\Controllers\PushLogsToDashboardController;
 use App\Client\Http\HttpClient;
 use App\Http\App;
@@ -79,6 +80,13 @@ class Factory
         });
     }
 
+    protected function bindClient()
+    {
+        app()->singleton('expose.client', function ($app) {
+            return $app->make(Client::class);
+        });
+    }
+
     protected function bindProxyManager()
     {
         app()->bind(ProxyManager::class, function ($app) {
@@ -88,6 +96,8 @@ class Factory
 
     public function createClient()
     {
+        $this->bindClient();
+
         $this->bindConfiguration();
 
         $this->bindProxyManager();
@@ -97,7 +107,7 @@ class Factory
 
     public function share($sharedUrl, $subdomain = null)
     {
-        app(Client::class)->share($sharedUrl, $subdomain);
+        app('expose.client')->share($sharedUrl, $subdomain);
 
         return $this;
     }
@@ -105,6 +115,7 @@ class Factory
     protected function addRoutes()
     {
         $this->router->get('/', DashboardController::class);
+        $this->router->post('/tunnel', CreateTunnelController::class);
         $this->router->get('/logs', LogController::class);
         $this->router->post('/logs', PushLogsToDashboardController::class);
         $this->router->get('/replay/{log}', ReplayLogController::class);

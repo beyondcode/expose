@@ -93,7 +93,7 @@
                 <p class="font-medium text-white flex justify-center">
                     <span class="inline-block">Waiting for requests on:
                         {% for subdomain in subdomains %}
-                            <a class="underline" target="_blank" href="http://{{ subdomain }}">{{ subdomain }}</a>
+                            <a class="underline" target="_blank" href="{{ subdomain }}">{{ subdomain }}</a>
                         {% endfor %}
                     </span>
                 </p>
