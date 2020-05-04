@@ -370,8 +370,8 @@
             </div>
             <div v-else  class="flex-col bg-white shadow overflow-hidden sm:rounded-lg justify-center items-center flex py-4">
                 <h1 class="text-lg">Waiting for connections...</h1>
-                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=http://{{ subdomains[0] | url_encode }}&choe=UTF-8" />
-                <a class="text-sm" href="http://{{ subdomains[0] }}" target="_blank">http://{{ subdomains[0] }}</a>
+                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ subdomains[0] | url_encode }}&choe=UTF-8" />
+                <a class="text-sm" href="{{ subdomains[0] }}" target="_blank">{{ subdomains[0] }}</a>
             </div>
         </div>
     </div>
