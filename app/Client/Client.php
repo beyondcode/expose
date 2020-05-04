@@ -15,6 +15,8 @@ use function Ratchet\Client\connect;
 
 class Client
 {
+    protected const MAX_CONNECTION_RETRIES = 3;
+
     /** @var LoopInterface */
     protected $loop;
 
@@ -23,6 +25,9 @@ class Client
 
     /** @var CliRequestLogger */
     protected $logger;
+
+    /** @var int  */
+    protected $connectionRetries = 0;
 
     /** @var int */
     protected $timeConnected = 0;
@@ -72,15 +77,17 @@ class Client
         connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
-            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $deferred) {
+            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $deferred, $authToken) {
+                $this->connectionRetries = 0;
+
                 $connection = ControlConnection::create($clientConnection);
 
                 $connection->authenticate($sharedUrl, $subdomain);
 
-                $clientConnection->on('close', function() use ($deferred) {
+                $clientConnection->on('close', function() use ($deferred, $sharedUrl, $subdomain, $authToken) {
                     $this->logger->error('Connection to server closed.');
 
-                    $this->exit($deferred);
+                    $this->retryConnectionOrExit($sharedUrl, $subdomain, $authToken);
                 });
 
                 $connection->on('authenticationFailed', function ($data) use ($deferred) {
@@ -124,7 +131,11 @@ class Client
                     $deferred->resolve();
                 });
 
-            }, function (\Exception $e) use ($deferred) {
+            }, function (\Exception $e) use ($deferred, $sharedUrl, $subdomain, $authToken) {
+                if ($this->connectionRetries > 0) {
+                    $this->retryConnectionOrExit($sharedUrl, $subdomain, $authToken);
+                    return;
+                }
                 $this->logger->error("Could not connect to the server.");
                 $this->logger->error($e->getMessage());
 
@@ -141,5 +152,20 @@ class Client
         $this->loop->futureTick(function(){
             exit(1);
         });
+    }
+
+    protected function retryConnectionOrExit(string $sharedUrl, $subdomain, $authToken = '')
+    {
+        $this->connectionRetries++;
+
+        if ($this->connectionRetries <= static::MAX_CONNECTION_RETRIES) {
+            $this->loop->addTimer($this->connectionRetries, function() use ($sharedUrl, $subdomain, $authToken) {
+                $this->logger->info("Retrying connection ({$this->connectionRetries}/".static::MAX_CONNECTION_RETRIES.")");
+
+                $this->connectToServer($sharedUrl, $subdomain, $authToken);
+            });
+        } else {
+            exit(1);
+        }
     }
 }

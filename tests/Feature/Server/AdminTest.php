@@ -70,7 +70,7 @@ class AdminTest extends TestCase
         $this->app['config']['expose.admin.validate_auth_tokens'] = false;
 
         /** @var ResponseInterface $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/settings', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/settings', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
             'Content-Type' => 'application/json'
@@ -85,7 +85,7 @@ class AdminTest extends TestCase
     public function it_can_create_users()
     {
         /** @var Response $response */
-        $response = $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
             'Content-Type' => 'application/json'
@@ -103,7 +103,7 @@ class AdminTest extends TestCase
     public function it_can_delete_users()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
             'Content-Type' => 'application/json'
@@ -112,7 +112,7 @@ class AdminTest extends TestCase
         ])));
 
 
-        $this->await($this->browser->delete('http://127.0.0.1:8080/users/1', [
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/users/1', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
             'Content-Type' => 'application/json'
@@ -125,7 +125,7 @@ class AdminTest extends TestCase
     public function it_can_list_all_users()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/users', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode("username:secret"),
             'Content-Type' => 'application/json'

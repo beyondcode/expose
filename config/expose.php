@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'host' => 'localhost',
-    'port' => 8080,
+    'host' => 'expose.dev',
+    'port' => 443,
     'auth_token' => '',
 
     'admin' => [

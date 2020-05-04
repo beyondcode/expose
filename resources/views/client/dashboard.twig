@@ -100,8 +100,8 @@
             </div>
         </div>
     </div>
-    <div class="p-5 flex flex-row">
-        <div class="w-1/3 flex flex-col mr-5">
+    <div class="p-5 flex flex-col md:flex-row">
+        <div class="w-full md:w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
                 <div class="flex mb-4">
                         <span class="h-8 inline-flex rounded-md shadow-sm">
@@ -142,10 +142,25 @@
                                     @{ log.request.uri }
                                 </p>
                                 <span class="text-xs">@{ log.subdomain }</span>
+                                <span class="text-xs text-gray-600">@{ log.performed_at }</span>
                             </td>
                             <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 <div v-if="log.response">
-                                    @{ log.response.status } - @{ log.response.reason }
+                                    <span
+                                        v-if="log.response.status >= 200 && log.response.status < 300"
+                                        class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
+                                      @{ log.response.status } - @{ log.response.reason }
+                                    </span>
+                                    <span
+                                        v-if="log.response.status >= 400 && log.response.status < 500"
+                                        class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
+                                      @{ log.response.status } - @{ log.response.reason }
+                                    </span>
+                                    <span
+                                        v-if="log.response.status >= 500"
+                                        class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-red-100 text-red-800">
+                                      @{ log.response.status } - @{ log.response.reason }
+                                    </span>
                                 </div>
                                 <div v-else>
                                     ...
@@ -162,7 +177,7 @@
                 </div>
             </div>
         </div>
-        <div class="w-2/3 ml-5">
+        <div class="w-full md:w-2/3 mt-5 md:mt-0 md:ml-5">
             <div v-if="currentLog" class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 flex">
@@ -185,7 +200,23 @@
                         </span>
                     </h3>
                     <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-                        Status code: @{ currentLog.response?.status}
+
+                        <span class="text-xs text-gray-600">Received at: @{ currentLog.performed_at }</span>
+                        <span
+                            v-if="currentLog.response?.status >= 200 && currentLog.response?.status < 300"
+                            class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
+                                      @{ currentLog.response?.status } - @{ currentLog.response?.reason }
+                                    </span>
+                        <span
+                            v-if="currentLog.response?.status >= 400 && currentLog.response?.status < 500"
+                            class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
+                                      @{ currentLog.response?.status } - @{ currentLog.response?.reason }
+                                    </span>
+                        <span
+                            v-if="currentLog.response?.status >= 500"
+                            class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-red-100 text-red-800">
+                                      @{ currentLog.response?.status } - @{ currentLog.response?.reason }
+                                    </span>
                     </p>
                 </div>
                 <div>
@@ -225,7 +256,7 @@
                     <div v-for="(value, name) in currentLog.request.query"
                          :key="'query_' + name"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-500">
+                        <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ name }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
@@ -241,7 +272,7 @@
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-500">
+                        <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ parameter.name }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
@@ -259,7 +290,7 @@
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-500">
+                        <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ header }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
@@ -281,7 +312,7 @@
                     <div v-for="(value, header) in currentLog.response.headers"
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-500">
+                        <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ header }
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
@@ -297,7 +328,7 @@
                         <div v-for="(value, key) in currentLog.request.additional_data"
                              :key="'debug'+key"
                              class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt class="text-sm leading-5 font-medium text-gray-500">
+                            <dt class="text-sm leading-5 font-medium text-gray-700">
                                 @{ key }
                             </dt>
                             <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
