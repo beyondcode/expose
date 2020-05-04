@@ -20,6 +20,7 @@ class HttpConnection
     public function send($data)
     {
         $this->emit('data', [$data]);
+
         $this->socket->send($data);
     }
 

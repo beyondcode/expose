@@ -66,7 +66,7 @@ class LoggedRequest implements \JsonSerializable
                 'body' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->parsedRequest->getContent(),
                 'query' => $this->parsedRequest->getQuery()->toArray(),
                 'post' => $this->getPostData(),
-                'curl' => '', //(new CurlFormatter())->format(parse_request($this->rawRequest)),
+                'curl' => $this->getRequestAsCurl(),
                 'additional_data' => $this->additionalData,
             ],
         ];
@@ -207,5 +207,14 @@ class LoggedRequest implements \JsonSerializable
     public function getDuration()
     {
         return $this->startTime->diffInMilliseconds($this->stopTime, false);
+    }
+
+    protected function getRequestAsCurl(): string
+    {
+        try {
+            return (new CurlFormatter())->format(parse_request($this->rawRequest));
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 }
