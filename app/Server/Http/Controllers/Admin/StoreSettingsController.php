@@ -27,7 +27,7 @@ class StoreSettingsController extends AdminController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        config()->set('expose.admin.validate_auth_tokens', $request->has('validate_auth_tokens'));
+        config()->set('expose.admin.validate_auth_tokens', (bool)$request->get('validate_auth_tokens'));
 
         $messages = $request->get('messages');
 
