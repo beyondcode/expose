@@ -35,6 +35,8 @@ class StoreSettingsController extends AdminController
 
         config()->set('expose.admin.messages.subdomain_taken', Arr::get($messages, 'subdomain_taken'));
 
+        config()->set('expose.admin.maximum_connection_length', $request->get('maximum_connection_length'));
+
         config()->set('expose.admin.messages.message_of_the_day', Arr::get($messages, 'message_of_the_day'));
 
         $httpConnection->send(

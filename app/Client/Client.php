@@ -61,6 +61,9 @@ class Client
         if (Arr::get($parsedUrl, 'scheme') === 'https') {
             $url .= ':443';
         }
+        if (! is_null($port = Arr::get($parsedUrl, 'port'))) {
+            $url .= ":{$port}";
+        }
 
         return $url;
     }
