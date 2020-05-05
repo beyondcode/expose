@@ -249,11 +249,10 @@
                 </div>
 
                 <div v-if="view === 'request'">
-
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Query Parameters
-                        </dt>
+                        </h3>
                     </div>
                     <div v-for="(value, name) in currentLog.request.query"
                          :key="'query_' + name"
@@ -261,15 +260,15 @@
                         <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ name }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             @{ value }
                         </dd>
                     </div>
 
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Post Parameters
-                        </dt>
+                        </h3>
                     </div>
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
@@ -277,17 +276,17 @@
                         <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ parameter.name }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             <span
                                 v-if="parameter.is_file">File: @{ parameter.filename } (@{ parameter.mime_type })</span>
                             <span v-else>@{ parameter.value }</span>
                         </dd>
                     </div>
 
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Headers
-                        </dt>
+                        </h3>
                     </div>
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
@@ -300,16 +299,21 @@
                         </dd>
                     </div>
 
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            Request Body
+                        </h3>
+                    </div>
                     <div>
-                        <pre class="p-6 prettyprint">@{ currentLog.request.body }</pre>
+                        <pre class="p-6 prettyprint break-all whitespace-pre-wrap">@{ currentLog.request.body }</pre>
                     </div>
                 </div>
 
                 <div v-if="view === 'response'">
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Headers
-                        </dt>
+                        </h3>
                     </div>
                     <div v-for="(value, header) in currentLog.response.headers"
                          :key="header"
@@ -317,7 +321,7 @@
                         <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ header }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             @{ value }
                         </dd>
                     </div>
@@ -339,9 +343,14 @@
                         </div>
                     </div>
 
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            Response
+                        </h3>
+                    </div>
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-900">
-                            Response
+
                         </dt>
                         <div>
                             <div>
@@ -363,7 +372,7 @@
                         </div>
                     </div>
                     <div v-if="activeTab === 'raw'">
-                        <pre class="p-6 text-sm">@{ currentLog.response.body }</pre>
+                        <pre class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
                     </div>
                     <div v-if="activeTab === 'preview'">
                         <iframe :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
