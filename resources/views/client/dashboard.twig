@@ -249,10 +249,17 @@
                 </div>
 
                 <div v-if="view === 'request'">
-                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.query).length > 0">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Query Parameters
                         </h3>
+                        <span class="inline-flex rounded-md shadow-sm ml-4">
+                            <button
+                                type="button"
+                                class="clipboard-query inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                Copy as PHP array
+                            </button>
+                        </span>
                     </div>
                     <div v-for="(value, name) in currentLog.request.query"
                          :key="'query_' + name"
@@ -265,10 +272,17 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Post Parameters
                         </h3>
+                        <span class="inline-flex rounded-md shadow-sm ml-4">
+                            <button
+                                type="button"
+                                class="clipboard-post inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                Copy as PHP array
+                            </button>
+                        </span>
                     </div>
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
@@ -283,10 +297,17 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
+                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6 flex justify-between">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Headers
                         </h3>
+                        <span class="inline-flex rounded-md shadow-sm ml-4">
+                            <button
+                                type="button"
+                                class="clipboard-headers inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                Copy as PHP array
+                            </button>
+                        </span>
                     </div>
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
@@ -421,11 +442,46 @@
                 fetch('/api/logs/clear');
                 this.currentLog = null;
             },
+            toPhpArray: function(rows, variableName) {
+                let output = `$${variableName} = [\n`;
+
+                for (let key in rows) {
+                    let value = rows[key];
+
+                    if (typeof value.value !== 'undefined') {
+                        value = value.value;
+                    }
+
+                    output += `    '${key}' => '${value}',\n`;
+                }
+
+                output += `];`;
+
+                return output;
+            },
             setLog: function (log) {
                 this.currentLog = log;
 
                 this.$nextTick(function () {
-                    let clipboard = new ClipboardJS('.clipboard');
+                    new ClipboardJS('.clipboard');
+
+                    new ClipboardJS('.clipboard-query', {
+                        text: (trigger) => {
+                            return this.toPhpArray(this.currentLog.request.query, 'queryParameters');
+                        }
+                    });
+
+                    new ClipboardJS('.clipboard-post', {
+                        text: (trigger) => {
+                            return this.toPhpArray(this.currentLog.request.post, 'postParameters');
+                        }
+                    });
+
+                    new ClipboardJS('.clipboard-headers', {
+                        text: (trigger) => {
+                            return this.toPhpArray(this.currentLog.request.headers, 'headers');
+                        }
+                    });
                 });
             },
             setView: function (view) {
