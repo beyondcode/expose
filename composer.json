@@ -19,7 +19,8 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "ext-json": "*"
+        "ext-json": "*",
+        "nikic/php-parser": "^4.4"
     },
     "require-dev": {
         "cboden/ratchet": "^0.4.2",

@@ -28,6 +28,6 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
             return $valetConfig->tld;
         }
 
-        return 'test';
+        return config('expose.default_tld', 'test');
     }
 }

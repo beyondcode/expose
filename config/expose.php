@@ -4,6 +4,7 @@ return [
     'host' => 'expose.dev',
     'port' => 443,
     'auth_token' => '',
+    'default_tld' => 'test',
 
     'admin' => [
 

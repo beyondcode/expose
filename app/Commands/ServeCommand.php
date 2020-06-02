@@ -8,7 +8,7 @@ use React\EventLoop\LoopInterface;
 
 class ServeCommand extends Command
 {
-    protected $signature = 'serve {host=0.0.0.0} {hostname=localhost} {--validateAuthTokens}';
+    protected $signature = 'serve {hostname=localhost} {host=0.0.0.0}  {--validateAuthTokens}';
 
     protected $description = 'Start the shaft server';
 
