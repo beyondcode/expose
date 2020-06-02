@@ -8,7 +8,7 @@ use React\EventLoop\LoopInterface;
 
 class ServeCommand extends Command
 {
-    protected $signature = 'serve {hostname=localhost} {host=0.0.0.0}  {--validateAuthTokens}';
+    protected $signature = 'serve {hostname=localhost} {host=0.0.0.0}  {--validateAuthTokens} {--port=8080}';
 
     protected $description = 'Start the shaft server';
 
@@ -18,12 +18,13 @@ class ServeCommand extends Command
         $loop = app(LoopInterface::class);
 
         $loop->futureTick(function () {
-            $this->info("Expose server running.");
+            $this->info("Expose server running on port ".$this->option('port').".");
         });
 
         (new Factory())
             ->setLoop($loop)
             ->setHost($this->argument('host'))
+            ->setPort($this->option('port'))
             ->setHostname($this->argument('hostname'))
             ->validateAuthTokens($this->option('validateAuthTokens'))
             ->createServer()
