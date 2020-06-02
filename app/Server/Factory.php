@@ -115,7 +115,7 @@ class Factory
 
     protected function addAdminRoutes()
     {
-        $adminCondition = 'request.headers.get("Host") matches "/^'.config('expose.admin.subdomain').'\./i"';
+        $adminCondition = 'request.headers.get("Host") matches "/^'.config('expose.admin.subdomain').'\\\\./i"';
 
         $this->router->get('/', RedirectToUsersController::class, $adminCondition);
         $this->router->get('/users', ListUsersController::class, $adminCondition);
