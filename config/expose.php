@@ -1,15 +1,86 @@
 <?php
 
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Host
+    |--------------------------------------------------------------------------
+    |
+    | The expose server to connect to. By default, expose is using the free
+    | expose.dev server, offered by Beyond Code. You will need a free
+    | Beyond Code account in order to authenticate with the server.
+    | Feel free to host your own server and change this value.
+    |
+    */
     'host' => 'expose.dev',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Port
+    |--------------------------------------------------------------------------
+    |
+    | The port that expose will try to connect to. If you want to bypass
+    | firewalls and have proper SSL encrypted tunnels, make sure to use
+    | port 443 and use a reverse proxy for Expose.
+    |
+    | The free default server is already running on port 443.
+    |
+    */
     'port' => 443,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auth Token
+    |--------------------------------------------------------------------------
+    |
+    | The global authentication token to use for the expose server that you
+    | are connecting to. You can let expose automatically update this value
+    | for you by running
+    |
+    | > expose token YOUR-AUTH-TOKEN
+    |
+    */
     'auth_token' => '',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default TLD
+    |--------------------------------------------------------------------------
+    |
+    | The default TLD to use when sharing your local sites. Expose will try
+    | to look up the TLD if you are using Laravel Valet automatically.
+    | Otherwise you can specify it here manually.
+    |
+    */
     'default_tld' => 'test',
 
     'admin' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Database
+        |--------------------------------------------------------------------------
+        |
+        | The SQLite database that your expose server should use. This datbaase
+        | will hold all users that are able to authenticate with your server,
+        | if you enable authentication token validation.
+        |
+        */
         'database' => base_path('database/expose.db'),
 
+        /*
+        |--------------------------------------------------------------------------
+        | Validate auth tokens
+        |--------------------------------------------------------------------------
+        |
+        | By default, once you start an expose server, anyone is able to connect to
+        | it, given that they know the server host. If you want to only allow the
+        | connection from users that have valid authentication tokens, set this
+        | setting to true. You can also modify this at runtime in the server
+        | admin interface.
+        |
+        */
         'validate_auth_tokens' => false,
 
         /*
@@ -75,6 +146,16 @@ return [
         */
         'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
 
+        /*
+        |--------------------------------------------------------------------------
+        | Messages
+        |--------------------------------------------------------------------------
+        |
+        | The default messages that the expose server will send the clients.
+        | These settings can also be changed at runtime in the expose admin
+        | interface.
+        |
+        */
         'messages' => [
             'message_of_the_day' => 'Thank you for using expose.',
 
