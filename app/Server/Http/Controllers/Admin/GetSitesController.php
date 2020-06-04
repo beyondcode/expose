@@ -28,7 +28,12 @@ class GetSitesController extends AdminController
     {
         $httpConnection->send(
             respond_json([
-                'sites' => $this->connectionManager->getConnections()
+                'sites' => collect($this->connectionManager->getConnections())->map(function ($site, $siteId) {
+                    $site = $site->toArray();
+                    $site['id'] = $siteId;
+
+                    return $site;
+                })->values()
             ])
         );
     }

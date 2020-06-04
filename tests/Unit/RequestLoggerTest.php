@@ -113,10 +113,10 @@ class RequestLoggerTest extends TestCase
 
         $logger = new RequestLogger($browser, $cliLogger);
 
-        foreach (range(1, 20) as $i) {
+        foreach (range(1, 50) as $i) {
             $logger->logRequest($requestString, $parsedRequest);
         }
 
-        $this->assertCount(RequestLogger::MAX_LOGGED_REQUESTS, $logger->getData());
+        $this->assertCount(config('expose.max_logged_requests'), $logger->getData());
     }
 }

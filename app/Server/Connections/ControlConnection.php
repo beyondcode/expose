@@ -4,6 +4,7 @@ namespace App\Server\Connections;
 
 use Evenement\EventEmitterTrait;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Ratchet\Client\WebSocket;
@@ -13,7 +14,7 @@ use Ratchet\WebSocket\WsConnection;
 use React\Stream\Util;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
-class ControlConnection
+class ControlConnection implements Arrayable
 {
     use EventEmitterTrait;
 
@@ -23,6 +24,7 @@ class ControlConnection
     public $subdomain;
     public $client_id;
     public $proxies = [];
+    protected $shared_at;
 
     public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId)
     {
@@ -57,5 +59,15 @@ class ControlConnection
     public function close()
     {
         $this->socket->close();
+    }
+
+    public function toArray()
+    {
+        return [
+            'host' => $this->host,
+            'client_id' => $this->client_id,
+            'subdomain' => $this->subdomain,
+            'shared_at' => $this->shared_at,
+        ];
     }
 }
