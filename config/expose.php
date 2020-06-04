@@ -55,6 +55,17 @@ return [
     */
     'default_tld' => 'test',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Logged Requests
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number if requests to keep in memory when inspecting your
+    | requests and responses in the local dashboard.
+    |
+    */
+    'max_logged_requests' => 25,
+
     'admin' => [
 
         /*

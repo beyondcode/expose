@@ -19,8 +19,6 @@ class RequestLogger
     /** @var CliRequestLogger */
     protected $cliRequestLogger;
 
-    const MAX_LOGGED_REQUESTS = 10;
-
     public function __construct(Browser $browser, CliRequestLogger $cliRequestLogger)
     {
         $this->client = $browser;
@@ -40,7 +38,7 @@ class RequestLogger
 
         array_unshift($this->requests, $loggedRequest);
 
-        $this->requests = array_slice($this->requests, 0, static::MAX_LOGGED_REQUESTS);
+        $this->requests = array_slice($this->requests, 0, config('expose.max_logged_requests', 10));
 
         $this->cliRequestLogger->logRequest($loggedRequest);
 
