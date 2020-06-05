@@ -23,7 +23,7 @@ class ServeCommand extends Command
 
         $validateAuthTokens = config('expose.admin.validate_auth_tokens');
 
-        if ($this->option('validateAuthTokens')) {
+        if ($this->option('validateAuthTokens') === true) {
             $validateAuthTokens = true;
         }
 
