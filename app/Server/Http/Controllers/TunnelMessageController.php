@@ -40,6 +40,14 @@ class TunnelMessageController extends Controller
     {
         $subdomain = $this->detectSubdomain($request);
 
+        if (is_null($subdomain)) {
+            $httpConnection->send(
+                respond_html($this->getView($httpConnection, 'server.homepage'), 200)
+            );
+            $httpConnection->close();
+            return;
+        }
+
         $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
 
         if (is_null($controlConnection)) {
