@@ -21,12 +21,18 @@ class ServeCommand extends Command
             $this->info("Expose server running on port ".$this->option('port').".");
         });
 
+        $validateAuthTokens = config('expose.server.validate_auth_tokens');
+
+        if ($this->option('validateAuthTokens')) {
+            $validateAuthTokens = true;
+        }
+
         (new Factory())
             ->setLoop($loop)
             ->setHost($this->argument('host'))
             ->setPort($this->option('port'))
             ->setHostname($this->argument('hostname'))
-            ->validateAuthTokens($this->option('validateAuthTokens'))
+            ->validateAuthTokens($validateAuthTokens)
             ->createServer()
             ->run();
     }
