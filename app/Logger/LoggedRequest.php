@@ -219,7 +219,7 @@ class LoggedRequest implements \JsonSerializable
     {
         try {
             return (new CurlFormatter())->format(parse_request($this->rawRequest));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return '';
         }
     }
