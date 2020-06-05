@@ -21,7 +21,7 @@ class ServeCommand extends Command
             $this->info("Expose server running on port ".$this->option('port').".");
         });
 
-        $validateAuthTokens = config('expose.server.validate_auth_tokens');
+        $validateAuthTokens = config('expose.admin.validate_auth_tokens');
 
         if ($this->option('validateAuthTokens')) {
             $validateAuthTokens = true;
