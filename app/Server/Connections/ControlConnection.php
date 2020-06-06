@@ -14,7 +14,7 @@ use Ratchet\WebSocket\WsConnection;
 use React\Stream\Util;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
-class ControlConnection implements Arrayable
+class ControlConnection
 {
     use EventEmitterTrait;
 
