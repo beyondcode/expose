@@ -10,7 +10,7 @@ class ServeCommand extends Command
 {
     protected $signature = 'serve {hostname=localhost} {host=0.0.0.0}  {--validateAuthTokens} {--port=8080}';
 
-    protected $description = 'Start the shaft server';
+    protected $description = 'Start the expose server';
 
     public function handle()
     {
