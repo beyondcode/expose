@@ -13,7 +13,7 @@ class ShareCommand extends Command
 {
     protected $signature = 'share {host} {--subdomain=} {--auth=}';
 
-    protected $description = 'Share a local url with a remote expose server';
+    protected $description = 'Share a local url with a remote shaft server';
 
     protected function configureConnectionLogger()
     {

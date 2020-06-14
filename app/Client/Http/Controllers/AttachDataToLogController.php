@@ -26,7 +26,7 @@ class AttachDataToLogController extends Controller
         if (! is_null($loggedRequest)) {
             $loggedRequest->setAdditionalData((array)$request->get('data', []));
 
-            $this->requestLogger->pushLogs();
+            $this->requestLogger->pushLoggedRequest($loggedRequest);
 
             $httpConnection->send(str(new Response(200)));
             return;

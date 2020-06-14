@@ -2,6 +2,7 @@
 
 namespace App\Logger;
 
+use App\WebSockets\Socket;
 use Clue\React\Buzz\Browser;
 use GuzzleHttp\RequestOptions;
 use Laminas\Http\Request;
@@ -12,9 +13,6 @@ class RequestLogger
 {
     /** @var array */
     protected $requests = [];
-
-    /** @var array */
-    protected $responses = [];
 
     /** @var CliRequestLogger */
     protected $cliRequestLogger;
@@ -42,23 +40,24 @@ class RequestLogger
 
         $this->cliRequestLogger->logRequest($loggedRequest);
 
-        $this->pushLogs();
+        $this->pushLoggedRequest($loggedRequest);
 
         return $loggedRequest;
     }
 
     public function logResponse(Request $request, string $rawResponse)
     {
-        $loggedRequest = collect($this->requests)->first(function (LoggedRequest $loggedRequest) use ($request) {
-            return $loggedRequest->getRequest() === $request;
-        });
-        if ($loggedRequest) {
+        $this->requests = collect($this->requests)->transform(function (LoggedRequest $loggedRequest) use ($request, $rawResponse) {
+            if ($loggedRequest->getRequest() !== $request) {
+                return $loggedRequest;
+            }
+
             $loggedRequest->setResponse($rawResponse, Response::fromString($rawResponse));
-
             $this->cliRequestLogger->logRequest($loggedRequest);
+            $this->pushLoggedRequest($loggedRequest);
 
-            $this->pushLogs();
-        }
+            return $loggedRequest;
+        })->toArray();
     }
 
     public function getData(): array
@@ -69,19 +68,17 @@ class RequestLogger
     public function clear()
     {
         $this->requests = [];
-
-        $this->pushLogs();
     }
 
-    public function pushLogs()
+    public function pushLoggedRequest(LoggedRequest $request)
     {
-        // TODO: Make dashboard part configurable
         $this
             ->client
             ->post(
                 'http://127.0.0.1:4040/api/logs',
                 ['Content-Type' => 'application/json'],
-                json_encode($this->getData(), JSON_INVALID_UTF8_IGNORE)
+                json_encode($request, JSON_INVALID_UTF8_IGNORE)
             );
     }
+
 }
