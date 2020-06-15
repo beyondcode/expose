@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class PublishCommand extends Command
 {
-    protected $signature = 'publish';
+    protected $signature = 'publish {--force}';
 
     protected $description = 'Publish the expose configuration file';
 
@@ -18,7 +18,7 @@ class PublishCommand extends Command
             'config.php'
         ]);
 
-        if (file_exists($configFile)) {
+        if (! $this->option('force') && file_exists($configFile)) {
             $this->error('Expose configuration file already exists at '.$configFile);
             return;
         }
