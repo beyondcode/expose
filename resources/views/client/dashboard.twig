@@ -1,8 +1,11 @@
-<html>
+<html lang="en">
 <head>
+    <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/styles/github.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/highlight.min.js" async></script>
     <script>
         !function (a, b) {
             "function" == typeof define && define.amd ? define([], b) : "undefined" != typeof module && module.exports ? module.exports = b() : a.ReconnectingWebSocket = b()
@@ -136,7 +139,7 @@
                         <tr v-for="log in filteredLogs"
                             :class="{'bg-gray-100': currentLog === log}"
                             @click="setLog(log)">
-                            <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
+                            <td class="cursor.pointer px-6 py-4 whitespace-normal border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
                                 <p>
                                     @{ log.request.method }
                                     @{ log.request.uri }
@@ -396,7 +399,10 @@
                         <pre class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
                     </div>
                     <div v-if="activeTab === 'preview'">
-                        <iframe :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
+                        <div v-if="responseIsJson()">
+                            <pre><span id="jsonResponseBody" class="json"></span></pre>
+                        </div>
+                        <iframe v-else :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
                     </div>
                 </div>
             </div>
@@ -421,6 +427,7 @@
             view: 'request',
             activeTab: 'raw',
             logs: [],
+            maxLogs: {{ max_logs }},
         },
 
         computed: {
@@ -437,10 +444,28 @@
         methods: {
             setActiveTab: function(tab) {
                 this.activeTab = tab;
+                this.$nextTick(function () {
+                  this.formatJsonResponse();
+                });
             },
             clearLogs: function() {
                 fetch('/api/logs/clear');
+                this.logs = []
                 this.currentLog = null;
+            },
+            formatJsonResponse: function () {
+                if (this.view === 'response' && this.activeTab === 'preview' && this.responseIsJson()) {
+                    const target = document.getElementById('jsonResponseBody');
+                    target.innerText = JSON.stringify(JSON.parse(this.currentLog.response.body), null, 2)
+                    hljs.highlightBlock(target);
+                }
+            },
+            responseIsJson: function() {
+              if (! this.currentLog || ! this.currentLog.response || ! this.currentLog.response.headers) {
+                return false;
+              }
+
+              return /application\/json/g.test(this.currentLog.response.headers['Content-Type']);
             },
             toPhpArray: function(rows, variableName) {
                 let output = `$${variableName} = [\n`;
@@ -461,8 +486,10 @@
             },
             setLog: function (log) {
                 this.currentLog = log;
+                this.formatJsonResponse();
 
                 this.$nextTick(function () {
+                    this.formatJsonResponse()
                     new ClipboardJS('.clipboard');
 
                     new ClipboardJS('.clipboard-query', {
@@ -494,7 +521,15 @@
                 let conn = new ReconnectingWebSocket(`ws://${window.location.hostname}:${window.location.port}/socket`);
 
                 conn.onmessage = (e) => {
-                    this.logs = JSON.parse(e.data);
+                  const request = JSON.parse(e.data);
+                  const index = this.logs.findIndex(log => log.id === request.id);
+                  if (index > -1) {
+                    this.$set(this.logs, index, request)
+                  } else {
+                    this.logs.unshift(request);
+                  }
+
+                  this.logs = this.logs.splice(0, this.maxLogs);
                 };
             },
             loadLogs: function (log) {

@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->loadConfigurationFile();
 
+        $this->setMemoryLimit();
+
         $this->app->singleton(LoopInterface::class, function () {
             return LoopFactory::create();
         });
@@ -52,5 +54,10 @@ class AppServiceProvider extends ServiceProvider
             $globalConfig = require $configFile;
             config()->set('expose', array_merge($builtInConfig, $globalConfig));
         }
+    }
+
+    protected function setMemoryLimit()
+    {
+        ini_set('memory_limit', config()->get('expose.memory_limit', '128M'));
     }
 }

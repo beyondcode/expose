@@ -2,21 +2,18 @@
 
 namespace App\Client;
 
+use App\Client\Http\Controllers\ClearLogsController;
 use App\Client\Http\Controllers\CreateTunnelController;
 use App\Client\Http\Controllers\PushLogsToDashboardController;
-use App\Client\Http\HttpClient;
 use App\Http\App;
 use App\Client\Http\Controllers\AttachDataToLogController;
-use App\Client\Http\Controllers\ClearLogsController;
 use App\Client\Http\Controllers\DashboardController;
 use App\Client\Http\Controllers\LogController;
 use App\Client\Http\Controllers\ReplayLogController;
-use App\Http\Controllers\StoreLogController;
 use App\Http\RouteGenerator;
 use App\WebSockets\Socket;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\LoopInterface;
-use Symfony\Component\Routing\Route;
 use React\EventLoop\Factory as LoopFactory;
 
 class Factory

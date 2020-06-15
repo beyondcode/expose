@@ -61,7 +61,7 @@ class LoggedRequest implements \JsonSerializable
             'request' => [
                 'raw' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->rawRequest,
                 'method' => $this->parsedRequest->getMethod(),
-                'uri' => $this->parsedRequest->getUri()->getPath(),
+                'uri' => $this->parsedRequest->getUriString(),
                 'headers' => $this->parsedRequest->getHeaders()->toArray(),
                 'body' => $this->isBinary($this->rawRequest) ? 'BINARY' : $this->parsedRequest->getContent(),
                 'query' => $this->parsedRequest->getQuery()->toArray(),
@@ -72,17 +72,20 @@ class LoggedRequest implements \JsonSerializable
         ];
 
         if ($this->parsedResponse) {
+            $logBody = $this->shouldReturnBody();
+
             try {
-                $body = $this->parsedResponse->getBody();
+                $body = $logBody ? $this->parsedResponse->getBody() : '';
             } catch (\Exception $e) {
                 $body = '';
             }
+
             $data['response'] = [
-                'raw' => $this->shouldReturnBody() ? $this->rawResponse : 'BINARY',
+                'raw' => $logBody ? $this->rawResponse : 'SKIPPED BY CONFIG OR BINARY RESPONSE',
                 'status' => $this->parsedResponse->getStatusCode(),
                 'headers' => $this->parsedResponse->getHeaders()->toArray(),
                 'reason' => $this->parsedResponse->getReasonPhrase(),
-                'body' => $this->shouldReturnBody() ? $body : 'BINARY',
+                'body' => $logBody ? $body : 'SKIPPED BY CONFIG OR BINARY RESPONSE',
             ];
         }
 
@@ -104,11 +107,95 @@ class LoggedRequest implements \JsonSerializable
         return preg_match('~[^\x20-\x7E\t\r\n]~', $string) > 0;
     }
 
-    protected function shouldReturnBody()
+    protected function shouldReturnBody(): bool
     {
-        $contentType = Arr::get($this->parsedResponse->getHeaders()->toArray(), 'Content-Type');
+        if ($this->skipByStatus()) {
+            return false;
+        }
 
-        return $contentType === 'application/json' || Str::is('text/*', $contentType) || Str::is('*javascript*', $contentType);
+        if ($this->skipByContentType()) {
+            return false;
+        }
+
+        if ($this->skipByExtension()) {
+            return false;
+        }
+
+        if ($this->skipBySize()) {
+            return false;
+        }
+
+        $header = $this->parsedResponse->getHeaders()->get('Content-Type');
+        $contentType = $header ? $header->getMediaType() : '';
+        $patterns = [
+            'application/json',
+            'text/*',
+            '*javascript*',
+        ];
+
+
+        return Str::is($patterns, $contentType);
+    }
+
+    protected function skipByStatus(): bool
+    {
+        if (empty(config()->get('expose.skip_body_log.status'))) {
+            return false;
+        }
+
+        return Str::is(config()->get('expose.skip_body_log.status'), $this->parsedResponse->getStatusCode());
+    }
+
+    protected function skipByContentType(): bool
+    {
+        if (empty(config()->get('expose.skip_body_log.content_type'))) {
+            return false;
+        }
+
+        $header = $this->parsedResponse->getHeaders()->get('Content-Type');
+        $contentType = $header ? $header->getMediaType() : '';
+
+        return Str::is(config()->get('expose.skip_body_log.content_type'), $contentType);
+    }
+    
+    protected function skipByExtension(): bool
+    {
+        if (empty(config()->get('expose.skip_body_log.extension'))) {
+            return false;
+        }
+
+        return Str::is(config()->get('expose.skip_body_log.extension'), $this->parsedRequest->getUri()->getPath());
+    }
+
+    protected function skipBySize(): bool
+    {
+        $configSize = $this->getConfigSize(config()->get('expose.skip_body_log.size', '1MB'));
+        $contentLength = $this->parsedResponse->getHeaders()->get('Content-Length');
+
+        if (! $contentLength) {
+            return false;
+        }
+
+        $contentSize = $contentLength->getFieldValue() ?? 0;
+
+        return $contentSize > $configSize;
+    }
+
+    protected function getConfigSize(string $size): int
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $number = substr($size, 0, -2);
+        $suffix = strtoupper(substr($size,-2));
+
+        // B or no suffix
+        if (is_numeric(substr($suffix, 0, 1))) {
+            return preg_replace('/[^\d]/', '', $size);
+        }
+
+        // if we have an error in the input, default to GB
+        $exponent = array_flip($units)[$suffix] ?? 5;
+
+        return $number * (1024 ** $exponent);
     }
 
     public function getRequest()

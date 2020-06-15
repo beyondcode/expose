@@ -45,7 +45,7 @@ class CliRequestLogger extends Logger
         } else {
             $this->requests->prepend($loggedRequest, $loggedRequest->id());
         }
-        $this->requests = $this->requests->slice(0, 10);
+        $this->requests = $this->requests->slice(0, config('expose.max_logged_requests', 10));
 
         $this->section->clear();
 
