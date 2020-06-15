@@ -37,8 +37,7 @@ class RequestLoggerTest extends TestCase
     public function it_can_clear_the_requests()
     {
         $browser = m::mock(Browser::class);
-        $browser->shouldReceive('post')
-            ->twice();
+        $browser->shouldReceive('post')->once();
 
         $cliLogger = m::mock(CliRequestLogger::class);
         $cliLogger->shouldReceive('logRequest')->once();
