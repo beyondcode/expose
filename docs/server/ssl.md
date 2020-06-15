@@ -5,9 +5,9 @@ order: 2
 
 # SSL Support
 
-Once your Expose server is running, you can onyl access it over the port that you configure when the server gets started.
+Once your Expose server is running, you can only access it over the port that you configure when the server gets started.
 
-If you want to enable SSL support, you will need to use a proxy service - like Nginx, HAProxy or Caddy - to handle the SSL configurations and proxy all requests in plain HTTP to your expose server.
+If you want to enable SSL support, you will need to use a proxy service - like Nginx, HAProxy or Caddy - to handle the SSL configurations and proxy all non-SSL requests to your expose server.
 
 A basic Nginx configuration would look like this, but you might want to tweak the SSL parameters to your liking.
 

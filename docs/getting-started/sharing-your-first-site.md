@@ -37,4 +37,4 @@ To register and use the given credentials, just run the following command:
 expose token [YOUR-AUTH-TOKEN]
 ```
 
-This will register the token globally in your expose configuration file, and all following expose calls, will automatically use the token to authenticate with the server.
+This will register the token globally in your expose configuration file, and all following expose calls will automatically use the token to authenticate with the server.

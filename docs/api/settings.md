@@ -38,7 +38,7 @@ The result looks like this:
 
 ## Updating the settings
 
-To update the currently active settings, send a POST requests to the `/api/settings` endpoint.
+To update the currently active settings, send a POST request to the `/api/settings` endpoint.
 
 The endpoint expects you to send the following data:
 

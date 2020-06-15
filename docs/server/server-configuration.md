@@ -5,7 +5,7 @@ order: 5
 
 # Server Configuration
 
-Within the Expose admin interface, you can configure how you want your specific expose server to behave.
+Within the Expose admin interface you can configure how you want your specific expose server to behave.
 
 Here are the available settings:
 

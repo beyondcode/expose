@@ -69,4 +69,4 @@ This will return a response containing the generated user:
 
 To delete a user on the expose server, you can perform a DELETE request to the `/api/users/{user_id}` endpoint.
 
-> **Note:** The users currently active shared sites will not be disconnected automatically.
+> **Note:** The user's currently active shared sites will not be disconnected automatically.

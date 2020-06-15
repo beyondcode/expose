@@ -31,7 +31,7 @@ When you start your expose server, anyone is able to connect to it by default. I
 expose serve my-domain.com --validateAuthTokens
 ```
 
-Don't worry - you can also changes this later on through the admin interface.
+Don't worry - you can also change this later on through the admin interface.
 
 ## Keeping the expose server running with supervisord
 
@@ -46,6 +46,9 @@ apt install supervisor
 # On Red Hat / CentOS
 yum install supervisor
 systemctl enable supervisord
+
+# On Mac
+brew install supervisor
 ```
 
 Once installed, add a new process that `supervisor` needs to keep running. You place your configurations in the `/etc/supervisor/conf.d` (Debian/Ubuntu) or `/etc/supervisord.d` (Red Hat/CentOS) directory.
