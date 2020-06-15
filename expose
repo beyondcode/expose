@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use function Clue\React\SQLite\runWorker;
+
 define('LARAVEL_START', microtime(true));
 
 /*
@@ -16,6 +18,14 @@ define('LARAVEL_START', microtime(true));
 */
 
 $autoloader = require file_exists(__DIR__.'/vendor/autoload.php') ?  __DIR__.'/vendor/autoload.php' : __DIR__.'/../../autoload.php';
+
+$options = getopt(null, [
+    'sqlite-worker',
+]);
+if (isset($options['sqlite-worker'])) {
+    runWorker($_SERVER['argv'][2] ?? null);
+    exit;
+}
 
 $app = require_once __DIR__.'/bootstrap/app.php';
 

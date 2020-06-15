@@ -24,6 +24,7 @@ use App\Http\RouteGenerator;
 use App\Server\Http\Router;
 use App\Server\SubdomainGenerator\RandomSubdomainGenerator;
 use Clue\React\SQLite\DatabaseInterface;
+use Phar;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use React\Socket\Server;
@@ -205,7 +206,14 @@ class Factory
     {
         app()->singleton(DatabaseInterface::class, function() {
             $factory = new \Clue\React\SQLite\Factory($this->loop);
-            return $factory->openLazy(config('expose.admin.database', ':memory:'));
+
+            $options = ['worker_command' => Phar::running(false) ? Phar::running(false) . ' --sqlite-worker' : null];
+
+            return $factory->openLazy(
+                config('expose.admin.database', ':memory:'),
+                null,
+                $options,
+            );
         });
 
         return $this;

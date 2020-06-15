@@ -131,7 +131,11 @@ return [
         | if you enable authentication token validation.
         |
         */
-        'database' => base_path('database/expose.db'),
+        'database' => implode(DIRECTORY_SEPARATOR, [
+            $_SERVER['HOME'] ?? __DIR__,
+            '.expose',
+            'expose.db'
+        ]),
 
         /*
         |--------------------------------------------------------------------------
