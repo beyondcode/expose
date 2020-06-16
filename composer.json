@@ -1,8 +1,8 @@
 {
     "name": "beyondcode/expose",
     "description": "Expose",
-    "keywords": [],
-    "homepage": "https://expose.dev",
+    "keywords": ["expose", "tunnel", "ngrok"],
+    "homepage": "https://sharedwithexpose.com",
     "type": "project",
     "license": "MIT",
     "authors": [
