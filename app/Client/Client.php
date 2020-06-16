@@ -70,7 +70,7 @@ class Client
 
     public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
     {
-        $deferred = new \React\Promise\Deferred();
+        $deferred = new Deferred();
         $promise = $deferred->promise();
 
         $wsProtocol = $this->configuration->port() === 443 ? "wss" : "ws";
