@@ -9,14 +9,11 @@ use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Request;
+use function GuzzleHttp\Psr7\str;
 use Mockery as m;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use React\EventLoop\LoopInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Tests\Feature\TestCase;
-use function GuzzleHttp\Psr7\str;
 
 class DashboardTest extends TestCase
 {
@@ -59,7 +56,7 @@ class DashboardTest extends TestCase
     public function it_can_replay_requests()
     {
         $request = new Request('GET', '/example', [
-            'X-Expose-Request-ID' => 'request-one'
+            'X-Expose-Request-ID' => 'request-one',
         ]);
 
         $httpClient = m::mock(HttpClient::class);
@@ -74,7 +71,7 @@ class DashboardTest extends TestCase
         $this->logRequest($request);
 
         $this->assertSame(200,
-            $this->await($this->browser->get("http://127.0.0.1:4040/api/replay/request-one"))
+            $this->await($this->browser->get('http://127.0.0.1:4040/api/replay/request-one'))
                 ->getStatusCode()
         );
     }
@@ -87,7 +84,7 @@ class DashboardTest extends TestCase
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(404);
 
-        $this->await($this->browser->get("http://127.0.0.1:4040/api/replay/invalid-request"));
+        $this->await($this->browser->get('http://127.0.0.1:4040/api/replay/invalid-request'));
     }
 
     /** @test */
@@ -101,7 +98,7 @@ class DashboardTest extends TestCase
 
         $this->assertCount(3, $this->requestLogger->getData());
 
-        $this->await($this->browser->get("http://127.0.0.1:4040/api/logs/clear"));
+        $this->await($this->browser->get('http://127.0.0.1:4040/api/logs/clear'));
         $this->assertCount(0, $this->requestLogger->getData());
     }
 
@@ -113,15 +110,15 @@ class DashboardTest extends TestCase
         $loggedRequest = $this->logRequest(new Request('GET', '/foo'));
 
         $this->await($this->browser->post("http://127.0.0.1:4040/api/logs/{$loggedRequest->id()}/data", [
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ], json_encode([
             'data' => [
                 'foo' => 'bar',
-            ]
+            ],
         ])));
 
         $this->assertSame([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ], $this->requestLogger->findLoggedRequest($loggedRequest->id())->getAdditionalData());
     }
 

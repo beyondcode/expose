@@ -22,6 +22,5 @@ class TokenNodeVisitor extends NodeVisitorAbstract
 
             return $node;
         }
-        return null;
     }
 }

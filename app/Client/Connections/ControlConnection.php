@@ -3,9 +3,9 @@
 namespace App\Client\Connections;
 
 use App\Client\ProxyManager;
+use Evenement\EventEmitterTrait;
 use Ratchet\Client\WebSocket;
 use Ratchet\ConnectionInterface;
-use Evenement\EventEmitterTrait;
 use Ratchet\RFC6455\Messaging\Message;
 
 class ControlConnection

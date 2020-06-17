@@ -6,12 +6,11 @@ use App\Client\Connections\ControlConnection;
 use App\Logger\CliRequestLogger;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use function Ratchet\Client\connect;
 
 class Client
 {
@@ -26,7 +25,7 @@ class Client
     /** @var CliRequestLogger */
     protected $logger;
 
-    /** @var int  */
+    /** @var int */
     protected $connectionRetries = 0;
 
     /** @var int */
@@ -73,7 +72,7 @@ class Client
         $deferred = new Deferred();
         $promise = $deferred->promise();
 
-        $wsProtocol = $this->configuration->port() === 443 ? "wss" : "ws";
+        $wsProtocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
 
         connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
             'X-Expose-Control' => 'enabled',
@@ -85,7 +84,7 @@ class Client
 
                 $connection->authenticate($sharedUrl, $subdomain);
 
-                $clientConnection->on('close', function() use ($deferred, $sharedUrl, $subdomain, $authToken) {
+                $clientConnection->on('close', function () use ($deferred, $sharedUrl, $subdomain, $authToken) {
                     $this->logger->error('Connection to server closed.');
 
                     $this->retryConnectionOrExit($sharedUrl, $subdomain, $authToken);
@@ -106,7 +105,7 @@ class Client
                 $connection->on('setMaximumConnectionLength', function ($data) {
                     $timeoutSection = $this->logger->getOutput()->section();
 
-                    $this->loop->addPeriodicTimer(1, function() use ($data, $timeoutSection) {
+                    $this->loop->addPeriodicTimer(1, function () use ($data, $timeoutSection) {
                         $this->timeConnected++;
 
                         $carbon = Carbon::createFromFormat('s', str_pad($data->length * 60 - $this->timeConnected, 2, 0, STR_PAD_LEFT));
@@ -117,7 +116,7 @@ class Client
                 });
 
                 $connection->on('authenticated', function ($data) use ($deferred, $sharedUrl) {
-                    $httpProtocol = $this->configuration->port() === 443 ? "https" : "http";
+                    $httpProtocol = $this->configuration->port() === 443 ? 'https' : 'http';
                     $host = $this->configuration->host();
 
                     if ($httpProtocol !== 'https') {
@@ -134,13 +133,13 @@ class Client
 
                     $deferred->resolve($data);
                 });
-
             }, function (\Exception $e) use ($deferred, $sharedUrl, $subdomain, $authToken) {
                 if ($this->connectionRetries > 0) {
                     $this->retryConnectionOrExit($sharedUrl, $subdomain, $authToken);
+
                     return;
                 }
-                $this->logger->error("Could not connect to the server.");
+                $this->logger->error('Could not connect to the server.');
                 $this->logger->error($e->getMessage());
 
                 $this->exit($deferred);
@@ -153,7 +152,7 @@ class Client
     {
         $deferred->reject();
 
-        $this->loop->futureTick(function(){
+        $this->loop->futureTick(function () {
             exit(1);
         });
     }
@@ -163,8 +162,8 @@ class Client
         $this->connectionRetries++;
 
         if ($this->connectionRetries <= static::MAX_CONNECTION_RETRIES) {
-            $this->loop->addTimer($this->connectionRetries, function() use ($sharedUrl, $subdomain, $authToken) {
-                $this->logger->info("Retrying connection ({$this->connectionRetries}/".static::MAX_CONNECTION_RETRIES.")");
+            $this->loop->addTimer($this->connectionRetries, function () use ($sharedUrl, $subdomain, $authToken) {
+                $this->logger->info("Retrying connection ({$this->connectionRetries}/".static::MAX_CONNECTION_RETRIES.')');
 
                 $this->connectToServer($sharedUrl, $subdomain, $authToken);
             });

@@ -5,8 +5,8 @@ namespace App\Client\Http;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Arr;
+use function GuzzleHttp\Psr7\parse_request;
+use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -14,8 +14,6 @@ use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
-use function GuzzleHttp\Psr7\parse_request;
-use function GuzzleHttp\Psr7\str;
 
 class HttpClient
 {
@@ -67,13 +65,13 @@ class HttpClient
 
     protected function createConnector(): Connector
     {
-        return new Connector($this->loop, array(
+        return new Connector($this->loop, [
             'dns' => '127.0.0.1',
-            'tls' => array(
+            'tls' => [
                 'verify_peer' => false,
-                'verify_peer_name' => false
-            )
-        ));
+                'verify_peer_name' => false,
+            ],
+        ]);
     }
 
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)

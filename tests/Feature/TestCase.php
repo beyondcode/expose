@@ -2,17 +2,12 @@
 
 namespace Tests\Feature;
 
+use function Clue\React\Block\await;
 use Clue\React\SQLite\DatabaseInterface;
-use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Str;
-use Psr\Http\Message\ResponseInterface;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\StreamSelectLoop;
 use React\Promise\PromiseInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use function Clue\React\Block\await;
 
 abstract class TestCase extends \Tests\TestCase
 {
@@ -25,7 +20,7 @@ abstract class TestCase extends \Tests\TestCase
     {
         parent::setUp();
 
-        $this->app->bind(ConsoleOutputInterface::class, function() {
+        $this->app->bind(ConsoleOutputInterface::class, function () {
             return new ConsoleOutput();
         });
 

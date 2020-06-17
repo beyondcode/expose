@@ -35,14 +35,14 @@ class ConnectionManager implements ConnectionManagerContract
 
         $connection->setMaximumConnectionLength($maximumConnectionLength);
 
-        $this->loop->addTimer($maximumConnectionLength * 60, function() use ($connection) {
+        $this->loop->addTimer($maximumConnectionLength * 60, function () use ($connection) {
             $connection->socket->close();
         });
     }
 
     public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection
     {
-        $clientId = (string)uniqid();
+        $clientId = (string) uniqid();
 
         $connection->client_id = $clientId;
 

@@ -3,6 +3,8 @@
 namespace App\Server\Http;
 
 use App\Http\QueryParameters;
+use function GuzzleHttp\Psr7\build_query;
+use function GuzzleHttp\Psr7\parse_query;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
@@ -13,8 +15,6 @@ use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use function GuzzleHttp\Psr7\build_query;
-use function GuzzleHttp\Psr7\parse_query;
 
 class Router implements HttpServerInterface
 {
@@ -56,7 +56,7 @@ class Router implements HttpServerInterface
         try {
             $route = $this->_matcher->matchRequest($symfonyRequest);
         } catch (MethodNotAllowedException $nae) {
-            return $this->close($conn, 405, array('Allow' => $nae->getAllowedMethods()));
+            return $this->close($conn, 405, ['Allow' => $nae->getAllowedMethods()]);
         } catch (ResourceNotFoundException $nfe) {
             return $this->close($conn, 404);
         }
@@ -65,7 +65,7 @@ class Router implements HttpServerInterface
             $route['_controller'] = new $route['_controller'];
         }
 
-        if (!($route['_controller'] instanceof HttpServerInterface)) {
+        if (! ($route['_controller'] instanceof HttpServerInterface)) {
             throw new \UnexpectedValueException('All routes must implement Ratchet\Http\HttpServerInterface');
         }
 

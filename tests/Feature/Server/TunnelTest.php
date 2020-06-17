@@ -3,18 +3,13 @@
 namespace Tests\Feature\Server;
 
 use App\Client\Client;
-use App\Contracts\ConnectionManager;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
-use Ratchet\Client\WebSocket;
-use Ratchet\ConnectionInterface;
-use React\EventLoop\LoopInterface;
 use React\Http\Server;
 use Tests\Feature\TestCase;
-use function Ratchet\Client\connect;
 
 class TunnelTest extends TestCase
 {
@@ -54,7 +49,7 @@ class TunnelTest extends TestCase
         $this->expectExceptionMessage(404);
 
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
-            'Host' => 'tunnel.localhost'
+            'Host' => 'tunnel.localhost',
         ]));
     }
 
@@ -65,7 +60,7 @@ class TunnelTest extends TestCase
 
         /**
          * We create an expose client that connects to our server and shares
-         * the created test HTTP server
+         * the created test HTTP server.
          */
         $client = $this->createClient();
         $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
@@ -75,7 +70,7 @@ class TunnelTest extends TestCase
          * created tunnel.
          */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
-            'Host' => 'tunnel.localhost'
+            'Host' => 'tunnel.localhost',
         ]));
 
         $this->assertSame('Hello World!', $response->getBody()->getContents());
@@ -92,7 +87,7 @@ class TunnelTest extends TestCase
 
         /**
          * We create an expose client that connects to our server and shares
-         * the created test HTTP server
+         * the created test HTTP server.
          */
         $client = $this->createClient();
         $result = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
@@ -109,7 +104,7 @@ class TunnelTest extends TestCase
 
         /**
          * We create an expose client that connects to our server and shares
-         * the created test HTTP server
+         * the created test HTTP server.
          */
         $client = $this->createClient();
         $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
@@ -141,7 +136,7 @@ class TunnelTest extends TestCase
     protected function createTestHttpServer()
     {
         $server = new Server(function (ServerRequestInterface $request) {
-            return new Response(200, ['Content-Type' => 'text/plain'], "Hello World!");
+            return new Response(200, ['Content-Type' => 'text/plain'], 'Hello World!');
         });
 
         $this->testHttpServer = new \React\Socket\Server(8085, $this->loop);

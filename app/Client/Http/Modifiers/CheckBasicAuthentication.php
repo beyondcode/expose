@@ -4,10 +4,10 @@ namespace App\Client\Http\Modifiers;
 
 use App\Client\Configuration;
 use GuzzleHttp\Psr7\Response;
+use function GuzzleHttp\Psr7\str;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\Client\WebSocket;
-use function GuzzleHttp\Psr7\str;
 
 class CheckBasicAuthentication
 {
@@ -30,10 +30,11 @@ class CheckBasicAuthentication
         if (is_null($username)) {
             $proxyConnection->send(
                 str(new Response(401, [
-                    'WWW-Authenticate' => 'Basic realm=Expose'
+                    'WWW-Authenticate' => 'Basic realm=Expose',
                 ], 'Unauthorized'))
             );
             $proxyConnection->close();
+
             return null;
         }
 
@@ -49,7 +50,7 @@ class CheckBasicAuthentication
             return null;
         }
 
-        if (!array_key_exists($authorization['username'], $credentials)) {
+        if (! array_key_exists($authorization['username'], $credentials)) {
             return null;
         }
 
@@ -63,13 +64,13 @@ class CheckBasicAuthentication
     protected function parseAuthorizationHeader(string $header)
     {
         if (strpos($header, 'Basic') !== 0) {
-            return null;
+            return;
         }
 
         $header = base64_decode(substr($header, 6));
 
         if ($header === false) {
-            return null;
+            return;
         }
 
         $header = explode(':', $header, 2);
@@ -82,13 +83,14 @@ class CheckBasicAuthentication
 
     protected function requiresAuthentication(): bool
     {
-        return !empty($this->getCredentials());
+        return ! empty($this->getCredentials());
     }
 
     protected function getCredentials()
     {
         try {
             $credentials = explode(':', $this->configuration->auth());
+
             return [
                 $credentials[0] => $credentials[1],
             ];
