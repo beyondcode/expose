@@ -27,7 +27,7 @@ This server is available free of charge for everyone, but makes use of Expose's 
 
 Therefore, in order to share your sites for the first time, you will need an authorization token.
 
-You can obtain such a token by singing in to your [Beyond Code account](https://beyondco.de/login). If you do not yet have an account, you can [sign up and create an account](https://beyondco.de/register) for free.
+You can obtain such a token by signing in to your [Beyond Code account](https://beyondco.de/login). If you do not yet have an account, you can [sign up and create an account](https://beyondco.de/register) for free.
 
 ## Authenticating with sharedwithexpose.com
 
