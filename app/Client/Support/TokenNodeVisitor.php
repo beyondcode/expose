@@ -17,7 +17,7 @@ class TokenNodeVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Expr\ArrayItem && $node->key->value === 'auth_token') {
+        if ($node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'auth_token') {
             $node->value->value = $this->token;
 
             return $node;
