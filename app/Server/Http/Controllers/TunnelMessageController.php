@@ -7,16 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use App\Server\Connections\ControlConnection;
 use App\Server\Connections\HttpConnection;
-use GuzzleHttp\Psr7\Response;
+use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Str;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\Frame;
-use React\Promise\Deferred;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use function GuzzleHttp\Psr7\str;
 
 class TunnelMessageController extends Controller
 {
@@ -45,6 +42,7 @@ class TunnelMessageController extends Controller
                 respond_html($this->getView($httpConnection, 'server.homepage'), 200)
             );
             $httpConnection->close();
+
             return;
         }
 
@@ -55,6 +53,7 @@ class TunnelMessageController extends Controller
                 respond_html($this->getView($httpConnection, 'server.errors.404', ['subdomain' => $subdomain]), 404)
             );
             $httpConnection->close();
+
             return;
         }
 
@@ -77,7 +76,7 @@ class TunnelMessageController extends Controller
         $httpConnection = $this->connectionManager->storeHttpConnection($httpConnection, $requestId);
 
         transform($this->passRequestThroughModifiers($request, $httpConnection), function (Request $request) use ($controlConnection, $httpConnection, $requestId) {
-            $controlConnection->once('proxy_ready_' . $requestId, function (ConnectionInterface $proxy) use ($request) {
+            $controlConnection->once('proxy_ready_'.$requestId, function (ConnectionInterface $proxy) use ($request) {
                 // Convert the Laravel request into a PSR7 request
                 $psr17Factory = new Psr17Factory();
                 $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
@@ -110,7 +109,7 @@ class TunnelMessageController extends Controller
 
         $host = $this->configuration->hostname();
 
-        if (!$request->isSecure()) {
+        if (! $request->isSecure()) {
             $host .= ":{$this->configuration->port()}";
         }
 
@@ -118,7 +117,7 @@ class TunnelMessageController extends Controller
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
         $request->headers->set('X-Expose-Request-ID', uniqid());
         $request->headers->set('Upgrade-Insecure-Requests', 1);
-        $request->headers->set('X-Exposed-By', config('app.name') . ' ' . config('app.version'));
+        $request->headers->set('X-Exposed-By', config('app.name').' '.config('app.version'));
         $request->headers->set('X-Original-Host', "{$controlConnection->subdomain}.{$host}");
 
         return $request;

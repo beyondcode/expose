@@ -3,17 +3,11 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\UserRepository;
-use App\Http\Controllers\Controller;
-use Clue\React\SQLite\Result;
-use GuzzleHttp\Psr7\Response;
+use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\str;
-use function GuzzleHttp\Psr7\stream_for;
 
 class StoreUsersController extends AdminController
 {
@@ -44,7 +38,7 @@ class StoreUsersController extends AdminController
 
         $insertData = [
             'name' => $request->get('name'),
-            'auth_token' => (string)Str::uuid()
+            'auth_token' => (string) Str::uuid(),
         ];
 
         $this->userRepository

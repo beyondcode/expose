@@ -4,7 +4,6 @@ namespace App\Commands;
 
 use App\Client\Factory;
 use App\Logger\CliRequestLogger;
-use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;

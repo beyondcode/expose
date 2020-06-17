@@ -3,10 +3,9 @@
 namespace App\Client;
 
 use App\Client\Http\HttpClient;
-use Ratchet\Client\WebSocket;
-use Ratchet\ConnectionInterface;
-use React\EventLoop\LoopInterface;
 use function Ratchet\Client\connect;
+use Ratchet\Client\WebSocket;
+use React\EventLoop\LoopInterface;
 
 class ProxyManager
 {
@@ -24,14 +23,14 @@ class ProxyManager
 
     public function createProxy(string $clientId, $connectionData)
     {
-        $protocol = $this->configuration->port() === 443 ? "wss" : "ws";
+        $protocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
 
         connect($protocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {
                 $proxyConnection->on('message', function ($message) use ($proxyConnection, $connectionData) {
-                    $this->performRequest($proxyConnection, $connectionData->request_id, (string)$message);
+                    $this->performRequest($proxyConnection, $connectionData->request_id, (string) $message);
                 });
 
                 $proxyConnection->send(json_encode([
@@ -46,6 +45,6 @@ class ProxyManager
 
     protected function performRequest(WebSocket $proxyConnection, $requestId, string $requestData)
     {
-        app(HttpClient::class)->performRequest((string)$requestData, $proxyConnection, $requestId);
+        app(HttpClient::class)->performRequest((string) $requestData, $proxyConnection, $requestId);
     }
 }

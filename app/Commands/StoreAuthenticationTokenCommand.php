@@ -8,7 +8,6 @@ use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\Parser\Php7;
-use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 
 class StoreAuthenticationTokenCommand extends Command
@@ -21,13 +20,13 @@ class StoreAuthenticationTokenCommand extends Command
     {
         $config = config('expose', []);
 
-        if (!is_null($this->argument('token'))) {
-            $this->info('Setting the expose authentication token to "' . $this->argument('token') . '"');
+        if (! is_null($this->argument('token'))) {
+            $this->info('Setting the expose authentication token to "'.$this->argument('token').'"');
 
             $configFile = implode(DIRECTORY_SEPARATOR, [
                 $_SERVER['HOME'],
                 '.expose',
-                'config.php'
+                'config.php',
             ]);
 
             if (! file_exists($configFile)) {
@@ -38,13 +37,14 @@ class StoreAuthenticationTokenCommand extends Command
             }
 
             file_put_contents($configFile, $updatedConfigFile);
+
             return;
         }
 
         if (is_null($token = config('expose.auth_token'))) {
             $this->info('There is no authentication token specified.');
         } else {
-            $this->info('Current authentication token: ' . $token);
+            $this->info('Current authentication token: '.$token);
         }
     }
 

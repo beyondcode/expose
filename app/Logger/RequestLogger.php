@@ -2,12 +2,9 @@
 
 namespace App\Logger;
 
-use App\WebSockets\Socket;
 use Clue\React\Buzz\Browser;
-use GuzzleHttp\RequestOptions;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
-use function GuzzleHttp\Psr7\stream_for;
 
 class RequestLogger
 {
@@ -80,5 +77,4 @@ class RequestLogger
                 json_encode($request, JSON_INVALID_UTF8_IGNORE)
             );
     }
-
 }

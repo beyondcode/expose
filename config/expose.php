@@ -93,28 +93,28 @@ return [
     */
     'skip_body_log' => [
         /**
-         | Skip response logging by HTTP response code. Format: 4*, 5*
+         * | Skip response logging by HTTP response code. Format: 4*, 5*.
          */
         'status' => [
             // "4*"
         ],
         /**
-         | Skip response logging by HTTP response content type. Ex: "text/css"
+         * | Skip response logging by HTTP response content type. Ex: "text/css"
          */
         'content_type' => [
             //
         ],
         /**
-         | Skip response logging by file extension. Ex: ".js.map", ".min.js", ".min.css"
+         * | Skip response logging by file extension. Ex: ".js.map", ".min.js", ".min.css"
          */
         'extension' => [
             '.js.map',
             '.css.map',
         ],
         /**
-         | Skip response logging if response size is greater than configured value.
-         | Valid suffixes are: B, KB, MB, GB.
-         | Ex: 500B, 1KB, 2MB, 3GB
+         * | Skip response logging if response size is greater than configured value.
+         * | Valid suffixes are: B, KB, MB, GB.
+         * | Ex: 500B, 1KB, 2MB, 3GB
          */
         'size' => '1MB',
     ],
@@ -134,7 +134,7 @@ return [
         'database' => implode(DIRECTORY_SEPARATOR, [
             $_SERVER['HOME'] ?? __DIR__,
             '.expose',
-            'expose.db'
+            'expose.db',
         ]),
 
         /*
@@ -199,7 +199,7 @@ return [
         |
         */
         'users' => [
-            'username' => 'password'
+            'username' => 'password',
         ],
 
         /*
@@ -230,6 +230,6 @@ return [
             'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
-        ]
-    ]
+        ],
+    ],
 ];

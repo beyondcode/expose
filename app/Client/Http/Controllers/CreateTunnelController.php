@@ -3,18 +3,13 @@
 namespace App\Client\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Exception;
-use App\WebSockets\Socket;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
-use Psr\Http\Message\RequestInterface;
+use Illuminate\Http\Request;
+use Ratchet\ConnectionInterface;
 
 class CreateTunnelController extends Controller
 {
-
     protected $keepConnectionOpen = true;
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
@@ -24,10 +19,9 @@ class CreateTunnelController extends Controller
             ->then(function ($data) use ($httpConnection) {
                 $httpConnection->send(respond_json($data));
                 $httpConnection->close();
-            }, function() use ($httpConnection) {
+            }, function () use ($httpConnection) {
                 $httpConnection->send(str(new Response(500)));
                 $httpConnection->close();
             });
-
     }
 }

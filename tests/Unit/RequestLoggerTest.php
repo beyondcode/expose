@@ -7,10 +7,10 @@ use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Laminas\Http\Request as LaminasRequest;
-use Tests\TestCase;
 use function GuzzleHttp\Psr7\str;
+use Laminas\Http\Request as LaminasRequest;
 use Mockery as m;
+use Tests\TestCase;
 
 class RequestLoggerTest extends TestCase
 {

@@ -3,15 +3,9 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\ConnectionManager;
-use App\Http\Controllers\Controller;
 use App\Server\Configuration;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\str;
-use function GuzzleHttp\Psr7\stream_for;
 
 class DisconnectSiteController extends AdminController
 {
@@ -37,7 +31,7 @@ class DisconnectSiteController extends AdminController
         }
 
         $httpConnection->send(respond_json([
-            'sites' => $this->connectionManager->getConnections()
+            'sites' => $this->connectionManager->getConnections(),
         ]));
     }
 }

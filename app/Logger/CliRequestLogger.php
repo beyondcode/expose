@@ -2,7 +2,6 @@
 
 namespace App\Logger;
 
-use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -53,8 +52,8 @@ class CliRequestLogger extends Logger
             return [
                 $loggedRequest->getRequest()->getMethod(),
                 $loggedRequest->getRequest()->getUri(),
-                optional($loggedRequest->getResponse())->getStatusCode() . ' ' . optional($loggedRequest->getResponse())->getReasonPhrase(),
-                $loggedRequest->getDuration().'ms'
+                optional($loggedRequest->getResponse())->getStatusCode().' '.optional($loggedRequest->getResponse())->getReasonPhrase(),
+                $loggedRequest->getDuration().'ms',
             ];
         })->toArray());
 

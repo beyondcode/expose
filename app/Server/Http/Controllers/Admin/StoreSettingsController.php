@@ -2,18 +2,10 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
-use App\Contracts\ConnectionManager;
-use App\Http\Controllers\Controller;
 use App\Server\Configuration;
-use Clue\React\SQLite\Result;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\str;
-use function GuzzleHttp\Psr7\stream_for;
 
 class StoreSettingsController extends AdminController
 {
@@ -27,7 +19,7 @@ class StoreSettingsController extends AdminController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        config()->set('expose.admin.validate_auth_tokens', (bool)$request->get('validate_auth_tokens'));
+        config()->set('expose.admin.validate_auth_tokens', (bool) $request->get('validate_auth_tokens'));
 
         $messages = $request->get('messages');
 

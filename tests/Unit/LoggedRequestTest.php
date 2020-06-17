@@ -4,11 +4,9 @@ namespace Tests\Unit;
 
 use App\Logger\LoggedRequest;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use Laminas\Http\Request as LaminasRequest;
-use Laminas\Http\Response as LaminasResponse;
-use Tests\TestCase;
 use function GuzzleHttp\Psr7\str;
+use Laminas\Http\Request as LaminasRequest;
+use Tests\TestCase;
 
 class LoggedRequestTest extends TestCase
 {
@@ -16,7 +14,7 @@ class LoggedRequestTest extends TestCase
     public function it_retrieves_the_request_id()
     {
         $rawRequest = str(new Request(200, '/expose', [
-            'X-Expose-Request-ID' => 'example-request'
+            'X-Expose-Request-ID' => 'example-request',
         ]));
         $parsedRequest = LaminasRequest::fromString($rawRequest);
 
@@ -29,11 +27,11 @@ class LoggedRequestTest extends TestCase
     {
         $postData = [
             'name' => 'Marcel',
-            'project' => 'expose'
+            'project' => 'expose',
         ];
 
         $rawRequest = str(new Request(200, '/expose', [
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ], json_encode($postData)));
         $parsedRequest = LaminasRequest::fromString($rawRequest);
 
@@ -42,12 +40,12 @@ class LoggedRequestTest extends TestCase
         $this->assertSame([
             [
                 'name' => 'name',
-                'value' => 'Marcel'
+                'value' => 'Marcel',
             ],
             [
                 'name' => 'project',
-                'value' => 'expose'
-            ]
+                'value' => 'expose',
+            ],
         ], $loggedRequest->getPostData());
     }
 
@@ -55,7 +53,7 @@ class LoggedRequestTest extends TestCase
     public function it_returns_the_raw_request()
     {
         $rawRequest = str(new Request(200, '/expose', [
-            'X-Expose-Request-ID' => 'example-request'
+            'X-Expose-Request-ID' => 'example-request',
         ]));
         $parsedRequest = LaminasRequest::fromString($rawRequest);
 
@@ -67,7 +65,7 @@ class LoggedRequestTest extends TestCase
     public function it_returns_the_parsed_request()
     {
         $rawRequest = str(new Request(200, '/expose', [
-            'X-Expose-Request-ID' => 'example-request'
+            'X-Expose-Request-ID' => 'example-request',
         ]));
         $parsedRequest = LaminasRequest::fromString($rawRequest);
 

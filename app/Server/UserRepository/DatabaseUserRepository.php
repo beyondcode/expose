@@ -23,7 +23,7 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query("SELECT * FROM users ORDER by created_at DESC")
+            ->query('SELECT * FROM users ORDER by created_at DESC')
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
             });
@@ -36,7 +36,7 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query("SELECT * FROM users WHERE id = :id", ['id' => $id])
+            ->query('SELECT * FROM users WHERE id = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);
             });
@@ -49,7 +49,7 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query("SELECT * FROM users WHERE auth_token = :token", ['token' => $authToken])
+            ->query('SELECT * FROM users WHERE auth_token = :token', ['token' => $authToken])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);
             });
@@ -66,7 +66,7 @@ class DatabaseUserRepository implements UserRepository
             VALUES (:name, :auth_token, DATETIME('now'))
         ", $data)
             ->then(function (Result $result) use ($deferred) {
-                $this->database->query("SELECT * FROM users WHERE id = :id", ['id' => $result->insertId])
+                $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $result->insertId])
                     ->then(function (Result $result) use ($deferred) {
                         $deferred->resolve($result->rows[0]);
                     });
@@ -79,7 +79,7 @@ class DatabaseUserRepository implements UserRepository
     {
         $deferred = new Deferred();
 
-        $this->database->query("DELETE FROM users WHERE id = :id", ['id' => $id])
+        $this->database->query('DELETE FROM users WHERE id = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result);
             });

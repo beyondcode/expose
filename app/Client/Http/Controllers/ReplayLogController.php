@@ -4,13 +4,11 @@ namespace App\Client\Http\Controllers;
 
 use App\Client\Http\HttpClient;
 use App\Http\Controllers\Controller;
-use App\Http\QueryParameters;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
+use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
-use function GuzzleHttp\Psr7\str;
-use Psr\Http\Message\RequestInterface;
 
 class ReplayLogController extends Controller
 {
@@ -32,6 +30,7 @@ class ReplayLogController extends Controller
 
         if (is_null($loggedRequest)) {
             $httpConnection->send(str(new Response(404)));
+
             return;
         }
 

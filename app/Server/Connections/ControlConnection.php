@@ -3,16 +3,7 @@
 namespace App\Server\Connections;
 
 use Evenement\EventEmitterTrait;
-use GuzzleHttp\Psr7\Request;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Ratchet\Client\WebSocket;
 use Ratchet\ConnectionInterface;
-use Ratchet\RFC6455\Messaging\Frame;
-use Ratchet\WebSocket\WsConnection;
-use React\Stream\Util;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 class ControlConnection
 {
