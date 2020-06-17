@@ -27,22 +27,22 @@ return [
     | Host
     |--------------------------------------------------------------------------
     |
-    | The expose server to connect to. By default, expose is using the free 
+    | The expose server to connect to. By default, expose is using the free
     | expose.dev server, offered by Beyond Code. You will need a free
     | Beyond Code account in order to authenticate with the server.
     | Feel free to host your own server and change this value.
     |
     */
-    'host' => 'expose.dev',
+    'host' => 'sharedwithexpose.com',
 
     /*
     |--------------------------------------------------------------------------
     | Port
     |--------------------------------------------------------------------------
     |
-    | The port that expose will try to connect to. If you want to bypass 
+    | The port that expose will try to connect to. If you want to bypass
     | firewalls and have proper SSL encrypted tunnels, make sure to use
-    | port 443 and use a reverse proxy for Expose. 
+    | port 443 and use a reverse proxy for Expose.
     |
     | The free default server is already running on port 443.
     |
@@ -75,6 +75,70 @@ return [
     */
     'default_tld' => 'test',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Logged Requests
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number if requests to keep in memory when inspecting your
+    | requests and responses in the local dashboard.
+    |
+    */
+    'max_logged_requests' => 25,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Allowed Memory
+    |--------------------------------------------------------------------------
+    |
+    | The maximum memory allocated to the expose process.
+    |
+    */
+    'memory_limit' => '128M',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Allowed Memory
+    |--------------------------------------------------------------------------
+    |
+    | Sometimes, some responses don't need to be logged. Some are too big,
+    | some can't be read (like compiled assets). This configuration allows you
+    | to be as granular as you wish when logging the responses.
+    |
+    | If you run constantly out of memory, you probably need to set some of these up.
+    |
+    | Keep in mind, by default, BINARY requests/responses are not logged.
+    | You do not need to add video/mp4 for example to this list.
+    |
+    */
+    'skip_body_log' => [
+        /**
+         | Skip response logging by HTTP response code. Format: 4*, 5*
+         */
+        'status' => [
+            // "4*"
+        ],
+        /**
+         | Skip response logging by HTTP response content type. Ex: "text/css"
+         */
+        'content_type' => [
+            //
+        ],
+        /**
+         | Skip response logging by file extension. Ex: ".js.map", ".min.js", ".min.css"
+         */
+        'extension' => [
+            '.js.map',
+            '.css.map',
+        ],
+        /**
+         | Skip response logging if response size is greater than configured value.
+         | Valid suffixes are: B, KB, MB, GB.
+         | Ex: 500B, 1KB, 2MB, 3GB
+         */
+        'size' => '1MB',
+    ],
+
     'admin' => [
 
         /*
@@ -83,11 +147,15 @@ return [
         |--------------------------------------------------------------------------
         |
         | The SQLite database that your expose server should use. This datbaase
-        | will hold all users that are able to authenticate with your server, 
+        | will hold all users that are able to authenticate with your server,
         | if you enable authentication token validation.
         |
         */
-        'database' => base_path('database/expose.db'),
+        'database' => implode(DIRECTORY_SEPARATOR, [
+            $_SERVER['HOME'] ?? __DIR__,
+            '.expose',
+            'expose.db'
+        ]),
 
         /*
         |--------------------------------------------------------------------------
@@ -185,5 +253,4 @@ return [
         ]
     ]
 ];
-
 ```
