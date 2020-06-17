@@ -23,13 +23,13 @@ To learn more about how you can share your local sites, check out the [sharing l
 
 A big advantage of Expose over other alternatives such as ngrok, is the ability to host your own server. To make sharing your sites as easy as possible, we provide and host a custom expose server on our own - so getting started with expose is a breeze.
 
-This server is available free of charge for everyone, but makes use of Expose's [authentication token]() authorization method.
+This server is available free of charge for everyone, but makes use of Expose's authentication token authorization method.
 
 Therefore, in order to share your sites for the first time, you will need an authorization token.
 
-You can obtain such a token by singing in to your [Beyond Code account](/login). If you do not yet have an account, you can [sign up and create an account](/register) for free.
+You can obtain such a token by singing in to your [Beyond Code account](https://beyondco.de/login). If you do not yet have an account, you can [sign up and create an account](https://beyondco.de/register) for free.
 
-## Authenticating with expose.dev
+## Authenticating with sharedwithexpose.com
 
 To register and use the given credentials, just run the following command:
 

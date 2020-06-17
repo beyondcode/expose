@@ -17,7 +17,7 @@ This makes the assumption that you have access to the current working directory 
 
 If you are using Laravel Valet, the configured Valet subdomain will automatically be detected.
 
-If you are using a different domain for your local sites, you can change the default TLD that expose uses in the [configuration file]().
+If you are using a different domain for your local sites, you can change the default TLD that expose uses in the [configuration file](/docs/expose/client/configuration).
 
 For example: 
 
