@@ -126,7 +126,7 @@ return [
         | Database
         |--------------------------------------------------------------------------
         |
-        | The SQLite database that your expose server should use. This datbaase
+        | The SQLite database that your expose server should use. This database
         | will hold all users that are able to authenticate with your server,
         | if you enable authentication token validation.
         |

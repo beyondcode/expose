@@ -19,7 +19,7 @@ When you start your expose server, anyone is able to connect to it by default. I
 
 ## Message of the day
 
-This message will be shown when a sucessful connection to the expose server can be established. You can change it on demand, or modify it permanently in your expose configuration file.
+This message will be shown when a successful connection to the expose server can be established. You can change it on demand, or modify it permanently in your expose configuration file.
 
 ## Maximum connection length
 
