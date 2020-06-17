@@ -1,3 +1,5 @@
+![](https://beyondco.de/img/docs/expose/img/card.png)
+
 # Expose
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/beyondcode/expose.svg?style=flat-square)](https://packagist.org/packages/beyondcode/expose)
