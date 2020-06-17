@@ -12,7 +12,7 @@ The easiest way to install expose is by making it a global composer dependency:
 composer global require beyondcode/expose
 ```
 
-Now you're ready to go and can [share your first site](/docs/expose/getting-started/share-your-first-site).
+Now you're ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
 
 ### Extending Expose
 
