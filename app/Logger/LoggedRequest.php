@@ -3,13 +3,13 @@
 namespace App\Logger;
 
 use Carbon\Carbon;
+use function GuzzleHttp\Psr7\parse_request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
 use Namshi\Cuzzle\Formatter\CurlFormatter;
 use Riverline\MultiPartParser\StreamedPart;
-use function GuzzleHttp\Psr7\parse_request;
 
 class LoggedRequest implements \JsonSerializable
 {
@@ -49,7 +49,7 @@ class LoggedRequest implements \JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function jsonSerialize()
     {
@@ -133,7 +133,6 @@ class LoggedRequest implements \JsonSerializable
             '*javascript*',
         ];
 
-
         return Str::is($patterns, $contentType);
     }
 
@@ -157,7 +156,7 @@ class LoggedRequest implements \JsonSerializable
 
         return Str::is(config()->get('expose.skip_body_log.content_type'), $contentType);
     }
-    
+
     protected function skipByExtension(): bool
     {
         if (empty(config()->get('expose.skip_body_log.extension'))) {
@@ -185,7 +184,7 @@ class LoggedRequest implements \JsonSerializable
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $number = substr($size, 0, -2);
-        $suffix = strtoupper(substr($size,-2));
+        $suffix = strtoupper(substr($size, -2));
 
         // B or no suffix
         if (is_numeric(substr($suffix, 0, 1))) {
@@ -294,7 +293,7 @@ class LoggedRequest implements \JsonSerializable
         return collect($this->parsedRequest->getHeaders()->toArray())
             ->mapWithKeys(function ($value, $key) {
                 return [strtolower($key) => $value];
-            })->get('x-expose-request-id', (string)Str::uuid());
+            })->get('x-expose-request-id', (string) Str::uuid());
     }
 
     public function getDuration()

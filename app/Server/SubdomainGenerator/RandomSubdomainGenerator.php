@@ -2,8 +2,8 @@
 
 namespace App\Server\SubdomainGenerator;
 
-use Illuminate\Support\Str;
 use App\Contracts\SubdomainGenerator;
+use Illuminate\Support\Str;
 
 class RandomSubdomainGenerator implements SubdomainGenerator
 {

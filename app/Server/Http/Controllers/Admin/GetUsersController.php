@@ -3,15 +3,8 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\UserRepository;
-use App\Http\Controllers\Controller;
-use Clue\React\SQLite\Result;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\str;
-use function GuzzleHttp\Psr7\stream_for;
 
 class GetUsersController extends AdminController
 {

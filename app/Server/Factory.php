@@ -5,6 +5,7 @@ namespace App\Server;
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use App\Contracts\UserRepository;
+use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
@@ -15,28 +16,24 @@ use App\Server\Http\Controllers\Admin\GetUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
-use App\Server\Http\Controllers\Admin\StoreSettingsController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
+use App\Server\Http\Controllers\Admin\StoreSettingsController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
-use App\Http\RouteGenerator;
 use App\Server\Http\Router;
-use App\Server\SubdomainGenerator\RandomSubdomainGenerator;
 use Clue\React\SQLite\DatabaseInterface;
 use Phar;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
-use React\Socket\Server;
-use React\EventLoop\LoopInterface;
 use React\EventLoop\Factory as LoopFactory;
+use React\EventLoop\LoopInterface;
+use React\Socket\Server;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 class Factory
 {
@@ -98,7 +95,7 @@ class Factory
             new Route('/{__catchall__}', [
                 '_controller' => app(TunnelMessageController::class),
             ], [
-                '__catchall__' => '.*'
+                '__catchall__' => '.*',
             ]));
     }
 
@@ -195,7 +192,7 @@ class Factory
 
     protected function bindUserRepository()
     {
-        app()->singleton(UserRepository::class, function() {
+        app()->singleton(UserRepository::class, function () {
             return app(config('expose.admin.user_repository'));
         });
 
@@ -204,10 +201,10 @@ class Factory
 
     protected function bindDatabase()
     {
-        app()->singleton(DatabaseInterface::class, function() {
+        app()->singleton(DatabaseInterface::class, function () {
             $factory = new \Clue\React\SQLite\Factory($this->loop);
 
-            $options = ['worker_command' => Phar::running(false) ? Phar::running(false) . ' --sqlite-worker' : null];
+            $options = ['worker_command' => Phar::running(false) ? Phar::running(false).' --sqlite-worker' : null];
 
             return $factory->openLazy(
                 config('expose.admin.database', ':memory:'),
@@ -244,5 +241,4 @@ class Factory
 
         return $this;
     }
-
 }

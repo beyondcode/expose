@@ -3,7 +3,6 @@
 namespace Tests\Feature\Server;
 
 use App\Contracts\ConnectionManager;
-use App\Http\Server;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
@@ -11,7 +10,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Ratchet\Server\IoConnection;
-use React\Socket\Connector;
 use Tests\Feature\TestCase;
 
 class AdminTest extends TestCase
@@ -19,7 +17,7 @@ class AdminTest extends TestCase
     /** @var Browser */
     protected $browser;
 
-    /** @var Factory  */
+    /** @var Factory */
     protected $serverFactory;
 
     public function setUp(): void
@@ -49,7 +47,7 @@ class AdminTest extends TestCase
 
         /** @var ResponseInterface $response */
         $this->await($this->browser->get('http://127.0.0.1:8080', [
-            'Host' => 'expose.localhost'
+            'Host' => 'expose.localhost',
         ]));
     }
 
@@ -59,7 +57,7 @@ class AdminTest extends TestCase
         /** @var ResponseInterface $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
+            'Authorization' => base64_encode('username:secret'),
         ]));
         $this->assertSame(301, $response->getStatusCode());
     }
@@ -72,8 +70,8 @@ class AdminTest extends TestCase
         /** @var ResponseInterface $response */
         $this->await($this->browser->post('http://127.0.0.1:8080/api/settings', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ], json_encode([
             'validate_auth_tokens' => true,
         ])));
@@ -87,8 +85,8 @@ class AdminTest extends TestCase
         /** @var Response $response */
         $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
         ])));
@@ -105,17 +103,16 @@ class AdminTest extends TestCase
         /** @var Response $response */
         $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
         ])));
 
-
         $this->await($this->browser->delete('http://127.0.0.1:8080/api/users/1', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ]));
 
         $this->assertDatabaseHasNoResults('SELECT * FROM users WHERE name = "Marcel"');
@@ -127,8 +124,8 @@ class AdminTest extends TestCase
         /** @var Response $response */
         $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
         ])));
@@ -136,8 +133,8 @@ class AdminTest extends TestCase
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/users', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ]));
 
         $body = $response->getBody()->getContents();
@@ -157,8 +154,8 @@ class AdminTest extends TestCase
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/sites', [
             'Host' => 'expose.localhost',
-            'Authorization' => base64_encode("username:secret"),
-            'Content-Type' => 'application/json'
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
         ]));
 
         $body = $response->getBody()->getContents();

@@ -4,11 +4,8 @@ namespace App\Client\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Logger\RequestLogger;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
-use function GuzzleHttp\Psr7\str;
-use Psr\Http\Message\RequestInterface;
 
 class LogController extends Controller
 {

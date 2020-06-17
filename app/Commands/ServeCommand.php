@@ -18,7 +18,7 @@ class ServeCommand extends Command
         $loop = app(LoopInterface::class);
 
         $loop->futureTick(function () {
-            $this->info("Expose server running on port ".$this->option('port').".");
+            $this->info('Expose server running on port '.$this->option('port').'.');
         });
 
         $validateAuthTokens = config('expose.admin.validate_auth_tokens');

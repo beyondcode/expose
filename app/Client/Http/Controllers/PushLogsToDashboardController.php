@@ -3,18 +3,15 @@
 namespace App\Client\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Exception;
 use App\WebSockets\Socket;
+use Exception;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Ratchet\ConnectionInterface;
 use function GuzzleHttp\Psr7\str;
-use Psr\Http\Message\RequestInterface;
+use Illuminate\Http\Request;
+use Ratchet\ConnectionInterface;
 
 class PushLogsToDashboardController extends Controller
 {
-
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         try {

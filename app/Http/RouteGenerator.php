@@ -2,9 +2,6 @@
 
 namespace App\Http;
 
-use Ratchet\WebSocket\MessageComponentInterface;
-use Ratchet\WebSocket\WsServer;
-use React\EventLoop\LoopInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 

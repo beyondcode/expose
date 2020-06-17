@@ -3,14 +3,9 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\ConnectionManager;
-use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
-use Twig\Environment;
-use Twig\Loader\ArrayLoader;
-use function GuzzleHttp\Psr7\str;
-use function GuzzleHttp\Psr7\stream_for;
 
 class ListSitesController extends AdminController
 {
@@ -30,7 +25,7 @@ class ListSitesController extends AdminController
         $sites = $this->getView($httpConnection, 'server.sites.index', [
             'scheme' => $this->configuration->port() === 443 ? 'https' : 'http',
             'configuration' => $this->configuration,
-            'sites' => $this->connectionManager->getConnections()
+            'sites' => $this->connectionManager->getConnections(),
         ]);
 
         $httpConnection->send(

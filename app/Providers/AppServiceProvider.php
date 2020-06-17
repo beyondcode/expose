@@ -35,19 +35,19 @@ class AppServiceProvider extends ServiceProvider
     {
         $builtInConfig = config('expose');
 
-        $localConfigFile = getcwd() . DIRECTORY_SEPARATOR . '.expose.php';
+        $localConfigFile = getcwd().DIRECTORY_SEPARATOR.'.expose.php';
 
         if (file_exists($localConfigFile)) {
             $localConfig = require $localConfigFile;
             config()->set('expose', array_merge($builtInConfig, $localConfig));
+
             return;
         }
-
 
         $configFile = implode(DIRECTORY_SEPARATOR, [
             $_SERVER['HOME'] ?? __DIR__,
             '.expose',
-            'config.php'
+            'config.php',
         ]);
 
         if (file_exists($configFile)) {

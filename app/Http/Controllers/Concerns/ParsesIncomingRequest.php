@@ -14,8 +14,8 @@ trait ParsesIncomingRequest
     protected function findContentLength(array $headers): int
     {
         return Collection::make($headers)->first(function ($values, $header) {
-                return strtolower($header) === 'content-length';
-            })[0] ?? 0;
+            return strtolower($header) === 'content-length';
+        })[0] ?? 0;
     }
 
     protected function shouldHandleRequest(Request $request, ConnectionInterface $httpConnection): bool
@@ -32,7 +32,7 @@ trait ParsesIncomingRequest
                 $this->handle($connection->laravelRequest, $connection);
             }
 
-            if (!$this->keepConnectionOpen) {
+            if (! $this->keepConnectionOpen) {
                 $connection->close();
             }
 
@@ -57,7 +57,7 @@ trait ParsesIncomingRequest
             $connection->requestBuffer,
             $connection->request->getProtocolVersion(),
             [
-                'REMOTE_ADDR' => $connection->remoteAddress
+                'REMOTE_ADDR' => $connection->remoteAddress,
             ]
         ))
             ->withQueryParams(QueryParameters::create($connection->request)->all())
