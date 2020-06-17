@@ -209,7 +209,7 @@ class Factory
             return $factory->openLazy(
                 config('expose.admin.database', ':memory:'),
                 null,
-                $options,
+                $options
             );
         });
 
