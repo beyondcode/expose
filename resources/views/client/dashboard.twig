@@ -155,6 +155,11 @@
                                       @{ log.response.status } - @{ log.response.reason }
                                     </span>
                                     <span
+                                        v-if="log.response.status >= 300 && log.response.status < 400"
+                                        class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-blue-100 text-blue-800">
+                                      @{ log.response.status } - @{ log.response.reason }
+                                    </span>
+                                    <span
                                         v-if="log.response.status >= 400 && log.response.status < 500"
                                         class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
                                       @{ log.response.status } - @{ log.response.reason }
