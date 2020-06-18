@@ -99,13 +99,13 @@ return [
             // "4*"
         ],
         /**
-         * | Skip response logging by HTTP response content type. Ex: "text/css"
+         * | Skip response logging by HTTP response content type. Ex: "text/css".
          */
         'content_type' => [
             //
         ],
         /**
-         * | Skip response logging by file extension. Ex: ".js.map", ".min.js", ".min.css"
+         * | Skip response logging by file extension. Ex: ".js.map", ".min.js", ".min.css".
          */
         'extension' => [
             '.js.map',
@@ -114,7 +114,7 @@ return [
         /**
          * | Skip response logging if response size is greater than configured value.
          * | Valid suffixes are: B, KB, MB, GB.
-         * | Ex: 500B, 1KB, 2MB, 3GB
+         * | Ex: 500B, 1KB, 2MB, 3GB.
          */
         'size' => '1MB',
     ],
