@@ -139,7 +139,7 @@
                         <tr v-for="log in filteredLogs"
                             :class="{'bg-gray-100': currentLog === log}"
                             @click="setLog(log)">
-                            <td class="cursor.pointer px-6 py-4 whitespace-normal border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
+                            <td class="cursor-pointer px-6 py-4 whitespace-normal border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
                                 <p>
                                     @{ log.request.method }
                                     @{ log.request.uri }
@@ -147,7 +147,7 @@
                                 <span class="text-xs">@{ log.subdomain }</span>
                                 <span class="text-xs text-gray-600">@{ log.performed_at }</span>
                             </td>
-                            <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                            <td class="cursor-pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 <div v-if="log.response">
                                     <span
                                         v-if="log.response.status >= 200 && log.response.status < 300"
@@ -174,7 +174,7 @@
                                     ...
                                 </div>
                             </td>
-                            <td class="cursor.pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                            <td class="cursor-pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 <div v-if="log.response">
                                     @{ log.duration }ms
                                 </div>
