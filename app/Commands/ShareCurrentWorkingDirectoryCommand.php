@@ -20,7 +20,7 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     protected function detectTld(): string
     {
-        $valetConfigFile = $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'].DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'config.json';
+        $valetConfigFile = ($_SERVER['HOME'] ?? $_SERVER['USERPROFILE']) .DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'config.json';
 
         if (file_exists($valetConfigFile)) {
             $valetConfig = json_decode(file_get_contents($valetConfigFile));
