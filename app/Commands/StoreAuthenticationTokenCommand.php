@@ -18,13 +18,11 @@ class StoreAuthenticationTokenCommand extends Command
 
     public function handle()
     {
-        $config = config('expose', []);
-
         if (! is_null($this->argument('token'))) {
             $this->info('Setting the expose authentication token to "'.$this->argument('token').'"');
 
             $configFile = implode(DIRECTORY_SEPARATOR, [
-                $_SERVER['HOME'],
+                $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'],
                 '.expose',
                 'config.php',
             ]);
