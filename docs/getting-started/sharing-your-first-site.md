@@ -15,11 +15,11 @@ cd ~/Sites/my-awesome-project/
 expose
 ```
 
-This will connect to the provided server at expose.dev and give you a tunnel that you can immediately start using.
+This will connect to the provided server at sharedwithexpose.com and give you a tunnel that you can immediately start using.
 
 To learn more about how you can share your local sites, check out the [sharing local sites](/docs/expose/client/sharing) documentation.
 
-## Using the provided server at expose.dev
+## Using the provided server at sharedwithexpose.com
 
 A big advantage of Expose over other alternatives such as ngrok, is the ability to host your own server. To make sharing your sites as easy as possible, we provide and host a custom expose server on our own - so getting started with expose is a breeze.
 

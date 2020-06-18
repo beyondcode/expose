@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The expose server to connect to. By default, expose is using the free
-    | expose.dev server, offered by Beyond Code. You will need a free
+    | sharedwithexpose.com server, offered by Beyond Code. You will need a free
     | Beyond Code account in order to authenticate with the server.
     | Feel free to host your own server and change this value.
     |
