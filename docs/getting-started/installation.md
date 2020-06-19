@@ -5,11 +5,35 @@ order: 1
 
 # Installation
 
+## As a global composer dependency
+
 Expose can be installed using composer.  
 The easiest way to install expose is by making it a global composer dependency:
 
 ```bash
 composer global require beyondcode/expose
+```
+
+## As a docker container
+
+Expose has a `Dockerfile` already in the source root.
+You can build and use it without requiring any extra effort.
+
+```bash
+docker build -t expose .
+```
+
+Usage:
+
+```bash
+docker run expose <expose command>
+```
+
+Examples:
+
+```bash
+docker run expose share http://192.168.2.100 # share a local site
+docker run expose serve my-domain.com # start a server
 ```
 
 Now you're ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
