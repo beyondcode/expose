@@ -78,7 +78,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Maximum Allowed Memory
+    | Skip Response Logging
     |--------------------------------------------------------------------------
     |
     | Sometimes, some responses don't need to be logged. Some are too big,
