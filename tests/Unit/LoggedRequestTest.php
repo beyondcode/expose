@@ -23,6 +23,19 @@ class LoggedRequestTest extends TestCase
     }
 
     /** @test */
+    public function it_retrieves_the_request_for_chrome_extensions()
+    {
+        $rawRequest = str(new Request(200, '/expose', [
+            'Origin' => 'chrome-extension://expose',
+            'X-Expose-Request-ID' => 'example-request',
+        ]));
+        $parsedRequest = LaminasRequest::fromString($rawRequest);
+
+        $loggedRequest = new LoggedRequest($rawRequest, $parsedRequest);
+        $this->assertSame('example-request', $loggedRequest->id());
+    }
+
+    /** @test */
     public function it_returns_post_data_for_json_payloads()
     {
         $postData = [

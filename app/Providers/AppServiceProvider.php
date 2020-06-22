@@ -6,6 +6,8 @@ use App\Logger\CliRequestLogger;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use Illuminate\Support\ServiceProvider;
+use Laminas\Uri\Uri;
+use Laminas\Uri\UriFactory;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
 
@@ -13,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //
+        UriFactory::registerScheme('chrome-extension', Uri::class);
     }
 
     public function register()
