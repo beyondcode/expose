@@ -8,7 +8,9 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     public function handle()
     {
-        $this->input->setArgument('host', basename(getcwd()).'.'.$this->detectTld());
+        $host = $this->prepareSharedHost(basename(getcwd()).'.'.$this->detectTld());
+
+        $this->input->setArgument('host', $host);
 
         if (! $this->hasOption('subdomain')) {
             $subdomain = str_replace('.', '_', basename(getcwd()));
@@ -29,5 +31,16 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
         }
 
         return config('expose.default_tld', 'test');
+    }
+
+    protected function prepareSharedHost($host): string
+    {
+        $certificateFile = ($_SERVER['HOME'] ?? $_SERVER['USERPROFILE']).DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'Certificates'.DIRECTORY_SEPARATOR.$host.'.crt';
+
+        if (file_exists($certificateFile)) {
+            return 'https://'.$host;
+        }
+
+        return $host;
     }
 }
