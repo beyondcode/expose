@@ -41,6 +41,9 @@ expose share http://192.168.2.100
 
 # Will share access to http://my-local-site.dev using a randomly generated subdomain
 expose share my-local-site.dev
+
+# Will share access to https://my-local-site.dev using a randomly generated subdomain (note the https)
+expose share https://my-local-site.dev
 ```
 
 ## Share a local site with a given subdomain
