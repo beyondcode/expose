@@ -13,7 +13,7 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
         $this->input->setArgument('host', $host);
 
         if (! $this->option('subdomain')) {
-            $subdomain = str_replace('.', '_', basename(getcwd()));
+            $subdomain = str_replace('.', '-', basename(getcwd()));
             $this->input->setOption('subdomain', $subdomain);
         }
 
