@@ -18,7 +18,7 @@ abstract class Command extends IlluminateCommand
 
     protected function createDir(string $dir)
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
     }
