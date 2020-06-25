@@ -8,39 +8,44 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     public function handle()
     {
-        $host = $this->prepareSharedHost(basename(getcwd()).'.'.$this->detectTld());
-
-        $this->input->setArgument('host', $host);
+        $this->input->setArgument('host', $this->host());
 
         if (! $this->option('subdomain')) {
-            $subdomain = str_replace('.', '_', basename(getcwd()));
-            $this->input->setOption('subdomain', $subdomain);
+            $this->input->setOption('subdomain', $this->subdomain());
         }
 
         parent::handle();
     }
 
-    protected function detectTld(): string
+    protected function host(): string
     {
-        $valetConfigFile = ($_SERVER['HOME'] ?? $_SERVER['USERPROFILE']).DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'config.json';
+        $host = $this->base().'.'.$this->tld();
 
-        if (file_exists($valetConfigFile)) {
-            $valetConfig = json_decode(file_get_contents($valetConfigFile));
+        if (is_file($this->pathFromHome('.config', 'valet', 'Certificates', $host.'.crt'))) {
+            return 'https://'.$host;
+        }
 
-            return $valetConfig->tld;
+        return $host;
+    }
+
+    protected function tld(): string
+    {
+        $file = $this->pathFromHome('.config', 'valet', 'config.json');
+
+        if (is_file($file)) {
+            return $this->fileRead($file, 'json')->id;
         }
 
         return config('expose.default_tld', 'test');
     }
 
-    protected function prepareSharedHost($host): string
+    protected function subdomain(): string
     {
-        $certificateFile = ($_SERVER['HOME'] ?? $_SERVER['USERPROFILE']).DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'Certificates'.DIRECTORY_SEPARATOR.$host.'.crt';
+        return str_replace('.', '_', $this->base());
+    }
 
-        if (file_exists($certificateFile)) {
-            return 'https://'.$host;
-        }
-
-        return $host;
+    protected function base(): string
+    {
+        return basename(getcwd());
     }
 }

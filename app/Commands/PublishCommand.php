@@ -2,8 +2,6 @@
 
 namespace App\Commands;
 
-use Illuminate\Console\Command;
-
 class PublishCommand extends Command
 {
     protected $signature = 'publish {--force}';
@@ -12,21 +10,14 @@ class PublishCommand extends Command
 
     public function handle()
     {
-        $configFile = implode(DIRECTORY_SEPARATOR, [
-            $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'],
-            '.expose',
-            'config.php',
-        ]);
+        $file = $this->pathFromHome('.expose', 'config.php');
 
-        if (! $this->option('force') && file_exists($configFile)) {
-            $this->error('Expose configuration file already exists at '.$configFile);
-
-            return;
+        if (! $this->option('force') && is_file($file)) {
+            return $this->error('Expose configuration file already exists at '.$file);
         }
 
-        @mkdir(dirname($configFile), 0755, true);
-        file_put_contents($configFile, file_get_contents(base_path('config/expose.php')));
+        $this->fileWrite($file, $this->fileRead(base_path('config/expose.php')));
 
-        $this->info('Published expose configuration file to: '.$configFile);
+        $this->info('Published expose configuration file to: '.$file);
     }
 }

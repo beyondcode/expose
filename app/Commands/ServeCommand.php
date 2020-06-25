@@ -3,7 +3,6 @@
 namespace App\Commands;
 
 use App\Server\Factory;
-use LaravelZero\Framework\Commands\Command;
 use React\EventLoop\LoopInterface;
 
 class ServeCommand extends Command
@@ -21,10 +20,10 @@ class ServeCommand extends Command
             $this->info('Expose server running on port '.$this->option('port').'.');
         });
 
-        $validateAuthTokens = config('expose.admin.validate_auth_tokens');
-
         if ($this->option('validateAuthTokens') === true) {
             $validateAuthTokens = true;
+        } else {
+            $validateAuthTokens = config('expose.admin.validate_auth_tokens');
         }
 
         (new Factory())

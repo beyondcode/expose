@@ -3,7 +3,6 @@
 namespace App\Commands;
 
 use App\Client\Support\TokenNodeVisitor;
-use Illuminate\Console\Command;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
@@ -18,35 +17,36 @@ class StoreAuthenticationTokenCommand extends Command
 
     public function handle()
     {
-        if (! is_null($this->argument('token'))) {
-            $this->info('Setting the expose authentication token to "'.$this->argument('token').'"');
-
-            $configFile = implode(DIRECTORY_SEPARATOR, [
-                $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'],
-                '.expose',
-                'config.php',
-            ]);
-
-            if (! file_exists($configFile)) {
-                @mkdir(dirname($configFile), 0777, true);
-                $updatedConfigFile = $this->modifyConfigurationFile(base_path('config/expose.php'), $this->argument('token'));
-            } else {
-                $updatedConfigFile = $this->modifyConfigurationFile($configFile, $this->argument('token'));
-            }
-
-            file_put_contents($configFile, $updatedConfigFile);
-
-            return;
+        if ($this->argument('token')) {
+            return $this->fromToken($this->argument('token'));
         }
 
-        if (is_null($token = config('expose.auth_token'))) {
-            $this->info('There is no authentication token specified.');
-        } else {
+        if ($token = config('expose.auth_token')) {
             $this->info('Current authentication token: '.$token);
+        } else {
+            $this->info('There is no authentication token specified.');
         }
     }
 
-    protected function modifyConfigurationFile(string $configFile, string $token)
+    protected function fromToken(string $token)
+    {
+        $this->info('Setting the expose authentication token to "'.$token.'"');
+
+        $file = $this->pathFromHome('.expose', 'config.php');
+
+        $this->fileWrite($file, $this->modifyConfiguration($this->config($file), $token));
+    }
+
+    protected function config(string $file): string
+    {
+        if (! is_file($file)) {
+            $file = base_path('config/expose.php');
+        }
+
+        return $this->fileRead($file);
+    }
+
+    protected function modifyConfiguration(string $config, string $token): string
     {
         $lexer = new Emulative([
             'usedAttributes' => [
@@ -55,9 +55,10 @@ class StoreAuthenticationTokenCommand extends Command
                 'startTokenPos', 'endTokenPos',
             ],
         ]);
+
         $parser = new Php7($lexer);
 
-        $oldStmts = $parser->parse(file_get_contents($configFile));
+        $oldStmts = $parser->parse($config);
         $oldTokens = $lexer->getTokens();
 
         $nodeTraverser = new NodeTraverser;
@@ -69,8 +70,6 @@ class StoreAuthenticationTokenCommand extends Command
 
         $newStmts = $nodeTraverser->traverse($newStmts);
 
-        $prettyPrinter = new Standard();
-
-        return $prettyPrinter->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
+        return (new Standard())->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
     }
 }
