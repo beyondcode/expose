@@ -41,7 +41,7 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     protected function subdomain(): string
     {
-        return str_replace('.', '_', $this->base());
+        return str_replace('.', '-', $this->base());
     }
 
     protected function base(): string
