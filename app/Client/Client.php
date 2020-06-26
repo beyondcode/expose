@@ -108,10 +108,11 @@ class Client
                     $this->loop->addPeriodicTimer(1, function () use ($data, $timeoutSection) {
                         $this->timeConnected++;
 
-                        $carbon = Carbon::createFromFormat('s', str_pad($data->length * 60 - $this->timeConnected, 2, 0, STR_PAD_LEFT));
+                        $secondsRemaining = $data->length * 60 - $this->timeConnected;
+                        $remaining = Carbon::now()->diff(Carbon::now()->addSeconds($secondsRemaining));
 
                         $timeoutSection->clear();
-                        $timeoutSection->writeln('Remaining time: '.$carbon->format('H:i:s'));
+                        $timeoutSection->writeln('Remaining time: '.$remaining->format('%H:%I:%S'));
                     });
                 });
 
