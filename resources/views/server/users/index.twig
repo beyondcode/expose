@@ -75,6 +75,27 @@
                 </tr>
                 </tbody>
             </table>
+
+            <div class="flex items-center justify-end text-gray-900 p-4" v-if="paginated.current_page > 0">
+                <button
+                    :disabled="paginated.previous_page == null"
+                    v-on:click="getUsers(paginated.previous_page)"
+                    type="button"
+                    :class="(paginated.previous_page == null ? 'opacity-50 cursor-not-allowed' : '') + ' mr-3 py-2 px-4 border border-gray-300 rounded-md text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800 transition duration-150 ease-in-out'"
+                >
+                    Previous
+                </button>
+
+                <button
+                    :disabled="paginated.next_page == null"
+                    v-on:click="getUsers(paginated.next_page)"
+                    type="button"
+                    :class="(paginated.next_page == null ? 'opacity-50 cursor-not-allowed' : '') + ' py-2 px-4 border border-gray-300 rounded-md text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800 transition duration-150 ease-in-out'"
+                >
+                    Next
+                </button>
+            </div>
+
             <div class="flex items-center justify-center text-gray-900 p-4" v-else>
                 <span class="text-xl">The expose server does not have any users yet.</span>
             </div>
@@ -94,10 +115,25 @@
                         name: '',
                         errors: {},
                     },
-                    users: {{ users|json_encode|raw }}
+                    paginated: {{ paginated|json_encode|raw }}
+                },
+
+                computed: {
+                    users : function() {
+                        return this.paginated.users;
+                    }
                 },
 
                 methods: {
+                    getUsers(page) {
+                        fetch('/api/users?page=' + page)
+                            .then((response) => {
+                                return response.json();
+                            }).then((data) => {
+                                this.paginated = data.paginated;
+                            });
+                    },
+
                     deleteUser(user) {
                         fetch('/api/users/' + user.id, {
                             method: 'DELETE',
