@@ -133,7 +133,7 @@ ADMIN_USERNAME=username
 ADMIN_PASSWORD=password
 ```
 
-After updating the environemtn variables you can start the server:
+After updating the environment variables you can start the server:
 
 ```bash
 docker-compose up -d
