@@ -24,7 +24,7 @@ class CliRequestLogger extends Logger
         $this->section = $this->output->section();
 
         $this->table = new Table($this->section);
-        $this->table->setHeaders(['Method', 'URI', 'Response', 'Duration']);
+        $this->table->setHeaders(['Method', 'URI', 'Response', 'Time', 'Duration']);
 
         $this->requests = new Collection();
     }
@@ -53,6 +53,7 @@ class CliRequestLogger extends Logger
                 $loggedRequest->getRequest()->getMethod(),
                 $loggedRequest->getRequest()->getUri(),
                 optional($loggedRequest->getResponse())->getStatusCode().' '.optional($loggedRequest->getResponse())->getReasonPhrase(),
+                $loggedRequest->getStartTime()->toDateTimeString(),
                 $loggedRequest->getDuration().'ms',
             ];
         })->toArray());

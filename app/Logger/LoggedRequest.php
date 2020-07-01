@@ -296,6 +296,11 @@ class LoggedRequest implements \JsonSerializable
             })->get('x-expose-request-id', (string) Str::uuid());
     }
 
+    public function getStartTime()
+    {
+        return $this->startTime;
+    }
+
     public function getDuration()
     {
         return $this->startTime->diffInMilliseconds($this->stopTime, false);
