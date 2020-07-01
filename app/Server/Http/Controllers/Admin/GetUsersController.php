@@ -21,10 +21,10 @@ class GetUsersController extends AdminController
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $this->userRepository
-            ->getUsers()
-            ->then(function ($users) use ($httpConnection) {
+            ->paginateUsers(20, (int) $request->get('page', 1))
+            ->then(function ($paginated) use ($httpConnection) {
                 $httpConnection->send(
-                    respond_json(['users' => $users])
+                    respond_json(['paginated' => $paginated])
                 );
 
                 $httpConnection->close();

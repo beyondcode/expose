@@ -21,10 +21,10 @@ class ListUsersController extends AdminController
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $this->userRepository
-            ->getUsers()
-            ->then(function ($users) use ($httpConnection) {
+            ->paginateUsers(20, (int) $request->get('page', 1))
+            ->then(function ($paginated) use ($httpConnection) {
                 $httpConnection->send(
-                    respond_html($this->getView($httpConnection, 'server.users.index', ['users' => $users]))
+                    respond_html($this->getView($httpConnection, 'server.users.index', ['paginated' => $paginated]))
                 );
 
                 $httpConnection->close();

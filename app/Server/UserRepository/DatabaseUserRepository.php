@@ -31,6 +31,35 @@ class DatabaseUserRepository implements UserRepository
         return $deferred->promise();
     }
 
+    public function paginateUsers(int $perPage, int $currentPage): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $this->database
+            ->query('SELECT * FROM users ORDER by created_at DESC LIMIT :limit OFFSET :offset', [
+                'limit' => $perPage + 1,
+                'offset' => $currentPage < 2 ? 0 :  ($currentPage - 1) * $perPage,
+            ])
+            ->then(function (Result $result) use ($deferred, $perPage, $currentPage) {
+                if(count($result->rows) == $perPage + 1) {
+                    array_pop($result->rows);
+                    $nextPage = $currentPage + 1;
+                }
+
+                $paginated = [
+                    'users' => $result->rows,
+                    'current_page' => $currentPage,
+                    'per_page' => $perPage,
+                    'next_page' => $nextPage ?? null,
+                    'previous_page' => $currentPage > 1 ? $currentPage - 1 : null,
+                ];
+
+                $deferred->resolve($paginated);
+            });
+
+        return $deferred->promise();
+    }
+
     public function getUserById($id): PromiseInterface
     {
         $deferred = new Deferred();
