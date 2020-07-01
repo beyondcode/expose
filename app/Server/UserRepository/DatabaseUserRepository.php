@@ -38,10 +38,10 @@ class DatabaseUserRepository implements UserRepository
         $this->database
             ->query('SELECT * FROM users ORDER by created_at DESC LIMIT :limit OFFSET :offset', [
                 'limit' => $perPage + 1,
-                'offset' => $currentPage < 2 ? 0 :  ($currentPage - 1) * $perPage,
+                'offset' => $currentPage < 2 ? 0 : ($currentPage - 1) * $perPage,
             ])
             ->then(function (Result $result) use ($deferred, $perPage, $currentPage) {
-                if(count($result->rows) == $perPage + 1) {
+                if (count($result->rows) == $perPage + 1) {
                     array_pop($result->rows);
                     $nextPage = $currentPage + 1;
                 }
