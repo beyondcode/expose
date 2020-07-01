@@ -1,7 +1,14 @@
 * text=auto
-/.github export-ignore
-.styleci.yml export-ignore
+
+/.github         export-ignore
+/tests           export-ignore
+/docs            export-ignore
+.gitattributes   export-ignore
+.gitignore       export-ignore
+.styleci.yml     export-ignore
 .scrutinizer.yml export-ignore
-BACKERS.md export-ignore
-CONTRIBUTING.md export-ignore
-CHANGELOG.md export-ignore
+BACKERS.md       export-ignore
+CONTRIBUTING.md  export-ignore
+CHANGELOG.md     export-ignore
+nodemod.json     export-ignore
+phpunit.xml.dist export-ignore
