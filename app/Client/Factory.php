@@ -27,6 +27,9 @@ class Factory
     /** @var string */
     protected $auth = '';
 
+    /** @var bool|null */
+    protected $ssl = null;
+
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
 
@@ -63,6 +66,13 @@ class Factory
         return $this;
     }
 
+    public function setSsl(?bool $ssl)
+    {
+        $this->ssl = $ssl;
+
+        return $this;
+    }
+
     public function setLoop(LoopInterface $loop)
     {
         $this->loop = $loop;
@@ -73,7 +83,7 @@ class Factory
     protected function bindConfiguration()
     {
         app()->singleton(Configuration::class, function ($app) {
-            return new Configuration($this->host, $this->port, $this->auth);
+            return new Configuration($this->host, $this->port, $this->auth, $this->ssl);
         });
     }
 

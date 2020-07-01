@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 (2020-07-01)
+*   Feature: Add pagination to admin user interface
+*   Feature: Add request time to CLI output
+*   Feature: Add `X-Forwarded-Host` header
+*   Fix: Fix remaining time calculation
+*   Fix: Don't use underscores for automatic subdomain generation
+
 ## 1.1.0 (2020-06-18)
 *   Feature: Allow overriding the subdomain when using `expose` without specifying `expose share` explicitly
 *   Show badges in the local dashboard for 3xx response statuses
