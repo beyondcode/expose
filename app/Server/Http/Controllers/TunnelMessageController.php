@@ -119,6 +119,7 @@ class TunnelMessageController extends Controller
         $request->headers->set('Upgrade-Insecure-Requests', 1);
         $request->headers->set('X-Exposed-By', config('app.name').' '.config('app.version'));
         $request->headers->set('X-Original-Host', "{$controlConnection->subdomain}.{$host}");
+        $request->headers->set('X-Forwarded-Host', "{$controlConnection->subdomain}.{$host}");
 
         return $request;
     }
