@@ -51,7 +51,9 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
             ->keys()
             ->first();
 
-            $projectPath = $site;
+            if ($site) {
+                $projectPath = $site;
+            }
         }
 
         return str_replace('.', '-', basename($projectPath));
