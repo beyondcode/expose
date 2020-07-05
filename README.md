@@ -20,7 +20,3 @@ If you discover any security related issues, please email marcel@beyondco.de ins
 
 - [Marcel Pociot](https://github.com/mpociot)
 - [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
