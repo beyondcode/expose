@@ -1,20 +1,18 @@
 {
     "name": "beyondcode/expose",
-    "description": "Expose",
-    "keywords": ["expose", "tunnel", "ngrok"],
-    "homepage": "https://sharedwithexpose.com",
     "type": "project",
+    "description": "Expose",
+    "keywords": [
+        "expose",
+        "tunnel",
+        "ngrok"
+    ],
+    "homepage": "https://sharedwithexpose.com",
     "license": "MIT",
     "authors": [
         {
             "name": "Marcel Pociot",
             "email": "marcel@beyondco.de"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/seankndy/reactphp-sqlite"
         }
     ],
     "require": {
@@ -23,31 +21,36 @@
         "padraic/phar-updater": "^1.0.6"
     },
     "require-dev": {
-        "nikic/php-parser": "^4.4",
         "cboden/ratchet": "^0.4.2",
         "clue/block-react": "^1.3",
         "clue/buzz-react": "^2.7",
         "clue/reactphp-sqlite": "dev-modular-worker-for-phar-support",
         "guzzlehttp/guzzle": "^6.5",
         "guzzlehttp/psr7": "dev-master as 1.6.1",
-        "illuminate/http": "5.8.*|^6.0|^7.0",
+        "illuminate/http": "5.8.* || ^6.0 || ^7.0",
         "illuminate/pipeline": "^7.6",
         "illuminate/validation": "^7.7",
         "laminas/laminas-http": "^2.11",
         "laravel-zero/framework": "^7.0",
         "mockery/mockery": "^1.3",
         "namshi/cuzzle": "^2.0",
+        "nikic/php-parser": "^4.4",
         "nyholm/psr7": "^1.2",
         "phpunit/phpunit": "^8.5",
         "ratchet/pawl": "^0.3.4",
         "react/http": "^0.8.6",
-        "react/stream": "^1.1.1",
         "react/socket": "dev-master as 1.1",
+        "react/stream": "^1.1.1",
         "riverline/multipart-parser": "^2.0",
         "symfony/expression-language": "^5.0",
-        "symfony/http-kernel": "^4.0|^5.0",
+        "symfony/http-kernel": "^4.0 || ^5.0",
         "symfony/psr-http-message-bridge": "^2.0",
         "twig/twig": "^3.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     },
     "autoload": {
         "psr-4": {
@@ -62,17 +65,20 @@
             "Tests\\": "tests/"
         }
     },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/seankndy/reactphp-sqlite"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "bin": [
+        "builds/expose"
+    ],
     "scripts": {
         "post-create-project-cmd": [
             "@php application app:rename"
         ]
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "bin": ["builds/expose"]
+    }
 }
