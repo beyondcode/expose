@@ -84,7 +84,7 @@ class Client
 
                 $connection->authenticate($sharedUrl, $subdomain);
 
-                $clientConnection->on('close', function () use ($deferred, $sharedUrl, $subdomain, $authToken) {
+                $clientConnection->on('close', function () use ($sharedUrl, $subdomain, $authToken) {
                     $this->logger->error('Connection to server closed.');
 
                     $this->retryConnectionOrExit($sharedUrl, $subdomain, $authToken);
