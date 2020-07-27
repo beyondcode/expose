@@ -136,7 +136,7 @@ class ControlMessageController implements MessageComponentInterface
 
         $this->userRepository
             ->getUserByToken($authToken)
-            ->then(function ($user) use ($connection, $deferred) {
+            ->then(function ($user) use ($deferred) {
                 if (is_null($user)) {
                     $deferred->reject();
                 } else {
