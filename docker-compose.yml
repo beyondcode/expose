@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   expose:
-    image: lukepolo/expose-server:latest
+    image: beyondcodegmbh/expose-server:latest
     ports:
       - 127.0.0.1:8080:${PORT}
     environment:
