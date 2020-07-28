@@ -16,3 +16,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: beyondcodegmbh/expose-server
           tag_with_ref: true
+          tags: latest
