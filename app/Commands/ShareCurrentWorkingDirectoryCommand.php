@@ -41,11 +41,11 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
         if (is_dir($valetSitesPath)) {
             $site = collect(scandir($valetSitesPath))
             ->skip(2)
-            ->map(function($site) use($valetSitesPath) {
+            ->map(function ($site) use ($valetSitesPath) {
                 return $valetSitesPath.DIRECTORY_SEPARATOR.$site;
-            })->mapWithKeys(function($site){
+            })->mapWithKeys(function ($site) {
                 return [$site => readlink($site)];
-            })->filter(function($sourcePath) use($projectPath) {
+            })->filter(function ($sourcePath) use ($projectPath) {
                 return $sourcePath === $projectPath;
             })
             ->keys()
