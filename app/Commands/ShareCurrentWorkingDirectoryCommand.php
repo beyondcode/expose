@@ -33,14 +33,19 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
         return config('expose.default_tld', 'test');
     }
 
-    protected function prepareSharedHost($host): string
+    protected function detectProtocol($host): string
     {
         $certificateFile = ($_SERVER['HOME'] ?? $_SERVER['USERPROFILE']).DIRECTORY_SEPARATOR.'.config'.DIRECTORY_SEPARATOR.'valet'.DIRECTORY_SEPARATOR.'Certificates'.DIRECTORY_SEPARATOR.$host.'.crt';
 
         if (file_exists($certificateFile)) {
-            return 'https://'.$host;
+            return 'https://';
         }
 
-        return $host;
+        return config('expose.default_https', false) ? 'https://' : 'http://';
+    }
+
+    protected function prepareSharedHost($host): string
+    {
+        return $this->detectProtocol($host) . $host;
     }
 }
