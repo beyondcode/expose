@@ -46,6 +46,6 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     protected function prepareSharedHost($host): string
     {
-        return $this->detectProtocol($host) . $host;
+        return $this->detectProtocol($host).$host;
     }
 }
