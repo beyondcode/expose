@@ -54,6 +54,10 @@ class ControlMessageController implements MessageComponentInterface
         if (isset($connection->request_id)) {
             return $this->sendResponseToHttpConnection($connection->request_id, $msg);
         }
+        if (isset($connection->tcp_request_id)) {
+            $connectionInfo = $this->connectionManager->findControlConnectionForClientId($connection->tcp_client_id);
+            $connectionInfo->proxyConnection->write($msg);
+        }
 
         try {
             $payload = json_decode($msg);
@@ -78,22 +82,11 @@ class ControlMessageController implements MessageComponentInterface
     {
         $this->verifyAuthToken($connection)
             ->then(function () use ($connection, $data) {
-                if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
-                    return;
+                if ($data->type === 'http') {
+                    $this->handleHttpConnection($connection, $data);
+                } elseif($data->type === 'tcp') {
+                    $this->handleTcpConnection($connection, $data);
                 }
-
-                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
-
-                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
-
-                $connection->send(json_encode([
-                    'event' => 'authenticated',
-                    'data' => [
-                        'message' => config('expose.admin.messages.message_of_the_day'),
-                        'subdomain' => $connectionInfo->subdomain,
-                        'client_id' => $connectionInfo->client_id,
-                    ],
-                ]));
             }, function () use ($connection) {
                 $connection->send(json_encode([
                     'event' => 'authenticationFailed',
@@ -105,6 +98,41 @@ class ControlMessageController implements MessageComponentInterface
             });
     }
 
+    protected function handleHttpConnection(ConnectionInterface $connection, $data)
+    {
+        if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
+            return;
+        }
+
+        $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
+
+        $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
+
+        $connection->send(json_encode([
+            'event' => 'authenticated',
+            'data' => [
+                'message' => config('expose.admin.messages.message_of_the_day'),
+                'subdomain' => $connectionInfo->subdomain,
+                'client_id' => $connectionInfo->client_id,
+            ],
+        ]));
+    }
+
+    protected function handleTcpConnection(ConnectionInterface $connection, $data)
+    {
+        $connectionInfo = $this->connectionManager->storeTcpConnection($data->port, $connection);
+
+        $connection->send(json_encode([
+            'event' => 'authenticated',
+            'data' => [
+                'message' => config('expose.admin.messages.message_of_the_day'),
+                'port' => $connectionInfo->port,
+                'shared_port' => $connectionInfo->shared_port,
+                'client_id' => $connectionInfo->client_id,
+            ],
+        ]));
+    }
+
     protected function registerProxy(ConnectionInterface $connection, $data)
     {
         $connection->request_id = $data->request_id;
@@ -112,6 +140,18 @@ class ControlMessageController implements MessageComponentInterface
         $connectionInfo = $this->connectionManager->findControlConnectionForClientId($data->client_id);
 
         $connectionInfo->emit('proxy_ready_'.$data->request_id, [
+            $connection,
+        ]);
+    }
+
+    protected function registerTcpProxy(ConnectionInterface $connection, $data)
+    {
+        $connection->tcp_client_id = $data->client_id;
+        $connection->tcp_request_id = $data->tcp_request_id;
+
+        $connectionInfo = $this->connectionManager->findControlConnectionForClientId($data->client_id);
+
+        $connectionInfo->emit('tcp_proxy_ready_'.$data->tcp_request_id, [
             $connection,
         ]);
     }

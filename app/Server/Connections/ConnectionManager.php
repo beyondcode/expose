@@ -6,6 +6,7 @@ use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
+use React\Socket\Server;
 
 class ConnectionManager implements ConnectionManagerContract
 {
@@ -51,6 +52,24 @@ class ConnectionManager implements ConnectionManagerContract
         $this->connections[] = $storedConnection;
 
         return $storedConnection;
+    }
+
+    public function storeTcpConnection(int $port, ConnectionInterface $connection): ControlConnection
+    {
+        $clientId = (string) uniqid();
+
+        $connection->client_id = $clientId;
+
+        $storedConnection = new TcpControlConnection($connection, $port, $this->getSharedTcpServer(), $clientId);
+
+        $this->connections[] = $storedConnection;
+
+        return $storedConnection;
+    }
+
+    protected function getSharedTcpServer(): Server
+    {
+        return new Server(0, $this->loop);
     }
 
     public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection
