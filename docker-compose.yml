@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  expose:
+    image: beyondcodegmbh/expose-server:latest
+    ports:
+      - 127.0.0.1:8080:${PORT}
+    environment:
+      port: ${PORT}
+      domain: ${DOMAIN}
+      username: ${ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+    restart: always
+    volumes:
+      - ./database/expose.db:/root/.expose

@@ -122,4 +122,21 @@ return [
     // ...
 ```
 
+## Running With Docker
+
+To run Expose with docker use the included `docker-compose.yaml`. Copy `.env-example` to `.env` and update the configuration.
+
+```
+PORT=8080
+DOMAIN=example.com
+ADMIN_USERNAME=username
+ADMIN_PASSWORD=password
+```
+
+After updating the environment variables you can start the server:
+
+```bash
+docker-compose up -d
+```
+
 Now that your basic expose server is running, let's take a look at how you can add SSL support.

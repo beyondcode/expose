@@ -308,6 +308,12 @@ class LoggedRequest implements \JsonSerializable
 
     protected function getRequestAsCurl(): string
     {
+        $maxRequestLength = 256000;
+
+        if (strlen($this->rawRequest) > $maxRequestLength) {
+            return '';
+        }
+
         try {
             return (new CurlFormatter())->format(parse_request($this->rawRequest));
         } catch (\Throwable $e) {

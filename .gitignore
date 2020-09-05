@@ -7,3 +7,4 @@
 expose.php
 database/expose.db
 .expose.php
+.env
