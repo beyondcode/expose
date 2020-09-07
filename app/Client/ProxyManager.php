@@ -3,6 +3,7 @@
 namespace App\Client;
 
 use App\Client\Http\HttpClient;
+use Ratchet\RFC6455\Messaging\Frame;
 use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
@@ -56,7 +57,8 @@ class ProxyManager
 
                 $connector->connect('127.0.0.1:'.$connectionData->port)->then(function ($connection) use ($proxyConnection) {
                     $connection->on('data', function ($data) use ($proxyConnection) {
-                        $proxyConnection->send($data);
+                        $binaryMsg = new Frame($data, true, Frame::OP_BINARY);
+                        $proxyConnection->send($binaryMsg);
                     });
 
                     $proxyConnection->on('message', function ($message) use ($connection) {

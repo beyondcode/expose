@@ -3,6 +3,7 @@
 namespace App\Server\Connections;
 
 use Ratchet\ConnectionInterface;
+use Ratchet\RFC6455\Messaging\Frame;
 use React\Socket\Server;
 
 class TcpControlConnection extends ControlConnection
@@ -92,7 +93,8 @@ class TcpControlConnection extends ControlConnection
                 $this->proxy = $proxy;
 
                 $connection->on('data', function ($data) use ($proxy) {
-                    $proxy->send($data);
+                    $binaryMsg = new Frame($data, true, Frame::OP_BINARY);
+                    $proxy->send($binaryMsg);
                 });
 
                 $connection->resume();
