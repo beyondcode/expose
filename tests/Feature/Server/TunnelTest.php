@@ -27,6 +27,9 @@ class TunnelTest extends TestCase
         parent::setUp();
 
         $this->browser = new Browser($this->loop);
+        $this->browser = $this->browser->withOptions([
+            'followRedirects' => false,
+        ]);
 
         $this->startServer();
     }
@@ -57,6 +60,8 @@ class TunnelTest extends TestCase
     public function it_sends_incoming_requests_to_the_connected_client()
     {
         $this->createTestHttpServer();
+
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
 
         /**
          * We create an expose client that connects to our server and shares
@@ -98,21 +103,95 @@ class TunnelTest extends TestCase
     {
         $this->app['config']['expose.admin.validate_auth_tokens'] = true;
 
-        $this->createTestHttpServer();
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ])));
 
-        $this->expectException(\UnexpectedValueException::class);
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
 
         /**
          * We create an expose client that connects to our server and shares
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+
+        $this->assertSame('tunnel', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_rejects_clients_to_specify_custom_subdomains()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 0,
+        ])));
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+
+        $this->assertSame('tunnel', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_clients_to_use_random_subdomains_if_custom_subdomains_are_forbidden()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 0,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', '', $user->auth_token));
+
+        $this->assertInstanceOf(\stdClass::class, $response);
     }
 
     protected function startServer()
     {
+        $this->app['config']['expose.admin.subdomain'] = 'expose';
         $this->app['config']['expose.admin.database'] = ':memory:';
+
+        $this->app['config']['expose.admin.users'] = [
+            'username' => 'secret',
+        ];
 
         $this->serverFactory = new Factory();
 

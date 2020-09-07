@@ -5,6 +5,7 @@ namespace App\Server\Http\Controllers;
 use App\Contracts\ConnectionManager;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
+use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
@@ -77,8 +78,8 @@ class ControlMessageController implements MessageComponentInterface
     protected function authenticate(ConnectionInterface $connection, $data)
     {
         $this->verifyAuthToken($connection)
-            ->then(function () use ($connection, $data) {
-                if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
+            ->then(function ($user) use ($connection, $data) {
+                if (! $this->hasValidSubdomain($connection, $data->subdomain, $user)) {
                     return;
                 }
 
@@ -147,8 +148,20 @@ class ControlMessageController implements MessageComponentInterface
         return $deferred->promise();
     }
 
-    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain): bool
+    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): bool
     {
+        if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
+            $connection->send(json_encode([
+                'event' => 'subdomainTaken',
+                'data' => [
+                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized'),
+                ],
+            ]));
+            $connection->close();
+
+            return false;
+        }
+
         if (! is_null($subdomain)) {
             $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
             if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {

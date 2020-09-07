@@ -24,6 +24,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+                        <label for="can_specify_subdomains"
+                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                            Can specify custom subdomains
+                        </label>
+                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                            <div class="mt-2 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="can_specify_subdomains"
+                                           v-model="userForm.can_specify_subdomains"
+                                           name="can_specify_subdomains"
+                                           value="1" type="checkbox" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+                                    <label for="can_specify_subdomains" class="ml-2 block text-sm leading-5 text-gray-900">
+                                        Yes
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-8 border-t border-gray-200 pt-5">
                     <div class="flex justify-end">
@@ -52,6 +71,9 @@
                         Auth-Token
                     </th>
                     <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                        Custom Subdomains
+                    </th>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                         Created At
                     </th>
                     <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
@@ -64,6 +86,14 @@
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                         @{ user.auth_token }
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                        <span v-if="user.can_specify_subdomains === 0">
+                            No
+                        </span>
+                        <span v-else>
+                            Yes
+                        </span>
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                         @{ user.created_at }
@@ -113,6 +143,7 @@
                 data: {
                     userForm: {
                         name: '',
+                        can_specify_subdomains: true,
                         errors: {},
                     },
                     paginated: {{ paginated|json_encode|raw }}
@@ -140,7 +171,7 @@
                         }).then((response) => {
                             return response.json();
                         }).then((data) => {
-                            this.users = this.users.filter(u => u.id !== user.id);
+                            this.getUsers(1)
                         });
                     },
                     saveUser() {
@@ -155,6 +186,7 @@
                         }).then((data) => {
                             if (data.user) {
                                 this.userForm.name = '';
+                                this.userForm.can_specify_subdomains = 0;
                                 this.userForm.errors = {};
                                 this.users.unshift(data.user);
                             }
