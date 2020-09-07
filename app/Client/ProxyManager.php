@@ -3,9 +3,9 @@
 namespace App\Client;
 
 use App\Client\Http\HttpClient;
-use Ratchet\RFC6455\Messaging\Frame;
 use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
+use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
 
