@@ -8,7 +8,6 @@ use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use stdClass;
 
@@ -81,11 +80,11 @@ class ControlMessageController implements MessageComponentInterface
     protected function authenticate(ConnectionInterface $connection, $data)
     {
         $this->verifyAuthToken($connection)
-            ->then(function () use ($connection, $data) {
+            ->then(function ($user) use ($connection, $data) {
                 if ($data->type === 'http') {
-                    $this->handleHttpConnection($connection, $data);
+                    $this->handleHttpConnection($connection, $data, $user);
                 } elseif($data->type === 'tcp') {
-                    $this->handleTcpConnection($connection, $data);
+                    $this->handleTcpConnection($connection, $data, $user);
                 }
             }, function () use ($connection) {
                 $connection->send(json_encode([
@@ -98,9 +97,9 @@ class ControlMessageController implements MessageComponentInterface
             });
     }
 
-    protected function handleHttpConnection(ConnectionInterface $connection, $data)
+    protected function handleHttpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        if (! $this->hasValidSubdomain($connection, $data->subdomain)) {
+        if (! $this->hasValidSubdomain($connection, $data->subdomain, $user)) {
             return;
         }
 
@@ -118,7 +117,7 @@ class ControlMessageController implements MessageComponentInterface
         ]));
     }
 
-    protected function handleTcpConnection(ConnectionInterface $connection, $data)
+    protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
     {
         $connectionInfo = $this->connectionManager->storeTcpConnection($data->port, $connection);
 
@@ -167,7 +166,7 @@ class ControlMessageController implements MessageComponentInterface
     protected function verifyAuthToken(ConnectionInterface $connection): PromiseInterface
     {
         if (config('expose.admin.validate_auth_tokens') !== true) {
-            return new FulfilledPromise();
+            return \React\Promise\resolve(null);
         }
 
         $deferred = new Deferred();
@@ -187,8 +186,20 @@ class ControlMessageController implements MessageComponentInterface
         return $deferred->promise();
     }
 
-    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain): bool
+    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): bool
     {
+        if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
+            $connection->send(json_encode([
+                'event' => 'subdomainTaken',
+                'data' => [
+                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized'),
+                ],
+            ]));
+            $connection->close();
+
+            return false;
+        }
+
         if (! is_null($subdomain)) {
             $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
             if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {

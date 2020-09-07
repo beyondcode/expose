@@ -14,7 +14,7 @@ class TcpControlConnection extends ControlConnection
     public $shared_port;
     public $shared_server;
 
-    public function __construct(ConnectionInterface $socket, int $port, Server $sharedServer, string $clientId)
+    public function __construct(ConnectionInterface $socket, int $port, Server $sharedServer, string $clientId, string $authToken = '')
     {
         $this->socket = $socket;
         $this->client_id = $clientId;
@@ -22,6 +22,7 @@ class TcpControlConnection extends ControlConnection
         $this->port = $port;
         $this->shared_at = now()->toDateTimeString();
         $this->shared_port = parse_url($sharedServer->getAddress(), PHP_URL_PORT);
+        $this->authToken = $authToken;
 
         $this->configureServer($sharedServer);
     }
@@ -85,7 +86,6 @@ class TcpControlConnection extends ControlConnection
 
             $this->once('tcp_proxy_ready_'.$requestId, function (ConnectionInterface $proxy) use ($connection) {
                 $this->proxy = $proxy;
-                dump("Proxy ready");
 
                 $connection->on('data', function($data) use ($proxy) {
                     $proxy->send($data);

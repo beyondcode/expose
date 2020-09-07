@@ -230,6 +230,8 @@ return [
             'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
+
+            'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro.',
         ],
     ],
 ];

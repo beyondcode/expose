@@ -17,8 +17,7 @@
     ],
     "require": {
         "php": "^7.3.0",
-        "ext-json": "*",
-        "padraic/phar-updater": "^1.0.6"
+        "ext-json": "*"
     },
     "require-dev": {
         "cboden/ratchet": "^0.4.2",
