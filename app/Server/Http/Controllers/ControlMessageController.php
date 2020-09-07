@@ -8,7 +8,6 @@ use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use stdClass;
 
@@ -127,7 +126,7 @@ class ControlMessageController implements MessageComponentInterface
     protected function verifyAuthToken(ConnectionInterface $connection): PromiseInterface
     {
         if (config('expose.admin.validate_auth_tokens') !== true) {
-            return new FulfilledPromise();
+            return \React\Promise\resolve(null);
         }
 
         $deferred = new Deferred();

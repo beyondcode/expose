@@ -4,6 +4,7 @@ namespace App\Server\Connections;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
+use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 
@@ -46,7 +47,13 @@ class ConnectionManager implements ConnectionManagerContract
 
         $connection->client_id = $clientId;
 
-        $storedConnection = new ControlConnection($connection, $host, $subdomain ?? $this->subdomainGenerator->generateSubdomain(), $clientId);
+        $storedConnection = new ControlConnection(
+            $connection,
+            $host,
+            $subdomain ?? $this->subdomainGenerator->generateSubdomain(),
+            $clientId,
+            $this->getAuthTokenFromConnection($connection)
+        );
 
         $this->connections[] = $storedConnection;
 
@@ -98,5 +105,22 @@ class ConnectionManager implements ConnectionManagerContract
     public function getConnections(): array
     {
         return $this->connections;
+    }
+
+    protected function getAuthTokenFromConnection(ConnectionInterface $connection): string
+    {
+        return QueryParameters::create($connection->httpRequest)->get('authToken');
+    }
+
+    public function getConnectionsForAuthToken(string $authToken): array
+    {
+        return collect($this->connections)
+            ->filter(function ($connection) use ($authToken) {
+                return $connection->authToken === $authToken;
+            })
+            ->map(function ($connection) {
+                return $connection->toArray();
+            })
+            ->toArray();
     }
 }

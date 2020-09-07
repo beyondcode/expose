@@ -12,6 +12,7 @@ use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
 use App\Server\Http\Controllers\Admin\GetSettingsController;
 use App\Server\Http\Controllers\Admin\GetSitesController;
+use App\Server\Http\Controllers\Admin\GetUserDetailsController;
 use App\Server\Http\Controllers\Admin\GetUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
@@ -124,6 +125,7 @@ class Factory
         $this->router->post('/api/settings', StoreSettingsController::class, $adminCondition);
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
+        $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
