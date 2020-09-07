@@ -88,7 +88,7 @@ class ConnectionManager implements ConnectionManagerContract
         do {
             try {
                 $portFound = true;
-                $server = new Server('127.0.0.1:'.$port, $this->loop);
+                $server = new Server('0.0.0.0:'.$port, $this->loop);
             } catch (\RuntimeException $exception) {
                 $portFound = false;
                 $port++;
