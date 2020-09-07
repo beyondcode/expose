@@ -93,7 +93,7 @@ class ConnectionManager implements ConnectionManagerContract
                 $portFound = false;
                 $port++;
             }
-        } while(! $portFound);
+        } while (! $portFound);
 
         return $server;
     }
