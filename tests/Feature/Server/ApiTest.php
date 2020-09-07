@@ -6,7 +6,6 @@ use App\Contracts\ConnectionManager;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Str;
 use Nyholm\Psr7\Request;
 use Ratchet\Server\IoConnection;
 use Tests\Feature\TestCase;
