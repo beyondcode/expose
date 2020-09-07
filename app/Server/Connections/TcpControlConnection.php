@@ -60,6 +60,12 @@ class TcpControlConnection extends ControlConnection
         ]));
     }
 
+    public function stop()
+    {
+        $this->shared_server->close();
+        $this->shared_server = null;
+    }
+
     public function close()
     {
         $this->socket->close();

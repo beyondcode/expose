@@ -82,7 +82,20 @@ class ConnectionManager implements ConnectionManagerContract
 
     protected function getSharedTcpServer(): Server
     {
-        return new Server(0, $this->loop);
+        $portRange = [50000, 62000];
+        $port = $portRange[0];
+
+        do {
+            try {
+                $portFound = true;
+                $server = new Server('127.0.0.1:'.$port, $this->loop);
+            } catch (\RuntimeException $exception) {
+                $portFound = false;
+                $port++;
+            }
+        } while(! $portFound);
+
+        return $server;
     }
 
     public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection
@@ -107,6 +120,16 @@ class ConnectionManager implements ConnectionManagerContract
 
         if (isset($connection->client_id)) {
             $clientId = $connection->client_id;
+
+            $controlConnection = collect($this->connections)->first(function ($connection) use ($clientId) {
+                return $connection->client_id == $clientId;
+            });
+
+            if ($controlConnection instanceof TcpControlConnection) {
+                $controlConnection->stop();
+                $controlConnection = null;
+            }
+
             $this->connections = collect($this->connections)->reject(function ($connection) use ($clientId) {
                 return $connection->client_id == $clientId;
             })->toArray();
