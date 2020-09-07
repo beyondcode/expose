@@ -2,7 +2,6 @@
 
 namespace App\Server\Connections;
 
-use Evenement\EventEmitterTrait;
 use Ratchet\ConnectionInterface;
 use React\Socket\Server;
 
@@ -86,14 +85,13 @@ class TcpControlConnection extends ControlConnection
     {
         $requestId = uniqid();
 
-        $sharedServer->on('connection', function(\React\Socket\ConnectionInterface $connection) use ($requestId) {
-
+        $sharedServer->on('connection', function (\React\Socket\ConnectionInterface $connection) use ($requestId) {
             $this->proxyConnection = $connection;
 
             $this->once('tcp_proxy_ready_'.$requestId, function (ConnectionInterface $proxy) use ($connection) {
                 $this->proxy = $proxy;
 
-                $connection->on('data', function($data) use ($proxy) {
+                $connection->on('data', function ($data) use ($proxy) {
                     $proxy->send($data);
                 });
 
