@@ -113,8 +113,8 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $this->database->query("
-            INSERT INTO users (name, auth_token, created_at)
-            VALUES (:name, :auth_token, DATETIME('now'))
+            INSERT INTO users (name, auth_token, can_specify_subdomains, created_at)
+            VALUES (:name, :auth_token, :can_specify_subdomains, DATETIME('now'))
         ", $data)
             ->then(function (Result $result) use ($deferred) {
                 $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $result->insertId])
