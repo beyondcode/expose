@@ -8,7 +8,6 @@ use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use stdClass;
 
