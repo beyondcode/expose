@@ -2,6 +2,7 @@
 
 namespace App\Server\UserRepository;
 
+use App\Contracts\ConnectionManager;
 use App\Contracts\UserRepository;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
@@ -13,9 +14,13 @@ class DatabaseUserRepository implements UserRepository
     /** @var DatabaseInterface */
     protected $database;
 
-    public function __construct(DatabaseInterface $database)
+    /** @var ConnectionManager */
+    protected $connectionManager;
+
+    public function __construct(DatabaseInterface $database, ConnectionManager $connectionManager)
     {
         $this->database = $database;
+        $this->connectionManager = $connectionManager;
     }
 
     public function getUsers(): PromiseInterface
@@ -46,8 +51,12 @@ class DatabaseUserRepository implements UserRepository
                     $nextPage = $currentPage + 1;
                 }
 
+                $users = collect($result->rows)->map(function ($user) {
+                    return $this->getUserDetails($user);
+                })->toArray();
+
                 $paginated = [
-                    'users' => $result->rows,
+                    'users' => $users,
                     'current_page' => $currentPage,
                     'per_page' => $perPage,
                     'next_page' => $nextPage ?? null,
@@ -60,6 +69,13 @@ class DatabaseUserRepository implements UserRepository
         return $deferred->promise();
     }
 
+    protected function getUserDetails(array $user)
+    {
+        $user['sites'] = $user['auth_token'] !== '' ? $this->connectionManager->getConnectionsForAuthToken($user['auth_token']) : [];
+
+        return $user;
+    }
+
     public function getUserById($id): PromiseInterface
     {
         $deferred = new Deferred();
@@ -67,7 +83,13 @@ class DatabaseUserRepository implements UserRepository
         $this->database
             ->query('SELECT * FROM users WHERE id = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
-                $deferred->resolve($result->rows[0] ?? null);
+                $user = $result->rows[0] ?? null;
+
+                if (! is_null($user)) {
+                    $user = $this->getUserDetails($user);
+                }
+
+                $deferred->resolve($user);
             });
 
         return $deferred->promise();

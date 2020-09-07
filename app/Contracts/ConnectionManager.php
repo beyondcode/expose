@@ -23,4 +23,6 @@ interface ConnectionManager
     public function findControlConnectionForClientId(string $clientId): ?ControlConnection;
 
     public function getConnections(): array;
+
+    public function getConnectionsForAuthToken(string $authToken): array;
 }
