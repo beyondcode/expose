@@ -3,10 +3,10 @@
 namespace App\Client;
 
 use App\Client\Http\HttpClient;
-use React\Socket\Connector;
 use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
+use React\Socket\Connector;
 
 class ProxyManager
 {
@@ -59,7 +59,7 @@ class ProxyManager
                         $proxyConnection->send($data);
                     });
 
-                    $proxyConnection->on('message', function ($message) use ($proxyConnection, $connection) {
+                    $proxyConnection->on('message', function ($message) use ($connection) {
                         $connection->write($message);
                     });
                 });

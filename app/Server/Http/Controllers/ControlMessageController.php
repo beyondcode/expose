@@ -83,7 +83,7 @@ class ControlMessageController implements MessageComponentInterface
             ->then(function ($user) use ($connection, $data) {
                 if ($data->type === 'http') {
                     $this->handleHttpConnection($connection, $data, $user);
-                } elseif($data->type === 'tcp') {
+                } elseif ($data->type === 'tcp') {
                     $this->handleTcpConnection($connection, $data, $user);
                 }
             }, function () use ($connection) {
