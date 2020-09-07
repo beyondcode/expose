@@ -5,11 +5,9 @@ namespace App\Server\Http\Controllers;
 use App\Contracts\ConnectionManager;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
-use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use stdClass;
 
