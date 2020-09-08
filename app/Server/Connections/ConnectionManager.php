@@ -5,8 +5,10 @@ namespace App\Server\Connections;
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
+use App\Server\Exceptions\NoFreePortAvailable;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
+use React\Socket\Server;
 
 class ConnectionManager implements ConnectionManagerContract
 {
@@ -60,6 +62,49 @@ class ConnectionManager implements ConnectionManagerContract
         return $storedConnection;
     }
 
+    public function storeTcpConnection(int $port, ConnectionInterface $connection): ControlConnection
+    {
+        $clientId = (string) uniqid();
+
+        $connection->client_id = $clientId;
+
+        $storedConnection = new TcpControlConnection(
+            $connection,
+            $port,
+            $this->getSharedTcpServer(),
+            $clientId,
+            $this->getAuthTokenFromConnection($connection)
+        );
+
+        $this->connections[] = $storedConnection;
+
+        return $storedConnection;
+    }
+
+    protected function getSharedTcpServer(): Server
+    {
+        $portRange = config('expose.admin.tcp_port_range');
+
+        $port = $portRange['from'] ?? 50000;
+        $maxPort = $portRange['to'] ?? 60000;
+
+        do {
+            try {
+                $portFound = true;
+                $server = new Server('0.0.0.0:'.$port, $this->loop);
+            } catch (\RuntimeException $exception) {
+                $portFound = false;
+                $port++;
+
+                if ($port > $maxPort) {
+                    throw new NoFreePortAvailable();
+                }
+            }
+        } while (! $portFound);
+
+        return $server;
+    }
+
     public function storeHttpConnection(ConnectionInterface $httpConnection, $requestId): HttpConnection
     {
         $this->httpConnections[$requestId] = new HttpConnection($httpConnection);
@@ -82,6 +127,16 @@ class ConnectionManager implements ConnectionManagerContract
 
         if (isset($connection->client_id)) {
             $clientId = $connection->client_id;
+
+            $controlConnection = collect($this->connections)->first(function ($connection) use ($clientId) {
+                return $connection->client_id == $clientId;
+            });
+
+            if ($controlConnection instanceof TcpControlConnection) {
+                $controlConnection->stop();
+                $controlConnection = null;
+            }
+
             $this->connections = collect($this->connections)->reject(function ($connection) use ($clientId) {
                 return $connection->client_id == $clientId;
             })->toArray();
@@ -118,9 +173,29 @@ class ConnectionManager implements ConnectionManagerContract
             ->filter(function ($connection) use ($authToken) {
                 return $connection->authToken === $authToken;
             })
+            ->filter(function ($connection) {
+                return get_class($connection) === ControlConnection::class;
+            })
             ->map(function ($connection) {
                 return $connection->toArray();
             })
+            ->values()
+            ->toArray();
+    }
+
+    public function getTcpConnectionsForAuthToken(string $authToken): array
+    {
+        return collect($this->connections)
+            ->filter(function ($connection) use ($authToken) {
+                return $connection->authToken === $authToken;
+            })
+            ->filter(function ($connection) {
+                return get_class($connection) === TcpControlConnection::class;
+            })
+            ->map(function ($connection) {
+                return $connection->toArray();
+            })
+            ->values()
             ->toArray();
     }
 }

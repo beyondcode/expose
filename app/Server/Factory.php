@@ -10,11 +10,14 @@ use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
+use App\Server\Http\Controllers\Admin\DisconnectTcpConnectionController;
 use App\Server\Http\Controllers\Admin\GetSettingsController;
 use App\Server\Http\Controllers\Admin\GetSitesController;
+use App\Server\Http\Controllers\Admin\GetTcpConnectionsController;
 use App\Server\Http\Controllers\Admin\GetUserDetailsController;
 use App\Server\Http\Controllers\Admin\GetUsersController;
 use App\Server\Http\Controllers\Admin\ListSitesController;
+use App\Server\Http\Controllers\Admin\ListTcpConnectionsController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
@@ -120,6 +123,7 @@ class Factory
         $this->router->get('/users', ListUsersController::class, $adminCondition);
         $this->router->get('/settings', ShowSettingsController::class, $adminCondition);
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
+        $this->router->get('/tcp', ListTcpConnectionsController::class, $adminCondition);
 
         $this->router->get('/api/settings', GetSettingsController::class, $adminCondition);
         $this->router->post('/api/settings', StoreSettingsController::class, $adminCondition);
@@ -129,6 +133,8 @@ class Factory
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
+        $this->router->get('/api/tcp', GetTcpConnectionsController::class, $adminCondition);
+        $this->router->delete('/api/tcp/{id}', DisconnectTcpConnectionController::class, $adminCondition);
     }
 
     protected function bindConfiguration()
