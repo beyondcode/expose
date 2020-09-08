@@ -29,11 +29,11 @@ class GetSitesController extends AdminController
                         return get_class($connection) === ControlConnection::class;
                     })
                     ->map(function ($site, $siteId) {
-                    $site = $site->toArray();
-                    $site['id'] = $siteId;
+                        $site = $site->toArray();
+                        $site['id'] = $siteId;
 
-                    return $site;
-                })->values(),
+                        return $site;
+                    })->values(),
             ])
         );
     }
