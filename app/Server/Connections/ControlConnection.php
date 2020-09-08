@@ -57,6 +57,7 @@ class ControlConnection
     public function toArray()
     {
         return [
+            'type' => 'http',
             'host' => $this->host,
             'client_id' => $this->client_id,
             'auth_token' => $this->authToken,

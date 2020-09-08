@@ -109,6 +109,13 @@ class Factory
         return $this;
     }
 
+    public function sharePort(int $port)
+    {
+        app('expose.client')->sharePort($port);
+
+        return $this;
+    }
+
     protected function addRoutes()
     {
         $this->router->get('/', DashboardController::class);
