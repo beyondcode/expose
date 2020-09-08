@@ -1,0 +1,73 @@
+{% extends "app" %}
+{% block title %}TCP Connections{% endblock %}
+{% block content %}
+    <div class="flex flex-col py-8">
+        <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <div
+                class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+                <table class="min-w-full" v-if="connections.length > 0">
+                    <thead>
+                    <tr>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            Local Port
+                        </th>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            Expose Port
+                        </th>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            Shared At
+                        </th>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <tr v-for="connection in connections">
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
+                                @{ connection.port }
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                @{ connection.shared_port }
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                @{ connection.shared_at }
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
+                                <a href="#"
+                                   @click.prevent="disconnectConnection(connection.client_id)"
+                                   class="pl-2 text-red-600 hover:text-red-900">Disconnect</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="flex items-center justify-center text-gray-900 p-4" v-else>
+                    <span class="text-xl">There are no TCP connections shared with this server yet.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        new Vue({
+            el: '#app',
+
+            delimiters: ['@{', '}'],
+
+            data: {
+                connections: {{ connections|json_encode|raw }}
+            },
+
+            methods: {
+                disconnectConnection(id) {
+                    fetch('/api/tcp/' + id, {
+                        method: 'DELETE',
+                    }).then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        this.connections = data.connections;
+                    });
+                }
+            }
+        })
+    </script>
+{% endblock %}
