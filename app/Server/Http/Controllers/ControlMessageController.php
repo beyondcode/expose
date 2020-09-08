@@ -130,6 +130,7 @@ class ControlMessageController implements MessageComponentInterface
                 ],
             ]));
             $connection->close();
+
             return;
         }
 
