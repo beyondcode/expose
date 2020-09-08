@@ -173,7 +173,7 @@ class ConnectionManager implements ConnectionManagerContract
             ->filter(function ($connection) use ($authToken) {
                 return $connection->authToken === $authToken;
             })
-            ->filter(function ($connection) use ($authToken) {
+            ->filter(function ($connection) {
                 return get_class($connection) === ControlConnection::class;
             })
             ->map(function ($connection) {
@@ -189,7 +189,7 @@ class ConnectionManager implements ConnectionManagerContract
             ->filter(function ($connection) use ($authToken) {
                 return $connection->authToken === $authToken;
             })
-            ->filter(function ($connection) use ($authToken) {
+            ->filter(function ($connection) {
                 return get_class($connection) === TcpControlConnection::class;
             })
             ->map(function ($connection) {

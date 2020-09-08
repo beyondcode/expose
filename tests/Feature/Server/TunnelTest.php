@@ -322,7 +322,7 @@ class TunnelTest extends TestCase
         $this->testTcpServer = new \React\Socket\Server(8085, $this->loop);
 
         $this->testTcpServer->on('connection', function (\React\Socket\ConnectionInterface $connection) {
-            $connection->write("Hello " . $connection->getRemoteAddress() . "!\n");
+            $connection->write('Hello '.$connection->getRemoteAddress()."!\n");
 
             $connection->pipe($connection);
         });
