@@ -214,6 +214,8 @@ return [
         */
         'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
 
+        'subdomain_repository' => \App\Server\SubdomainRepository\DatabaseSubdomainRepository::class,
+
         /*
         |--------------------------------------------------------------------------
         | Messages

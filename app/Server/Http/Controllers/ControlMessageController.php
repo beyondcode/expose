@@ -3,6 +3,7 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
+use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
@@ -19,10 +20,14 @@ class ControlMessageController implements MessageComponentInterface
     /** @var UserRepository */
     protected $userRepository;
 
-    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository)
+    /** @var SubdomainRepository */
+    protected $subdomainRepository;
+
+    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository, SubdomainRepository $subdomainRepository)
     {
         $this->connectionManager = $connectionManager;
         $this->userRepository = $userRepository;
+        $this->subdomainRepository = $subdomainRepository;
     }
 
     /**
@@ -148,6 +153,9 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): bool
     {
+        /**
+         * Check if the user can specify a custom subdomain in the first place
+         */
         if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
             $connection->send(json_encode([
                 'event' => 'subdomainTaken',
@@ -159,6 +167,10 @@ class ControlMessageController implements MessageComponentInterface
 
             return false;
         }
+
+        /**
+         * Check if the given subdomain is reserved for a different user
+         */
 
         if (! is_null($subdomain)) {
             $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);

@@ -4,6 +4,7 @@ namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
+use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
@@ -165,6 +166,7 @@ class Factory
         $this->bindConfiguration()
             ->bindSubdomainGenerator()
             ->bindUserRepository()
+            ->bindSubdomainRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
             ->bindConnectionManager()
@@ -196,6 +198,15 @@ class Factory
     {
         app()->singleton(UserRepository::class, function () {
             return app(config('expose.admin.user_repository'));
+        });
+
+        return $this;
+    }
+
+    protected function bindSubdomainRepository()
+    {
+        app()->singleton(SubdomainRepository::class, function () {
+            return app(config('expose.admin.subdomain_repository'));
         });
 
         return $this;
