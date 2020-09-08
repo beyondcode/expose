@@ -5,6 +5,7 @@ namespace App\Server\Connections;
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
+use App\Server\Exceptions\NoFreePortAvailable;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\Server;
@@ -82,8 +83,10 @@ class ConnectionManager implements ConnectionManagerContract
 
     protected function getSharedTcpServer(): Server
     {
-        $portRange = [50000, 62000];
-        $port = $portRange[0];
+        $portRange = config('expose.admin.tcp_port_range');
+
+        $port = $portRange['from'] ?? 50000;
+        $maxPort = $portRange['to'] ?? 60000;
 
         do {
             try {
@@ -92,6 +95,10 @@ class ConnectionManager implements ConnectionManagerContract
             } catch (\RuntimeException $exception) {
                 $portFound = false;
                 $port++;
+
+                if ($port > $maxPort) {
+                    throw new NoFreePortAvailable();
+                }
             }
         } while (! $portFound);
 

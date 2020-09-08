@@ -5,6 +5,7 @@ namespace App\Server\Http\Controllers;
 use App\Contracts\ConnectionManager;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
+use App\Server\Exceptions\NoFreePortAvailable;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
@@ -119,7 +120,18 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        $connectionInfo = $this->connectionManager->storeTcpConnection($data->port, $connection);
+        try {
+            $connectionInfo = $this->connectionManager->storeTcpConnection($data->port, $connection);
+        } catch (NoFreePortAvailable $exception) {
+            $connection->send(json_encode([
+                'event' => 'authenticationFailed',
+                'data' => [
+                    'message' => config('expose.admin.messages.no_free_tcp_port_available'),
+                ],
+            ]));
+            $connection->close();
+            return;
+        }
 
         $connection->send(json_encode([
             'event' => 'authenticated',
