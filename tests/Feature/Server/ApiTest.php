@@ -76,6 +76,14 @@ class ApiTest extends TestCase
             'name' => 'Marcel',
         ])));
 
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+        ])));
+
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
             'Host' => 'expose.localhost',
@@ -85,10 +93,13 @@ class ApiTest extends TestCase
 
         $body = json_decode($response->getBody()->getContents());
         $user = $body->user;
+        $subdomains = $body->subdomains;
 
         $this->assertSame('Marcel', $user->name);
         $this->assertSame([], $user->sites);
         $this->assertSame([], $user->tcp_connections);
+
+        $this->assertCount(1, $subdomains);
     }
 
     /** @test */

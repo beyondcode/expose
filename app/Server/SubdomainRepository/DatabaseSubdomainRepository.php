@@ -50,7 +50,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE name = :name', ['id' => $name])
+            ->query('SELECT * FROM subdomains WHERE subdomain = :name', ['name' => $name])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);
             });
@@ -96,7 +96,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE user_id = :user_id AND domain = :name ORDER by created_at DESC', [
+            ->query('SELECT * FROM subdomains WHERE user_id = :user_id AND subdomain = :name ORDER by created_at DESC', [
                 'user_id' => $id,
                 'name' => $name
             ])

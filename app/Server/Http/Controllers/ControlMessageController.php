@@ -12,6 +12,7 @@ use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use stdClass;
+use function React\Promise\reject;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -105,22 +106,20 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleHttpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        if (! $this->hasValidSubdomain($connection, $data->subdomain, $user)) {
-            return;
-        }
+        $this->hasValidSubdomain($connection, $data->subdomain, $user)->then(function ($hasValidSubdomain) use ($data, $connection) {
+            $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
-        $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
+            $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
-        $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
-
-        $connection->send(json_encode([
-            'event' => 'authenticated',
-            'data' => [
-                'message' => config('expose.admin.messages.message_of_the_day'),
-                'subdomain' => $connectionInfo->subdomain,
-                'client_id' => $connectionInfo->client_id,
-            ],
-        ]));
+            $connection->send(json_encode([
+                'event' => 'authenticated',
+                'data' => [
+                    'message' => config('expose.admin.messages.message_of_the_day'),
+                    'subdomain' => $connectionInfo->subdomain,
+                    'client_id' => $connectionInfo->client_id,
+                ],
+            ]));
+        });
     }
 
     protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
@@ -208,7 +207,7 @@ class ControlMessageController implements MessageComponentInterface
         return $deferred->promise();
     }
 
-    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): bool
+    protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): PromiseInterface
     {
         /**
          * Check if the user can specify a custom subdomain in the first place
@@ -222,32 +221,52 @@ class ControlMessageController implements MessageComponentInterface
             ]));
             $connection->close();
 
-            return false;
+            return \React\Promise\resolve(false);
         }
 
         /**
          * Check if the given subdomain is reserved for a different user
          */
-
         if (! is_null($subdomain)) {
-            $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
-            if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
-                $message = config('expose.admin.messages.subdomain_taken');
-                $message = str_replace(':subdomain', $subdomain, $message);
+            return $this->subdomainRepository->getSubdomainByName($subdomain)
+                ->then(function ($foundSubdomain) use ($connection, $subdomain, $user) {
+                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']) {
+                        $message = config('expose.admin.messages.subdomain_reserved');
+                        $message = str_replace(':subdomain', $subdomain, $message);
 
-                $connection->send(json_encode([
-                    'event' => 'subdomainTaken',
-                    'data' => [
-                        'message' => $message,
-                    ],
-                ]));
-                $connection->close();
+                        $connection->send(json_encode([
+                            'event' => 'subdomainTaken',
+                            'data' => [
+                                'message' => $message,
+                            ],
+                        ]));
+                        $connection->close();
 
-                return false;
-            }
+                        return \React\Promise\resolve(false);
+                    }
+
+                    $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
+
+                    if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
+                        $message = config('expose.admin.messages.subdomain_taken');
+                        $message = str_replace(':subdomain', $subdomain, $message);
+
+                        $connection->send(json_encode([
+                            'event' => 'subdomainTaken',
+                            'data' => [
+                                'message' => $message,
+                            ],
+                        ]));
+                        $connection->close();
+
+                        return \React\Promise\resolve(false);
+                    }
+
+                    return \React\Promise\resolve(true);
+                });
         }
 
-        return true;
+        return \React\Promise\resolve(true);
     }
 
     protected function canShareTcpPorts(ConnectionInterface $connection, $data, $user)
