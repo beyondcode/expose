@@ -72,6 +72,7 @@ class DatabaseUserRepository implements UserRepository
     protected function getUserDetails(array $user)
     {
         $user['sites'] = $user['auth_token'] !== '' ? $this->connectionManager->getConnectionsForAuthToken($user['auth_token']) : [];
+        $user['tcp_connections'] = $user['auth_token'] !== '' ? $this->connectionManager->getTcpConnectionsForAuthToken($user['auth_token']) : [];
 
         return $user;
     }
@@ -113,8 +114,8 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $this->database->query("
-            INSERT INTO users (name, auth_token, can_specify_subdomains, created_at)
-            VALUES (:name, :auth_token, :can_specify_subdomains, DATETIME('now'))
+            INSERT INTO users (name, auth_token, can_specify_subdomains, can_share_tcp_ports, created_at)
+            VALUES (:name, :auth_token, :can_specify_subdomains, :can_share_tcp_ports, DATETIME('now'))
         ", $data)
             ->then(function (Result $result) use ($deferred) {
                 $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $result->insertId])

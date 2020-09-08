@@ -173,9 +173,29 @@ class ConnectionManager implements ConnectionManagerContract
             ->filter(function ($connection) use ($authToken) {
                 return $connection->authToken === $authToken;
             })
+            ->filter(function ($connection) use ($authToken) {
+                return get_class($connection) === ControlConnection::class;
+            })
             ->map(function ($connection) {
                 return $connection->toArray();
             })
+            ->values()
+            ->toArray();
+    }
+
+    public function getTcpConnectionsForAuthToken(string $authToken): array
+    {
+        return collect($this->connections)
+            ->filter(function ($connection) use ($authToken) {
+                return $connection->authToken === $authToken;
+            })
+            ->filter(function ($connection) use ($authToken) {
+                return get_class($connection) === TcpControlConnection::class;
+            })
+            ->map(function ($connection) {
+                return $connection->toArray();
+            })
+            ->values()
             ->toArray();
     }
 }

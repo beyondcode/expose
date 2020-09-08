@@ -172,6 +172,7 @@ class Client
 
                     $this->logger->info($data->message);
                     $this->logger->info("Local-Port:\t\t{$port}");
+                    $this->logger->info("Shared-Port:\t\t{$data->shared_port}");
                     $this->logger->info("Expose-URL:\t\ttcp://{$host}:{$data->shared_port}.");
                     $this->logger->line('');
 

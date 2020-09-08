@@ -88,6 +88,7 @@ class ApiTest extends TestCase
 
         $this->assertSame('Marcel', $user->name);
         $this->assertSame([], $user->sites);
+        $this->assertSame([], $user->tcp_connections);
     }
 
     /** @test */
@@ -115,6 +116,10 @@ class ApiTest extends TestCase
         $connection->httpRequest = new Request('GET', '/?authToken=some-other-token');
         $connectionManager->storeConnection('some-different-host.test', 'different-subdomain', $connection);
 
+        $connection = \Mockery::mock(IoConnection::class);
+        $connection->httpRequest = new Request('GET', '/?authToken='.$createdUser->auth_token);
+        $connectionManager->storeTcpConnection(2525, $connection);
+
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
@@ -126,6 +131,7 @@ class ApiTest extends TestCase
         $users = $body->paginated->users;
 
         $this->assertCount(1, $users[0]->sites);
+        $this->assertCount(1, $users[0]->tcp_connections);
         $this->assertSame('some-host.test', $users[0]->sites[0]->host);
         $this->assertSame('fixed-subdomain', $users[0]->sites[0]->subdomain);
     }

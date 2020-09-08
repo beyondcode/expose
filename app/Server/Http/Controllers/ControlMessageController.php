@@ -120,6 +120,10 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
     {
+        if (! $this->canShareTcpPorts($connection, $data, $user)) {
+            return;
+        }
+
         try {
             $connectionInfo = $this->connectionManager->storeTcpConnection($data->port, $connection);
         } catch (NoFreePortAvailable $exception) {
@@ -229,6 +233,23 @@ class ControlMessageController implements MessageComponentInterface
 
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    protected function canShareTcpPorts(ConnectionInterface $connection, $data, $user)
+    {
+        if (! is_null($user) && $user['can_share_tcp_ports'] === 0) {
+            $connection->send(json_encode([
+                'event' => 'authenticationFailed',
+                'data' => [
+                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized'),
+                ],
+            ]));
+            $connection->close();
+
+            return false;
         }
 
         return true;
