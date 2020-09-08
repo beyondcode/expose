@@ -166,7 +166,7 @@ return [
         */
         'tcp_port_range' => [
             'from' => 50000,
-            'to' => 60000
+            'to' => 60000,
         ],
 
         /*
@@ -251,7 +251,7 @@ return [
 
             'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro.',
 
-            'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.'
+            'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',
         ],
     ],
 ];
