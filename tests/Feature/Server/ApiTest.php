@@ -66,10 +66,10 @@ class ApiTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_user_details()
+    public function it_does_not_allow_subdomain_reservation_for_users_without_the_right_flag()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -77,11 +77,69 @@ class ApiTest extends TestCase
             'name' => 'Marcel',
         ])));
 
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->expectException(ResponseException::class);
+        $this->expectExceptionMessage('HTTP status code 401');
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
+            'auth_token' => $user->auth_token,
+            'subdomain' => 'reserved',
+        ])));
+    }
+
+    /** @test */
+    public function it_allows_subdomain_reservation_for_users_with_the_right_flag()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+            'subdomain' => 'reserved',
+        ])));
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function it_can_get_user_details()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
             'subdomain' => 'reserved',
         ])));
 
@@ -107,27 +165,33 @@ class ApiTest extends TestCase
     public function it_can_delete_subdomains()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
+            'can_specify_subdomains' => 1
         ])));
 
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token
         ])));
 
-        $this->await($this->browser->delete('http://127.0.0.1:8080/api/users/1/subdomains/1', [
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/subdomains/1', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
-        ]));
+        ], json_encode([
+            'auth_token' => $user->auth_token
+        ])));
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
@@ -146,39 +210,47 @@ class ApiTest extends TestCase
     public function it_can_not_reserve_an_already_reserved_subdomain()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
         ])));
 
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
         ])));
 
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Sebastian',
+            'can_specify_subdomains' => 1,
         ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
 
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage('HTTP status code 422');
 
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/2/subdomains', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
         ])));
 
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/2', [

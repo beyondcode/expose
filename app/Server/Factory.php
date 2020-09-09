@@ -133,8 +133,8 @@ class Factory
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
-        $this->router->post('/api/users/{id}/subdomains', StoreSubdomainController::class, $adminCondition);
-        $this->router->delete('/api/users/{id}/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
+        $this->router->post('/api/subdomains', StoreSubdomainController::class, $adminCondition);
+        $this->router->delete('/api/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);

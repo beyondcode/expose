@@ -265,12 +265,13 @@ class TunnelTest extends TestCase
 
         $user = json_decode($response->getBody()->getContents())->user;
 
-        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users/'.$user->id.'/subdomains', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
         ])));
 
         $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
@@ -313,12 +314,13 @@ class TunnelTest extends TestCase
 
         $user = json_decode($response->getBody()->getContents())->user;
 
-        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users/'.$user->id.'/subdomains', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
         ])));
 
         $this->createTestHttpServer();
