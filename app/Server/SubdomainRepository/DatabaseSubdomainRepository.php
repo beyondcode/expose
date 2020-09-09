@@ -2,7 +2,6 @@
 
 namespace App\Server\SubdomainRepository;
 
-use App\Contracts\ConnectionManager;
 use App\Contracts\SubdomainRepository;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
@@ -64,7 +63,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
 
         $this->database
             ->query('SELECT * FROM subdomains WHERE user_id = :user_id ORDER by created_at DESC', [
-                'user_id' => $id
+                'user_id' => $id,
             ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
@@ -81,6 +80,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
             ->then(function ($registeredSubdomain) use ($data, $deferred) {
                 if (! is_null($registeredSubdomain)) {
                     $deferred->resolve(null);
+
                     return;
                 }
 
@@ -106,7 +106,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $this->database
             ->query('SELECT * FROM subdomains WHERE user_id = :user_id AND subdomain = :name ORDER by created_at DESC', [
                 'user_id' => $id,
-                'name' => $name
+                'name' => $name,
             ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
@@ -120,9 +120,9 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $deferred = new Deferred();
 
         $this->database->query('DELETE FROM subdomains WHERE id = :id AND user_id = :user_id', [
-                'id' => $subdomainId,
-                'user_id' => $userId,
-            ])
+            'id' => $subdomainId,
+            'user_id' => $userId,
+        ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result);
             });

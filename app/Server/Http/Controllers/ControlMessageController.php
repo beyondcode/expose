@@ -12,7 +12,6 @@ use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use stdClass;
-use function React\Promise\reject;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -216,7 +215,7 @@ class ControlMessageController implements MessageComponentInterface
     protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user): PromiseInterface
     {
         /**
-         * Check if the user can specify a custom subdomain in the first place
+         * Check if the user can specify a custom subdomain in the first place.
          */
         if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
             $connection->send(json_encode([
@@ -225,11 +224,12 @@ class ControlMessageController implements MessageComponentInterface
                     'message' => config('expose.admin.messages.custom_subdomain_unauthorized').PHP_EOL,
                 ],
             ]));
+
             return \React\Promise\resolve(null);
         }
 
         /**
-         * Check if the given subdomain is reserved for a different user
+         * Check if the given subdomain is reserved for a different user.
          */
         if (! is_null($subdomain)) {
             return $this->subdomainRepository->getSubdomainByName($subdomain)
