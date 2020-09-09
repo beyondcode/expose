@@ -17,7 +17,7 @@ class DeleteSubdomainController extends AdminController
     /** @var UserRepository */
     protected $userRepository;
 
-    public function __construct(UserRepository  $userRepository, SubdomainRepository $subdomainRepository)
+    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository)
     {
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
@@ -30,6 +30,7 @@ class DeleteSubdomainController extends AdminController
                 if (is_null($user)) {
                     $httpConnection->send(respond_json(['error' => 'The user does not exist'], 404));
                     $httpConnection->close();
+
                     return;
                 }
 

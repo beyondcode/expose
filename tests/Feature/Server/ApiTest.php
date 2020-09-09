@@ -102,7 +102,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
-            'can_specify_subdomains' => 1
+            'can_specify_subdomains' => 1,
         ])));
 
         $user = json_decode($response->getBody()->getContents())->user;
@@ -129,7 +129,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
-            'can_specify_subdomains' => 1
+            'can_specify_subdomains' => 1,
         ])));
 
         $user = json_decode($response->getBody()->getContents())->user;
@@ -171,7 +171,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
-            'can_specify_subdomains' => 1
+            'can_specify_subdomains' => 1,
         ])));
 
         $user = json_decode($response->getBody()->getContents())->user;
@@ -182,7 +182,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'subdomain' => 'reserved',
-            'auth_token' => $user->auth_token
+            'auth_token' => $user->auth_token,
         ])));
 
         $this->await($this->browser->delete('http://127.0.0.1:8080/api/subdomains/1', [
@@ -190,7 +190,7 @@ class ApiTest extends TestCase
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
         ], json_encode([
-            'auth_token' => $user->auth_token
+            'auth_token' => $user->auth_token,
         ])));
 
         /** @var Response $response */
