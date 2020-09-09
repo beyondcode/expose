@@ -197,6 +197,14 @@ class Client
 
     protected function attachCommonConnectionListeners(ControlConnection $connection, Deferred $deferred)
     {
+        $connection->on('info', function ($data) {
+            $this->logger->info($data->message);
+        });
+
+        $connection->on('error', function ($data) {
+            $this->logger->error($data->message);
+        });
+
         $connection->on('authenticationFailed', function ($data) use ($deferred) {
             $this->logger->error($data->message);
 

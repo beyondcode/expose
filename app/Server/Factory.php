@@ -4,10 +4,12 @@ namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
+use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
+use App\Server\Http\Controllers\Admin\DeleteSubdomainController;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
 use App\Server\Http\Controllers\Admin\DisconnectTcpConnectionController;
@@ -22,6 +24,7 @@ use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
 use App\Server\Http\Controllers\Admin\StoreSettingsController;
+use App\Server\Http\Controllers\Admin\StoreSubdomainController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
@@ -130,6 +133,8 @@ class Factory
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
+        $this->router->post('/api/subdomains', StoreSubdomainController::class, $adminCondition);
+        $this->router->delete('/api/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
@@ -171,6 +176,7 @@ class Factory
         $this->bindConfiguration()
             ->bindSubdomainGenerator()
             ->bindUserRepository()
+            ->bindSubdomainRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
             ->bindConnectionManager()
@@ -202,6 +208,15 @@ class Factory
     {
         app()->singleton(UserRepository::class, function () {
             return app(config('expose.admin.user_repository'));
+        });
+
+        return $this;
+    }
+
+    protected function bindSubdomainRepository()
+    {
+        app()->singleton(SubdomainRepository::class, function () {
+            return app(config('expose.admin.subdomain_repository'));
         });
 
         return $this;
