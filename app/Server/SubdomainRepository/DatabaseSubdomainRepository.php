@@ -77,14 +77,22 @@ class DatabaseSubdomainRepository implements SubdomainRepository
     {
         $deferred = new Deferred();
 
-        $this->database->query("
-            INSERT INTO subdomains (user_id, subdomain, created_at)
-            VALUES (:user_id, :subdomain, DATETIME('now'))
-        ", $data)
-            ->then(function (Result $result) use ($deferred) {
-                $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
+        $this->getSubdomainByName($data['subdomain'])
+            ->then(function ($registeredSubdomain) use ($data, $deferred) {
+                if (! is_null($registeredSubdomain)) {
+                    $deferred->resolve(null);
+                    return;
+                }
+
+                $this->database->query("
+                    INSERT INTO subdomains (user_id, subdomain, created_at)
+                    VALUES (:user_id, :subdomain, DATETIME('now'))
+                ", $data)
                     ->then(function (Result $result) use ($deferred) {
-                        $deferred->resolve($result->rows[0]);
+                        $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
+                            ->then(function (Result $result) use ($deferred) {
+                                $deferred->resolve($result->rows[0]);
+                            });
                     });
             });
 
@@ -102,6 +110,21 @@ class DatabaseSubdomainRepository implements SubdomainRepository
             ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
+            });
+
+        return $deferred->promise();
+    }
+
+    public function deleteSubdomainForUserId($userId, $subdomainId): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $this->database->query('DELETE FROM subdomains WHERE id = :id AND user_id = :user_id', [
+                'id' => $subdomainId,
+                'user_id' => $userId,
+            ])
+            ->then(function (Result $result) use ($deferred) {
+                $deferred->resolve($result);
             });
 
         return $deferred->promise();

@@ -16,5 +16,7 @@ interface SubdomainRepository
 
     public function getSubdomainsByUserIdAndName($id, $name): PromiseInterface;
 
+    public function deleteSubdomainForUserId($userId, $subdomainId): PromiseInterface;
+
     public function storeSubdomain(array $data): PromiseInterface;
 }

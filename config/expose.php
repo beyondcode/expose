@@ -251,7 +251,7 @@ return [
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
 
-            'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro.',
+            'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro. Assigning a random subdomain instead.',
 
             'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',
         ],

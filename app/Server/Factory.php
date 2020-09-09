@@ -9,6 +9,7 @@ use App\Contracts\UserRepository;
 use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
+use App\Server\Http\Controllers\Admin\DeleteSubdomainController;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
 use App\Server\Http\Controllers\Admin\DisconnectTcpConnectionController;
@@ -133,6 +134,7 @@ class Factory
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
         $this->router->post('/api/users/{id}/subdomains', StoreSubdomainController::class, $adminCondition);
+        $this->router->delete('/api/users/{id}/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);

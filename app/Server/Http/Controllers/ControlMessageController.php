@@ -106,7 +106,13 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleHttpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        $this->hasValidSubdomain($connection, $data->subdomain, $user)->then(function ($hasValidSubdomain) use ($data, $connection) {
+        $this->hasValidSubdomain($connection, $data->subdomain, $user)->then(function ($subdomain) use ($data, $connection) {
+            if ($subdomain === false) {
+                return;
+            }
+
+            $data->subdomain = $subdomain;
+
             $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
 
             $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
@@ -214,14 +220,12 @@ class ControlMessageController implements MessageComponentInterface
          */
         if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
             $connection->send(json_encode([
-                'event' => 'subdomainTaken',
+                'event' => 'info',
                 'data' => [
-                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized'),
+                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized').PHP_EOL,
                 ],
             ]));
-            $connection->close();
-
-            return \React\Promise\resolve(false);
+            return \React\Promise\resolve(null);
         }
 
         /**
@@ -262,11 +266,11 @@ class ControlMessageController implements MessageComponentInterface
                         return \React\Promise\resolve(false);
                     }
 
-                    return \React\Promise\resolve(true);
+                    return \React\Promise\resolve($subdomain);
                 });
         }
 
-        return \React\Promise\resolve(true);
+        return \React\Promise\resolve($subdomain);
     }
 
     protected function canShareTcpPorts(ConnectionInterface $connection, $data, $user)

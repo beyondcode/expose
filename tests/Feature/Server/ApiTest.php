@@ -5,6 +5,7 @@ namespace Tests\Feature\Server;
 use App\Contracts\ConnectionManager;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
+use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Nyholm\Psr7\Request;
 use Ratchet\Server\IoConnection;
@@ -100,6 +101,96 @@ class ApiTest extends TestCase
         $this->assertSame([], $user->tcp_connections);
 
         $this->assertCount(1, $subdomains);
+    }
+
+    /** @test */
+    public function it_can_delete_subdomains()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+        ])));
+
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/users/1/subdomains/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $subdomains = $body->subdomains;
+
+        $this->assertCount(0, $subdomains);
+    }
+
+    /** @test */
+    public function it_can_not_reserve_an_already_reserved_subdomain()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/1/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+        ])));
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Sebastian',
+        ])));
+
+        $this->expectException(ResponseException::class);
+        $this->expectExceptionMessage('HTTP status code 422');
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users/2/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+        ])));
+
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/2', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $subdomains = $body->subdomains;
+
+        $this->assertCount(0, $subdomains);
     }
 
     /** @test */

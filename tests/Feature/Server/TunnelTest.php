@@ -235,8 +235,6 @@ class TunnelTest extends TestCase
             'can_specify_subdomains' => 0,
         ])));
 
-        $this->expectException(\UnexpectedValueException::class);
-
         $user = json_decode($response->getBody()->getContents())->user;
 
         $this->createTestHttpServer();
@@ -248,7 +246,7 @@ class TunnelTest extends TestCase
         $client = $this->createClient();
         $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
 
-        $this->assertSame('tunnel', $response->subdomain);
+        $this->assertNotSame('tunnel', $response->subdomain);
     }
 
     /** @test */
