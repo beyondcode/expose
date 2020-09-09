@@ -3,11 +3,8 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\SubdomainRepository;
-use App\Contracts\UserRepository;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
 
 class StoreSubdomainController extends AdminController
@@ -48,6 +45,7 @@ class StoreSubdomainController extends AdminController
                 if (is_null($subdomain)) {
                     $httpConnection->send(respond_json(['error' => 'The subdomain is already taken.'], 422));
                     $httpConnection->close();
+
                     return;
                 }
                 $httpConnection->send(respond_json(['subdomain' => $subdomain], 200));

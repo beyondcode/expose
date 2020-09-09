@@ -17,7 +17,7 @@ class GetUserDetailsController extends AdminController
     /** @var SubdomainRepository */
     protected $subdomainRepository;
 
-    public function __construct(UserRepository $userRepository, SubdomainRepository  $subdomainRepository)
+    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository)
     {
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
