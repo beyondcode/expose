@@ -8,6 +8,7 @@ use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
+use Nyholm\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 use Ratchet\Server\IoConnection;
 use Tests\Feature\TestCase;
@@ -149,6 +150,8 @@ class AdminTest extends TestCase
         $connectionManager = app(ConnectionManager::class);
 
         $connection = \Mockery::mock(IoConnection::class);
+        $connection->httpRequest = new Request('GET', '/?authToken=some-token');
+
         $connectionManager->storeConnection('some-host.text', 'fixed-subdomain', $connection);
 
         /** @var Response $response */

@@ -165,6 +165,24 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | TCP Port Range
+        |--------------------------------------------------------------------------
+        |
+        | Expose allows you to also share TCP ports, for example when sharing your
+        | local SSH server with the public. This setting allows you to define the
+        | port range that Expose will use to assign new ports to the users.
+        |
+        | Note: Do not use port ranges below 1024, as it might require root
+        | privileges to assign these ports.
+        |
+        */
+        'tcp_port_range' => [
+            'from' => 50000,
+            'to' => 60000,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Maximum connection length
         |--------------------------------------------------------------------------
         |
@@ -226,6 +244,8 @@ return [
         */
         'user_repository' => \App\Server\UserRepository\DatabaseUserRepository::class,
 
+        'subdomain_repository' => \App\Server\SubdomainRepository\DatabaseSubdomainRepository::class,
+
         /*
         |--------------------------------------------------------------------------
         | Messages
@@ -242,6 +262,10 @@ return [
             'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
+
+            'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro. Assigning a random subdomain instead.',
+
+            'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',
         ],
     ],
 ];

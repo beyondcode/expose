@@ -9,6 +9,7 @@ use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Server;
+use React\Socket\Connection;
 use Tests\Feature\TestCase;
 
 class TunnelTest extends TestCase
@@ -22,11 +23,17 @@ class TunnelTest extends TestCase
     /** @var \React\Socket\Server */
     protected $testHttpServer;
 
+    /** @var \React\Socket\Server */
+    protected $testTcpServer;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->browser = new Browser($this->loop);
+        $this->browser = $this->browser->withOptions([
+            'followRedirects' => false,
+        ]);
 
         $this->startServer();
     }
@@ -37,6 +44,10 @@ class TunnelTest extends TestCase
 
         if (isset($this->testHttpServer)) {
             $this->testHttpServer->close();
+        }
+
+        if (isset($this->testTcpServer)) {
+            $this->testTcpServer->close();
         }
 
         parent::tearDown();
@@ -58,6 +69,8 @@ class TunnelTest extends TestCase
     {
         $this->createTestHttpServer();
 
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
         /**
          * We create an expose client that connects to our server and shares
          * the created test HTTP server.
@@ -74,6 +87,93 @@ class TunnelTest extends TestCase
         ]));
 
         $this->assertSame('Hello World!', $response->getBody()->getContents());
+    }
+
+    /** @test */
+    public function it_sends_incoming_requests_to_the_connected_client_via_tcp()
+    {
+        $this->createTestTcpServer();
+
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServerAndShareTcp(8085));
+
+        /**
+         * Once the client is connected, we connect to the
+         * created tunnel.
+         */
+        $connector = new \React\Socket\Connector($this->loop);
+        $connection = $this->await($connector->connect('127.0.0.1:'.$response->shared_port));
+
+        $this->assertInstanceOf(Connection::class, $connection);
+    }
+
+    /** @test */
+    public function it_rejects_tcp_sharing_if_forbidden()
+    {
+        $this->createTestTcpServer();
+
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_share_tcp_ports' => 0,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $this->await($client->connectToServerAndShareTcp(8085, $user->auth_token));
+    }
+
+    /** @test */
+    public function it_allows_tcp_sharing_if_enabled_for_user()
+    {
+        $this->createTestTcpServer();
+
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_share_tcp_ports' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServerAndShareTcp(8085, $user->auth_token));
+
+        /**
+         * Once the client is connected, we connect to the
+         * created tunnel.
+         */
+        $connector = new \React\Socket\Connector($this->loop);
+        $connection = $this->await($connector->connect('127.0.0.1:'.$response->shared_port));
+
+        $this->assertInstanceOf(Connection::class, $connection);
     }
 
     /** @test */
@@ -98,21 +198,178 @@ class TunnelTest extends TestCase
     {
         $this->app['config']['expose.admin.validate_auth_tokens'] = true;
 
-        $this->createTestHttpServer();
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ])));
 
-        $this->expectException(\UnexpectedValueException::class);
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
 
         /**
          * We create an expose client that connects to our server and shares
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel'));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+
+        $this->assertSame('tunnel', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_rejects_clients_to_specify_custom_subdomains()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 0,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+
+        $this->assertNotSame('tunnel', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_rejects_users_that_want_to_use_a_reserved_subdomain()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Test-User',
+            'can_specify_subdomains' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_users_to_use_their_own_reserved_subdomains()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->createTestHttpServer();
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_clients_to_use_random_subdomains_if_custom_subdomains_are_forbidden()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 0,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->createTestHttpServer();
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', '', $user->auth_token));
+
+        $this->assertInstanceOf(\stdClass::class, $response);
     }
 
     protected function startServer()
     {
+        $this->app['config']['expose.admin.subdomain'] = 'expose';
         $this->app['config']['expose.admin.database'] = ':memory:';
+
+        $this->app['config']['expose.admin.users'] = [
+            'username' => 'secret',
+        ];
 
         $this->serverFactory = new Factory();
 
@@ -141,5 +398,16 @@ class TunnelTest extends TestCase
 
         $this->testHttpServer = new \React\Socket\Server(8085, $this->loop);
         $server->listen($this->testHttpServer);
+    }
+
+    protected function createTestTcpServer()
+    {
+        $this->testTcpServer = new \React\Socket\Server(8085, $this->loop);
+
+        $this->testTcpServer->on('connection', function (\React\Socket\ConnectionInterface $connection) {
+            $connection->write('Hello '.$connection->getRemoteAddress()."!\n");
+
+            $connection->pipe($connection);
+        });
     }
 }
