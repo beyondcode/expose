@@ -13,13 +13,18 @@ class Configuration
     /** @var string|null */
     protected $auth;
 
-    public function __construct(string $host, int $port, ?string $auth = null)
+    /** @var bool|null */
+    protected $ssl;
+
+    public function __construct(string $host, int $port, ?string $auth = null, $ssl = null)
     {
         $this->host = $host;
 
         $this->port = $port;
 
         $this->auth = $auth;
+
+        $this->ssl = $ssl;
     }
 
     public function host(): string
@@ -35,5 +40,14 @@ class Configuration
     public function port(): int
     {
         return intval($this->port);
+    }
+
+    public function ssl(): bool
+    {
+        if ($this->ssl === null) {
+            return $this->port() === 443;
+        }
+
+        return boolval($this->ssl);
     }
 }

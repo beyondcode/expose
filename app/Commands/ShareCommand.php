@@ -31,6 +31,7 @@ class ShareCommand extends Command
             ->setLoop(app(LoopInterface::class))
             ->setHost(config('expose.host', 'localhost'))
             ->setPort(config('expose.port', 8080))
+            ->setSsl(config('expose.ssl', null))
             ->setAuth($this->option('auth'))
             ->createClient()
             ->share($this->argument('host'), explode(',', $this->option('subdomain')))

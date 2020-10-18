@@ -31,6 +31,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | SSL
+    |--------------------------------------------------------------------------
+    |
+    | If Expose is to consider this as a SSL port.
+    | this allows SSL use if you are using a non-standard SSL port.
+    | If null, assume SSL if 443, set to true to force SSL
+    | use false to force no SSL
+    |
+    */
+    'ssl' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Auth Token
     |--------------------------------------------------------------------------
     |

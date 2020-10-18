@@ -77,7 +77,7 @@ class Client
         $deferred = new Deferred();
         $promise = $deferred->promise();
 
-        $wsProtocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
+        $wsProtocol = $this->configuration->ssl() ? 'wss' : 'ws';
 
         connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
             'X-Expose-Control' => 'enabled',
@@ -106,12 +106,8 @@ class Client
                 });
 
                 $connection->on('authenticated', function ($data) use ($deferred, $sharedUrl) {
-                    $httpProtocol = $this->configuration->port() === 443 ? 'https' : 'http';
-                    $host = $this->configuration->host();
-
-                    if ($httpProtocol !== 'https') {
-                        $host .= ":{$this->configuration->port()}";
-                    }
+                    $httpProtocol = $this->configuration->ssl() ? 'https' : 'http';
+                    $host = $this->getHost();
 
                     $this->logger->info($data->message);
                     $this->logger->info("Local-URL:\t\t{$sharedUrl}");
@@ -248,5 +244,18 @@ class Client
         } else {
             exit(1);
         }
+    }
+
+    private function getHost()
+    {
+        $host = $this->configuration->host();
+        if ($this->configuration->port() === 80 && ! $this->configuration->ssl()) {
+            return $host;
+        }
+        if ($this->configuration->port() === 443 && $this->configuration->ssl()) {
+            return $host;
+        }
+
+        return "{$host}:{$this->configuration->port()}";
     }
 }
