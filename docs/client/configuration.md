@@ -20,7 +20,7 @@ The configuration file will be written to your home directory inside a `.expose`
 You can also provide a custom location of the config file by providing the full path as a server variable.
 
 ```bash
-EXPOSE_CONFIG_FILE="~/my-custom-config.php" expose publish
+EXPOSE_CONFIG_FILE="~/my-custom-config.php" expose share
 ```
 
 And the default content of the configuration file is this:
