@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Client;
 
+use App\Client\Configuration;
 use App\Client\Factory;
 use App\Client\Http\HttpClient;
 use App\Logger\LoggedRequest;
@@ -129,6 +130,10 @@ class DashboardTest extends TestCase
 
     protected function startDashboard()
     {
+        app()->singleton(Configuration::class, function ($app) {
+            return new Configuration('localhost', '8080', false);
+        });
+
         $this->dashboardFactory = (new Factory())
             ->setLoop($this->loop)
             ->createHttpServer();

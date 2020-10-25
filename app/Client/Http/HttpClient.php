@@ -2,6 +2,7 @@
 
 namespace App\Client\Http;
 
+use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
@@ -26,19 +27,26 @@ class HttpClient
     /** @var Request */
     protected $request;
 
+    protected $connectionData;
+
     /** @var array */
     protected $modifiers = [
         CheckBasicAuthentication::class,
     ];
+    /** @var Configuration */
+    protected $configuration;
 
-    public function __construct(LoopInterface $loop, RequestLogger $logger)
+    public function __construct(LoopInterface $loop, RequestLogger $logger, Configuration $configuration)
     {
         $this->loop = $loop;
         $this->logger = $logger;
+        $this->configuration = $configuration;
     }
 
-    public function performRequest(string $requestData, WebSocket $proxyConnection = null, string $requestId = null)
+    public function performRequest(string $requestData, WebSocket $proxyConnection = null, $connectionData = null)
     {
+        $this->connectionData = $connectionData;
+
         $this->request = $this->parseRequest($requestData);
 
         $this->logger->logRequest($requestData, $this->request);
@@ -84,7 +92,9 @@ class HttpClient
             ])
             ->send($request)
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
-                if (! isset($response->buffer)) {
+                if (!isset($response->buffer)) {
+                    $response = $this->rewriteResponseHeaders($response);
+
                     $response->buffer = str($response);
                 }
 
@@ -125,5 +135,26 @@ class HttpClient
     protected function parseRequest($data): Request
     {
         return Request::fromString($data);
+    }
+
+    protected function rewriteResponseHeaders(ResponseInterface $response)
+    {
+        if (!$response->hasHeader('Location')) {
+            return $response;
+        }
+
+        $location = $response->getHeaderLine('Location');
+
+        if (!strstr($location, $this->connectionData->host)) {
+            return $response;
+        }
+
+        $location = str_replace(
+            $this->connectionData->host,
+            $this->configuration->getUrl($this->connectionData->subdomain),
+            $location
+        );
+
+        return $response->withHeader('Location', $location);
     }
 }

@@ -32,7 +32,7 @@ class ProxyManager
         ], $this->loop)
             ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {
                 $proxyConnection->on('message', function ($message) use ($proxyConnection, $connectionData) {
-                    $this->performRequest($proxyConnection, $connectionData->request_id, (string) $message);
+                    $this->performRequest($proxyConnection, (string) $message, $connectionData);
                 });
 
                 $proxyConnection->send(json_encode([
@@ -76,8 +76,8 @@ class ProxyManager
             });
     }
 
-    protected function performRequest(WebSocket $proxyConnection, $requestId, string $requestData)
+    protected function performRequest(WebSocket $proxyConnection, string $requestData, $connectionData)
     {
-        app(HttpClient::class)->performRequest((string) $requestData, $proxyConnection, $requestId);
+        app(HttpClient::class)->performRequest((string) $requestData, $proxyConnection, $connectionData);
     }
 }

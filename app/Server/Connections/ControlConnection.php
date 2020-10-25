@@ -43,6 +43,8 @@ class ControlConnection
         $this->socket->send(json_encode([
             'event' => 'createProxy',
             'data' => [
+                'host' => $this->host,
+                'subdomain' => $this->subdomain,
                 'request_id' => $requestId,
                 'client_id' => $this->client_id,
             ],

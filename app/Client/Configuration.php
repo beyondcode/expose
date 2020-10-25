@@ -36,4 +36,16 @@ class Configuration
     {
         return intval($this->port);
     }
+
+    public function getUrl(string $subdomain): string
+    {
+        $httpProtocol = $this->port() === 443 ? 'https' : 'http';
+        $host = $this->host();
+
+        if ($httpProtocol !== 'https') {
+            $host .= ":{$this->port()}";
+        }
+
+        return "{$subdomain}.{$host}";
+    }
 }
