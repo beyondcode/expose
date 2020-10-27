@@ -66,7 +66,6 @@ class HttpClient
     protected function createConnector(): Connector
     {
         return new Connector($this->loop, [
-            'dns' => '127.0.0.1',
             'tls' => [
                 'verify_peer' => false,
                 'verify_peer_name' => false,
