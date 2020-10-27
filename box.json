@@ -1,1 +1,20 @@
-{"chmod":"0755","directories":["app","bootstrap","database","resources","config","vendor"],"exclude-dev-files":false,"files":["composer.json"],"exclude-composer-files":false,"compression":"GZ","compactors":["KevinGH\\Box\\Compactor\\Json"],"main":"expose"}
+{
+    "chmod": "0755",
+    "directories": [
+        "app",
+        "bootstrap",
+        "database",
+        "resources",
+        "config",
+        "vendor"
+    ],
+    "exclude-dev-files": false,
+    "files": [
+        "composer.json"
+    ],
+    "exclude-composer-files": false,
+    "compression": "GZ",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Json"
+    ]
+}
