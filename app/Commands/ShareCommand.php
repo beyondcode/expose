@@ -29,7 +29,7 @@ class ShareCommand extends Command
 
         $serverHost = $this->option('server-host') ?? config('expose.host', 'localhost');
         $serverPort = $this->option('server-port') ?? config('expose.port', 8080);
-        $auth       = $this->option('auth')        ?? config('expose.auth_token', '');
+        $auth = $this->option('auth') ?? config('expose.auth_token', '');
 
         (new Factory())
             ->setLoop(app(LoopInterface::class))
