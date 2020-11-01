@@ -3,8 +3,8 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
-use App\Contracts\SubdomainRepository;
 use App\Contracts\HostnameRepository;
+use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
 use App\Server\Connections\ConnectionConfiguration;
@@ -14,9 +14,9 @@ use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use stdClass;
 use function React\Promise\reject;
 use function React\Promise\resolve as resolvePromise;
+use stdClass;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -116,23 +116,23 @@ class ControlMessageController implements MessageComponentInterface
     {
         $this->hasValidConfiguration($connection, $data, $user)
             ->then(function (ConnectionConfiguration $configuration) use ($data, $connection) {
-            $data->subdomain = $configuration->getSubdomain();
-            $data->hostname = $configuration->getHostname();
+                $data->subdomain = $configuration->getSubdomain();
+                $data->hostname = $configuration->getHostname();
 
-            $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->hostname, $connection);
+                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->hostname, $connection);
 
-            $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
+                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
-            $connection->send(json_encode([
-                'event' => 'authenticated',
-                'data' => [
-                    'message' => config('expose.admin.messages.message_of_the_day'),
-                    'subdomain' => $connectionInfo->subdomain,
-                    'hostname' => $connectionInfo->hostname,
-                    'client_id' => $connectionInfo->client_id,
-                ],
+                $connection->send(json_encode([
+                    'event' => 'authenticated',
+                    'data' => [
+                        'message' => config('expose.admin.messages.message_of_the_day'),
+                        'subdomain' => $connectionInfo->subdomain,
+                        'hostname' => $connectionInfo->hostname,
+                        'client_id' => $connectionInfo->client_id,
+                    ],
             ]));
-        });
+            });
     }
 
     protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
@@ -301,7 +301,7 @@ class ControlMessageController implements MessageComponentInterface
          * Check if the given hostname is reserved for a different user.
          */
         return $this->hostnameRepository->getHostnamesByUserId($user['id'])
-            ->then(function ($foundHostnames) use ($connection, $hostname, $user) {
+            ->then(function ($foundHostnames) use ($connection, $hostname) {
                 $foundHostname = collect($foundHostnames)->first(function ($foundHostname) use ($hostname) {
                     return Str::is($foundHostname['hostname'], $hostname);
                 });

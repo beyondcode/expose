@@ -27,6 +27,7 @@ class ShareCommand extends Command
     {
         if (! empty($this->option('hostname')) && ! empty($this->option('subdomain'))) {
             $this->error('You can only specify one. Either a custom hostname or a subdomain.');
+
             return;
         }
 
