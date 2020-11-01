@@ -23,10 +23,10 @@ trait LoadsViews
         $data = array_merge($data, [
             'request' => $connection->laravelRequest ?? null,
         ]);
-try {
-        return stream_for($twig->render('template', $data));
-} catch (\Throwable $e) {
-    var_dump($e->getMessage());
-}
+        try {
+            return stream_for($twig->render('template', $data));
+        } catch (\Throwable $e) {
+            var_dump($e->getMessage());
+        }
     }
 }

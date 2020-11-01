@@ -4,7 +4,6 @@ namespace App\Client\Fileserver;
 
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\LoopInterface;
-use React\Http\Response;
 use React\Http\Server;
 use React\Socket\Server as SocketServer;
 

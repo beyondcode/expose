@@ -7,15 +7,12 @@ use App\Http\QueryParameters;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Http\Request;
 use Psr\Http\Message\ServerRequestInterface;
-use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
 use React\Stream\ReadableResourceStream;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Glob;
 use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ConnectionHandler
 {
@@ -30,7 +27,7 @@ class ConnectionHandler
     /** @var LoopInterface */
     protected $loop;
 
-    public function __construct(string $rootFolder, string $name, LoopInterface  $loop)
+    public function __construct(string $rootFolder, string $name, LoopInterface $loop)
     {
         $this->rootFolder = $rootFolder;
         $this->name = $name;
@@ -40,7 +37,7 @@ class ConnectionHandler
     public function handle(ServerRequestInterface $request)
     {
         $request = $this->createLaravelRequest($request);
-        $targetPath = realpath($this->rootFolder . DIRECTORY_SEPARATOR . $request->path());
+        $targetPath = realpath($this->rootFolder.DIRECTORY_SEPARATOR.$request->path());
 
         if (! $this->isValidTarget($targetPath)) {
             return new Response(404);
@@ -70,7 +67,7 @@ class ConnectionHandler
                     'currentPath' => $request->path(),
                     'parentPath' => $parentPath,
                     'directory' => $targetPath,
-                    'directoryContent' => $directoryContent
+                    'directoryContent' => $directoryContent,
                 ])
             );
         }
@@ -108,6 +105,7 @@ class ConnectionHandler
                     return $this->isAccepted($this->filename);
                 }
             };
+
             return $filter->accept();
         }
 
