@@ -25,7 +25,7 @@ class ShareFilesCommand extends Command
 
     public function handle()
     {
-        if ( !is_dir($this->argument('folder'))) {
+        if (! is_dir($this->argument('folder'))) {
             throw new \InvalidArgumentException('The folder '.$this->argument('folder').' does not exist.');
         }
 

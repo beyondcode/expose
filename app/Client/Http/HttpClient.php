@@ -92,7 +92,7 @@ class HttpClient
             ])
             ->send($request)
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
-                if (!isset($response->buffer)) {
+                if (! isset($response->buffer)) {
                     $response = $this->rewriteResponseHeaders($response);
 
                     $response->buffer = str($response);
@@ -139,13 +139,13 @@ class HttpClient
 
     protected function rewriteResponseHeaders(ResponseInterface $response)
     {
-        if (!$response->hasHeader('Location')) {
+        if (! $response->hasHeader('Location')) {
             return $response;
         }
 
         $location = $response->getHeaderLine('Location');
 
-        if (!strstr($location, $this->connectionData->host)) {
+        if (! strstr($location, $this->connectionData->host)) {
             return $response;
         }
 
