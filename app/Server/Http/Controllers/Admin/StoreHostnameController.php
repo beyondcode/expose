@@ -3,7 +3,6 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\HostnameRepository;
-use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
