@@ -36,8 +36,9 @@ class TunnelMessageController extends Controller
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $subdomain = $this->detectSubdomain($request);
+        $hostname = $request->getHost();
 
-        if (is_null($subdomain)) {
+        if (is_null($subdomain) && $hostname === $this->configuration->hostname()) {
             $httpConnection->send(
                 respond_html($this->getView($httpConnection, 'server.homepage'), 200)
             );
@@ -46,7 +47,11 @@ class TunnelMessageController extends Controller
             return;
         }
 
-        $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
+        if (! is_null($subdomain)) {
+            $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
+        } else {
+            $controlConnection = $this->connectionManager->findControlConnectionForHostname($hostname);
+        }
 
         if (is_null($controlConnection)) {
             $httpConnection->send(
@@ -113,13 +118,19 @@ class TunnelMessageController extends Controller
             $host .= ":{$this->configuration->port()}";
         }
 
+        if (empty($controlConnection->subdomain)) {
+            $originalHost = $controlConnection->hostname;
+        } else {
+            $originalHost = "{$controlConnection->subdomain}.{$host}";
+        }
+
         $request->headers->set('Host', $controlConnection->host);
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
         $request->headers->set('X-Expose-Request-ID', uniqid());
         $request->headers->set('Upgrade-Insecure-Requests', 1);
         $request->headers->set('X-Exposed-By', config('app.name').' '.config('app.version'));
-        $request->headers->set('X-Original-Host', "{$controlConnection->subdomain}.{$host}");
-        $request->headers->set('X-Forwarded-Host', "{$controlConnection->subdomain}.{$host}");
+        $request->headers->set('X-Original-Host', $originalHost);
+        $request->headers->set('X-Forwarded-Host', $originalHost);
 
         return $request;
     }

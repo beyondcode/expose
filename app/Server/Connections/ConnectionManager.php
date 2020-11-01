@@ -43,16 +43,23 @@ class ConnectionManager implements ConnectionManagerContract
         });
     }
 
-    public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection
+    public function storeConnection(string $host, ?string $subdomain, ?string $hostname, ConnectionInterface $connection): ControlConnection
     {
         $clientId = (string) uniqid();
 
         $connection->client_id = $clientId;
 
+        if (! is_null($hostname) && $hostname !== '') {
+            $subdomain = '';
+        } else {
+            $subdomain = $subdomain ?? $this->subdomainGenerator->generateSubdomain();
+        }
+
         $storedConnection = new ControlConnection(
             $connection,
             $host,
-            $subdomain ?? $this->subdomainGenerator->generateSubdomain(),
+            $subdomain,
+            $hostname,
             $clientId,
             $this->getAuthTokenFromConnection($connection)
         );
@@ -147,6 +154,13 @@ class ConnectionManager implements ConnectionManagerContract
     {
         return collect($this->connections)->last(function ($connection) use ($subdomain) {
             return $connection->subdomain == $subdomain;
+        });
+    }
+
+    public function findControlConnectionForHostname($hostname): ?ControlConnection
+    {
+        return collect($this->connections)->last(function ($connection) use ($hostname) {
+            return $connection->hostname == $hostname;
         });
     }
 

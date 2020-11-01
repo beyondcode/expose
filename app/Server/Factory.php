@@ -3,12 +3,14 @@
 namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
+use App\Contracts\HostnameRepository;
 use App\Contracts\SubdomainGenerator;
 use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
+use App\Server\Http\Controllers\Admin\DeleteHostnameController;
 use App\Server\Http\Controllers\Admin\DeleteSubdomainController;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
@@ -23,6 +25,7 @@ use App\Server\Http\Controllers\Admin\ListTcpConnectionsController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
+use App\Server\Http\Controllers\Admin\StoreHostnameController;
 use App\Server\Http\Controllers\Admin\StoreSettingsController;
 use App\Server\Http\Controllers\Admin\StoreSubdomainController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
@@ -135,6 +138,8 @@ class Factory
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
         $this->router->post('/api/subdomains', StoreSubdomainController::class, $adminCondition);
         $this->router->delete('/api/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
+        $this->router->post('/api/hostnames', StoreHostnameController::class, $adminCondition);
+        $this->router->delete('/api/hostnames/{hostname}', DeleteHostnameController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
@@ -177,6 +182,7 @@ class Factory
             ->bindSubdomainGenerator()
             ->bindUserRepository()
             ->bindSubdomainRepository()
+            ->bindHostnameRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
             ->bindConnectionManager()
@@ -222,6 +228,15 @@ class Factory
         return $this;
     }
 
+    protected function bindHostnameRepository()
+    {
+        app()->singleton(HostnameRepository::class, function () {
+            return app(config('expose.admin.hostname_repository'));
+        });
+
+        return $this;
+    }
+
     protected function bindDatabase()
     {
         app()->singleton(DatabaseInterface::class, function () {
@@ -248,6 +263,7 @@ class Factory
             ->files()
             ->ignoreDotFiles(true)
             ->in(database_path('migrations'))
+            ->sortByName()
             ->name('*.sql');
 
         /** @var SplFileInfo $migration */

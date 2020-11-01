@@ -102,9 +102,9 @@ class Factory
         return $this;
     }
 
-    public function share($sharedUrl, $subdomain = null)
+    public function share($sharedUrl, $subdomain = null, $hostname = null)
     {
-        app('expose.client')->share($sharedUrl, $subdomain);
+        app('expose.client')->share($sharedUrl, $subdomain, $hostname);
 
         return $this;
     }

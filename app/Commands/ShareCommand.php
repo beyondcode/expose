@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ShareCommand extends Command
 {
-    protected $signature = 'share {host} {--subdomain=} {--auth=}';
+    protected $signature = 'share {host} {--hostname=} {--subdomain=} {--auth=}';
 
     protected $description = 'Share a local url with a remote expose server';
 
@@ -25,6 +25,11 @@ class ShareCommand extends Command
 
     public function handle()
     {
+        if (! empty($this->option('hostname')) && ! empty($this->option('subdomain'))) {
+            $this->error('You can only specify one. Either a custom hostname or a subdomain.');
+            return;
+        }
+
         $this->configureConnectionLogger();
 
         (new Factory())
@@ -33,7 +38,11 @@ class ShareCommand extends Command
             ->setPort(config('expose.port', 8080))
             ->setAuth($this->option('auth'))
             ->createClient()
-            ->share($this->argument('host'), explode(',', $this->option('subdomain')))
+            ->share(
+                $this->argument('host'),
+                explode(',', $this->option('subdomain')),
+                $this->option('hostname')
+            )
             ->createHttpServer()
             ->run();
     }

@@ -234,6 +234,8 @@ return [
 
         'subdomain_repository' => \App\Server\SubdomainRepository\DatabaseSubdomainRepository::class,
 
+        'hostname_repository' => \App\Server\HostnameRepository\DatabaseHostnameRepository::class,
+
         /*
         |--------------------------------------------------------------------------
         | Messages

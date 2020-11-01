@@ -57,7 +57,7 @@ class ControlConnection
         $this->proxyManager->createTcpProxy($this->clientId, $data);
     }
 
-    public function authenticate(string $sharedHost, string $subdomain)
+    public function authenticate(string $sharedHost, ?string $subdomain, ?string $hostname)
     {
         $this->socket->send(json_encode([
             'event' => 'authenticate',
@@ -65,6 +65,7 @@ class ControlConnection
                 'type' => 'http',
                 'host' => $sharedHost,
                 'subdomain' => empty($subdomain) ? null : $subdomain,
+                'hostname' => empty($hostname) ? null : $hostname,
             ],
         ]));
     }

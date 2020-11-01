@@ -152,7 +152,7 @@ class AdminTest extends TestCase
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken=some-token');
 
-        $connectionManager->storeConnection('some-host.text', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.text', 'fixed-subdomain', '', $connection);
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/sites', [

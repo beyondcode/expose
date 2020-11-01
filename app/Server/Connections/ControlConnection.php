@@ -14,15 +14,17 @@ class ControlConnection
     public $host;
     public $authToken;
     public $subdomain;
+    public $hostname;
     public $client_id;
     public $proxies = [];
     protected $shared_at;
 
-    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId, string $authToken = '')
+    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, ?string $hostname, string $clientId, string $authToken = '')
     {
         $this->socket = $socket;
         $this->host = $host;
         $this->subdomain = $subdomain;
+        $this->hostname = $hostname;
         $this->client_id = $clientId;
         $this->authToken = $authToken;
         $this->shared_at = now()->toDateTimeString();
@@ -64,6 +66,7 @@ class ControlConnection
             'client_id' => $this->client_id,
             'auth_token' => $this->authToken,
             'subdomain' => $this->subdomain,
+            'hostname' => $this->hostname,
             'shared_at' => $this->shared_at,
         ];
     }

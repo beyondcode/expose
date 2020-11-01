@@ -120,6 +120,78 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_allows__hostname_reservation_for_users_with_the_right_flag()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_hostnames' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/hostnames', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+            'hostname' => 'reserved.beyondco.de',
+        ])));
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function it_can_delete_hostnames()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_hostnames' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/hostnames', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'hostname' => 'reserved.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/hostnames/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $hostnames = $body->hostnames;
+
+        $this->assertCount(0, $hostnames);
+    }
+
+    /** @test */
     public function it_can_get_user_details()
     {
         /** @var Response $response */
@@ -129,6 +201,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
+            'can_specify_hostnames' => 1,
             'can_specify_subdomains' => 1,
         ])));
 
@@ -143,6 +216,15 @@ class ApiTest extends TestCase
             'subdomain' => 'reserved',
         ])));
 
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/hostnames', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+            'hostname' => 'reserved.beyondco.de',
+        ])));
+
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
             'Host' => 'expose.localhost',
@@ -153,12 +235,14 @@ class ApiTest extends TestCase
         $body = json_decode($response->getBody()->getContents());
         $user = $body->user;
         $subdomains = $body->subdomains;
+        $hostnames = $body->hostnames;
 
         $this->assertSame('Marcel', $user->name);
         $this->assertSame([], $user->sites);
         $this->assertSame([], $user->tcp_connections);
 
         $this->assertCount(1, $subdomains);
+        $this->assertCount(1, $hostnames);
     }
 
     /** @test */
@@ -284,11 +368,11 @@ class ApiTest extends TestCase
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken='.$createdUser->auth_token);
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', '', $connection);
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken=some-other-token');
-        $connectionManager->storeConnection('some-different-host.test', 'different-subdomain', $connection);
+        $connectionManager->storeConnection('some-different-host.test', 'different-subdomain', '', $connection);
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken='.$createdUser->auth_token);
@@ -319,7 +403,7 @@ class ApiTest extends TestCase
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken=some-token');
 
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', '', $connection);
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites', [
@@ -346,7 +430,7 @@ class ApiTest extends TestCase
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/');
 
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', '', $connection);
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites', [

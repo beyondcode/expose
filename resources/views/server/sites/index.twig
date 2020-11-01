@@ -9,10 +9,10 @@
                     <thead>
                     <tr>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                            Host
+                            Local Host
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                            Subdomain
+                            Expose Host
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                             Shared At
@@ -26,13 +26,13 @@
                                 @{ site.host }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                                @{ site.subdomain }.{{ configuration.hostname()}}:{{ configuration.port() }}
+                                @{ getUrl(site) }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ site.shared_at }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
-                                <a :href="'{{ scheme|raw }}://'+site.subdomain+'.{{ configuration.hostname()}}:{{ configuration.port() }}'" target="_blank"
+                                <a :href="'{{ scheme|raw }}://'+getUrl(site)" target="_blank"
                                    class="text-indigo-600 hover:text-indigo-900">Visit</a>
                                 <a href="#"
                                    @click.prevent="disconnectSite(site.client_id)"
@@ -60,6 +60,12 @@
             },
 
             methods: {
+                getUrl(site) {
+                    if (site.hostname !== '' && site.hostname !== null) {
+                        return site.hostname;
+                    }
+                    return `${site.subdomain}.{{ configuration.hostname()}}:{{ configuration.port() }}`;
+                },
                 disconnectSite(id) {
                     fetch('/api/sites/' + id, {
                         method: 'DELETE',

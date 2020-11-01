@@ -4,7 +4,7 @@ namespace App\Commands;
 
 class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 {
-    protected $signature = 'share-cwd {host?} {--subdomain=} {--auth=}';
+    protected $signature = 'share-cwd {host?} {--hostname=} {--subdomain=} {--auth=}';
 
     public function handle()
     {
@@ -13,7 +13,7 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
         $this->input->setArgument('host', $host);
 
-        if (! $this->option('subdomain')) {
+        if (! $this->option('subdomain') && ! $this->option('hostname')) {
             $this->input->setOption('subdomain', $subdomain);
         }
 

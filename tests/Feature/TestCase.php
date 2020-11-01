@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 abstract class TestCase extends \Tests\TestCase
 {
-    const AWAIT_TIMEOUT = 5.0;
+    const AWAIT_TIMEOUT = 0.2;
 
     /** @var LoopInterface */
     protected $loop;

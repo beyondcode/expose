@@ -4,14 +4,19 @@ namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
 use App\Contracts\SubdomainRepository;
+use App\Contracts\HostnameRepository;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
+use App\Server\Connections\ConnectionConfiguration;
 use App\Server\Exceptions\NoFreePortAvailable;
+use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use stdClass;
+use function React\Promise\reject;
+use function React\Promise\resolve as resolvePromise;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -24,11 +29,15 @@ class ControlMessageController implements MessageComponentInterface
     /** @var SubdomainRepository */
     protected $subdomainRepository;
 
-    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository, SubdomainRepository $subdomainRepository)
+    /** @var HostnameRepository */
+    protected $hostnameRepository;
+
+    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository, SubdomainRepository $subdomainRepository, HostnameRepository $hostnameRepository)
     {
         $this->connectionManager = $connectionManager;
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
+        $this->hostnameRepository = $hostnameRepository;
     }
 
     /**
@@ -105,14 +114,12 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleHttpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        $this->hasValidSubdomain($connection, $data->subdomain, $user)->then(function ($subdomain) use ($data, $connection) {
-            if ($subdomain === false) {
-                return;
-            }
+        $this->hasValidConfiguration($connection, $data, $user)
+            ->then(function (ConnectionConfiguration $configuration) use ($data, $connection) {
+            $data->subdomain = $configuration->getSubdomain();
+            $data->hostname = $configuration->getHostname();
 
-            $data->subdomain = $subdomain;
-
-            $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $connection);
+            $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->hostname, $connection);
 
             $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
@@ -121,6 +128,7 @@ class ControlMessageController implements MessageComponentInterface
                 'data' => [
                     'message' => config('expose.admin.messages.message_of_the_day'),
                     'subdomain' => $connectionInfo->subdomain,
+                    'hostname' => $connectionInfo->hostname,
                     'client_id' => $connectionInfo->client_id,
                 ],
             ]));
@@ -192,7 +200,7 @@ class ControlMessageController implements MessageComponentInterface
     protected function verifyAuthToken(ConnectionInterface $connection): PromiseInterface
     {
         if (config('expose.admin.validate_auth_tokens') !== true) {
-            return \React\Promise\resolve(null);
+            return resolvePromise(null);
         }
 
         $deferred = new Deferred();
@@ -225,7 +233,7 @@ class ControlMessageController implements MessageComponentInterface
                 ],
             ]));
 
-            return \React\Promise\resolve(null);
+            return resolvePromise(ConnectionConfiguration::withSubdomain(null));
         }
 
         /**
@@ -246,7 +254,7 @@ class ControlMessageController implements MessageComponentInterface
                         ]));
                         $connection->close();
 
-                        return \React\Promise\resolve(false);
+                        return reject(false);
                     }
 
                     $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
@@ -263,14 +271,75 @@ class ControlMessageController implements MessageComponentInterface
                         ]));
                         $connection->close();
 
-                        return \React\Promise\resolve(false);
+                        return reject(false);
                     }
 
-                    return \React\Promise\resolve($subdomain);
+                    return resolvePromise(ConnectionConfiguration::withSubdomain($subdomain));
                 });
         }
 
-        return \React\Promise\resolve($subdomain);
+        return resolvePromise(ConnectionConfiguration::withSubdomain($subdomain));
+    }
+
+    protected function hasValidHostname(ConnectionInterface $connection, string $hostname, ?array $user): PromiseInterface
+    {
+        /**
+         * Check if the user can specify a custom hostname in the first place.
+         */
+        if (! is_null($user) && $user['can_specify_hostnames'] === 0) {
+            $connection->send(json_encode([
+                'event' => 'info',
+                'data' => [
+                    'message' => config('expose.admin.messages.custom_hostname_unauthorized').PHP_EOL,
+                ],
+            ]));
+
+            return reject();
+        }
+
+        /**
+         * Check if the given hostname is reserved for a different user.
+         */
+        return $this->hostnameRepository->getHostnamesByUserId($user['id'])
+            ->then(function ($foundHostnames) use ($connection, $hostname, $user) {
+                $foundHostname = collect($foundHostnames)->first(function ($foundHostname) use ($hostname) {
+                    return Str::is($foundHostname['hostname'], $hostname);
+                });
+
+                if (is_null($foundHostname)) {
+                    $message = config('expose.admin.messages.hostname_invalid');
+                    $message = str_replace(':hostname', $hostname, $message);
+
+                    $connection->send(json_encode([
+                        'event' => 'hostnameTaken',
+                        'data' => [
+                            'message' => $message,
+                        ],
+                    ]));
+                    $connection->close();
+
+                    return reject(false);
+                }
+
+                $controlConnection = $this->connectionManager->findControlConnectionForHostname($hostname);
+
+                if (! is_null($controlConnection)) {
+                    $message = config('expose.admin.messages.hostname_taken');
+                    $message = str_replace(':hostname', $hostname, $message);
+
+                    $connection->send(json_encode([
+                        'event' => 'hostnameTaken',
+                        'data' => [
+                            'message' => $message,
+                        ],
+                    ]));
+                    $connection->close();
+
+                    return reject(false);
+                }
+
+                return resolvePromise(ConnectionConfiguration::withHostname($hostname));
+            });
     }
 
     protected function canShareTcpPorts(ConnectionInterface $connection, $data, $user)
@@ -288,5 +357,14 @@ class ControlMessageController implements MessageComponentInterface
         }
 
         return true;
+    }
+
+    protected function hasValidConfiguration(ConnectionInterface $connection, $data, $user)
+    {
+        if (isset($data->hostname) && ! is_null($data->hostname)) {
+            return $this->hasValidHostname($connection, $data->hostname, $user);
+        }
+
+        return $this->hasValidSubdomain($connection, $data->subdomain, $user);
     }
 }
