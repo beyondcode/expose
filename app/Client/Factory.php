@@ -2,6 +2,7 @@
 
 namespace App\Client;
 
+use App\Client\Fileserver\Fileserver;
 use App\Client\Http\Controllers\AttachDataToLogController;
 use App\Client\Http\Controllers\ClearLogsController;
 use App\Client\Http\Controllers\CreateTunnelController;
@@ -32,6 +33,9 @@ class Factory
 
     /** @var App */
     protected $app;
+
+    /** @var Fileserver */
+    protected $fileserver;
 
     /** @var RouteGenerator */
     protected $router;
@@ -116,6 +120,15 @@ class Factory
         return $this;
     }
 
+    public function shareFolder(string $folder, string $name, $subdomain = null)
+    {
+        $host = $this->createFileServer($folder, $name);
+
+        $this->share($host, $subdomain);
+
+        return $this;
+    }
+
     protected function addRoutes()
     {
         $this->router->get('/', DashboardController::class);
@@ -134,18 +147,18 @@ class Factory
         }
     }
 
-    protected function detectNextFreeDashboardPort($port = 4040): int
+    protected function detectNextAvailablePort($startPort = 4040): int
     {
-        while (is_resource(@fsockopen('127.0.0.1', $port))) {
-            $port++;
+        while (is_resource(@fsockopen('127.0.0.1', $startPort))) {
+            $startPort++;
         }
 
-        return $port;
+        return $startPort;
     }
 
     public function createHttpServer()
     {
-        $dashboardPort = $this->detectNextFreeDashboardPort();
+        $dashboardPort = $this->detectNextAvailablePort();
 
         config()->set('expose.dashboard_port', $dashboardPort);
 
@@ -156,9 +169,23 @@ class Factory
         return $this;
     }
 
+    public function createFileServer(string $folder, string $name)
+    {
+        $port = $this->detectNextAvailablePort(8090);
+
+        $this->fileserver = new Fileserver($folder, $name, $port, '0.0.0.0', $this->loop);
+
+        return "127.0.0.1:{$port}";
+    }
+
     public function getApp(): App
     {
         return $this->app;
+    }
+
+    public function getFileserver(): Fileserver
+    {
+        return $this->fileserver;
     }
 
     public function run()

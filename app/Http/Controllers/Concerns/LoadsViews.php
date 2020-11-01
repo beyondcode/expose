@@ -9,7 +9,7 @@ use Twig\Loader\ArrayLoader;
 
 trait LoadsViews
 {
-    protected function getView(ConnectionInterface $connection, string $view, array $data = [])
+    protected function getView(?ConnectionInterface $connection, string $view, array $data = [])
     {
         $templatePath = implode(DIRECTORY_SEPARATOR, explode('.', $view));
 
@@ -23,7 +23,10 @@ trait LoadsViews
         $data = array_merge($data, [
             'request' => $connection->laravelRequest ?? null,
         ]);
-
+try {
         return stream_for($twig->render('template', $data));
+} catch (\Throwable $e) {
+    var_dump($e->getMessage());
+}
     }
 }

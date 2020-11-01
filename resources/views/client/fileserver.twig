@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+    <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/styles/github.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/highlight.min.js" async></script>
+</head>
+<body>
+<div id="app" class="">
+    <div class="relative bg-indigo-600" style="marign-left: -1px">
+        <div class="max-w-screen-xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+            <div class="pr-16 sm:text-center sm:px-16">
+                <p class="font-medium text-white flex justify-center">
+                    <span class="inline-block font-mono">{{ directory }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% macro bytesToSize(bytes) %}
+            {% set kilobyte = 1024 %}
+            {% set megabyte = kilobyte * 1024 %}
+            {% set gigabyte = megabyte * 1024 %}
+            {% set terabyte = gigabyte * 1024 %}
+
+            {% if bytes < kilobyte %}
+                {{ bytes ~ ' B' }}
+            {% elseif bytes < megabyte %}
+                {{ (bytes / kilobyte)|number_format(2, '.') ~ ' KiB' }}
+            {% elseif bytes < gigabyte %}
+                {{ (bytes / megabyte)|number_format(2, '.') ~ ' MiB' }}
+            {% elseif bytes < terabyte %}
+                {{ (bytes / gigabyte)|number_format(2, '.') ~ ' GiB' }}
+            {% else %}
+                {{ (bytes / terabyte)|number_format(2, '.') ~ ' TiB' }}
+            {% endif %}
+    {% endmacro %}
+    <div class="flex flex-col px-6 py-4">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                        <tr>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                Name
+                            </th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                Date Modified
+                            </th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                Size
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                        {% if currentPath != '/' %}
+                            <tr class="border-b">
+                                <td colspan="3" class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-mono text-gray-900">
+                                    <a href="/{{ parentPath }}" class="text-indigo-600 font-bold hover:text-indigo-900">Back</a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% for item in directoryContent %}
+                        <tr class="{% if loop.index % 2 == 0 %} bg-gray-50 {% endif %}">
+                            <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-mono text-gray-900">
+                                {% if currentPath != '/' %}
+                                    <a href="/{{ currentPath }}/{{ item.getFilename() }}" class="text-indigo-600 hover:text-indigo-900">{{ item.filename }}</a>
+                                {% else %}
+                                    <a href="/{{ item.getFilename() }}" class="text-indigo-600 hover:text-indigo-900">{{ item.filename }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                {{ item.getMTime() | date("m/d/Y H:i:s") }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                {% if item.isDir() %}
+                                    -
+                                {% else %}
+                                    {{ _self.bytesToSize(item.getSize()) }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
