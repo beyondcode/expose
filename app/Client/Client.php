@@ -45,7 +45,7 @@ class Client
         $sharedUrl = $this->prepareSharedUrl($sharedUrl);
 
         foreach ($subdomains as $subdomain) {
-            $this->connectToServer($sharedUrl, $subdomain, config('expose.auth_token'));
+            $this->connectToServer($sharedUrl, $subdomain, $this->configuration->auth());
         }
     }
 
