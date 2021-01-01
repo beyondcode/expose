@@ -45,7 +45,7 @@ class Client
         $sharedUrl = $this->prepareSharedUrl($sharedUrl);
 
         foreach ($subdomains as $subdomain) {
-            $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $this->configuration->auth());
+            $this->connectToServer($sharedUrl, $subdomain, $this->configuration->auth());
         }
     }
 
@@ -67,7 +67,7 @@ class Client
         return sprintf('%s:%s:%s', $scheme, $url, $port);
     }
 
-    public function connectToServerAndShareHttp(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
+    public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
     {
         $deferred = new Deferred();
         $promise = $deferred->promise();
@@ -88,7 +88,7 @@ class Client
                     $this->logger->error('Connection to server closed.');
 
                     $this->retryConnectionOrExit(function () use ($sharedUrl, $subdomain, $authToken) {
-                        $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $authToken);
+                        $this->connectToServer($sharedUrl, $subdomain, $authToken);
                     });
                 });
 
@@ -121,7 +121,7 @@ class Client
             }, function (\Exception $e) use ($deferred, $sharedUrl, $subdomain, $authToken) {
                 if ($this->connectionRetries > 0) {
                     $this->retryConnectionOrExit(function () use ($sharedUrl, $subdomain, $authToken) {
-                        $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $authToken);
+                        $this->connectToServer($sharedUrl, $subdomain, $authToken);
                     });
 
                     return;
