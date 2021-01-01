@@ -6,17 +6,17 @@ use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
-use Psr\Http\Message\UriInterface;
-use React\Stream\ReadableStreamInterface;
 use function GuzzleHttp\Psr7\parse_request;
 use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
+use React\Stream\ReadableStreamInterface;
 
 class HttpClient
 {
@@ -107,7 +107,6 @@ class HttpClient
                     $response->buffer .= $chunk;
 
                     $this->sendChunkToServer($chunk, $proxyConnection);
-
                 });
 
                 $body->on('close', function () use ($proxyConnection, $response) {
