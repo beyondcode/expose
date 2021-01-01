@@ -91,8 +91,6 @@ class HttpClient
             ->requestStreaming($request->getMethod(), $this->getExposeUri($request), $request->getHeaders(), $request->getBody())
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
                 if (! isset($response->buffer)) {
-                    //$response = $this->rewriteResponseHeaders($response);
-
                     $response->buffer = str($response);
                 }
 
@@ -133,27 +131,6 @@ class HttpClient
     protected function parseRequest($data): Request
     {
         return Request::fromString($data);
-    }
-
-    protected function rewriteResponseHeaders(ResponseInterface $response)
-    {
-        if (! $response->hasHeader('Location')) {
-            return $response;
-        }
-
-        $location = $response->getHeaderLine('Location');
-
-        if (! strstr($location, $this->connectionData->host)) {
-            return $response;
-        }
-
-        $location = str_replace(
-            $this->connectionData->host,
-            $this->configuration->getUrl($this->connectionData->subdomain),
-            $location
-        );
-
-        return $response->withHeader('Location', $location);
     }
 
     private function getExposeUri(RequestInterface $request): UriInterface
