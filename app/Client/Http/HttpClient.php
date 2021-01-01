@@ -6,6 +6,8 @@ use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
+use Psr\Http\Message\UriInterface;
+use React\Stream\ReadableStreamInterface;
 use function GuzzleHttp\Psr7\parse_request;
 use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
@@ -84,22 +86,19 @@ class HttpClient
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)
     {
         (new Browser($this->loop, $this->createConnector()))
-            ->withOptions([
-                'followRedirects' => false,
-                'obeySuccessCode' => false,
-                'streaming' => true,
-            ])
-            ->send($request)
+            ->withFollowRedirects(false)
+            ->withRejectErrorResponse(false)
+            ->requestStreaming($request->getMethod(), $this->getExposeUri($request), $request->getHeaders(), $request->getBody())
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
                 if (! isset($response->buffer)) {
-                    $response = $this->rewriteResponseHeaders($response);
+                    //$response = $this->rewriteResponseHeaders($response);
 
                     $response->buffer = str($response);
                 }
 
                 $this->sendChunkToServer($response->buffer, $proxyConnection);
 
-                /* @var $body \React\Stream\ReadableStreamInterface */
+                /* @var $body ReadableStreamInterface */
                 $body = $response->getBody();
 
                 $this->logResponse(str($response));
@@ -108,6 +107,7 @@ class HttpClient
                     $response->buffer .= $chunk;
 
                     $this->sendChunkToServer($chunk, $proxyConnection);
+
                 });
 
                 $body->on('close', function () use ($proxyConnection, $response) {
@@ -155,5 +155,16 @@ class HttpClient
         );
 
         return $response->withHeader('Location', $location);
+    }
+
+    private function getExposeUri(RequestInterface $request): UriInterface
+    {
+        $exposeProto = $request->getHeader('x-expose-proto')[0];
+        $exposeHost = explode(':', $request->getHeader('x-expose-host')[0]);
+
+        return $request->getUri()
+            ->withScheme($exposeProto)
+            ->withHost($exposeHost[0])
+            ->withPort($exposeHost[1]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Server\Connections;
 
 use Evenement\EventEmitterTrait;
+use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
 
 class ControlConnection

@@ -45,7 +45,7 @@ class Client
         $sharedUrl = $this->prepareSharedUrl($sharedUrl);
 
         foreach ($subdomains as $subdomain) {
-            $this->connectToServer($sharedUrl, $subdomain, $this->configuration->auth());
+            $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $this->configuration->auth());
         }
     }
 
@@ -61,18 +61,13 @@ class Client
         }
 
         $url = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path'));
+        $scheme = Arr::get($parsedUrl, 'scheme');
+        $port = Arr::get($parsedUrl, 'port', $scheme === 'https' ? 443 : 80);
 
-        if (Arr::get($parsedUrl, 'scheme') === 'https') {
-            $url .= ':443';
-        }
-        if (! is_null($port = Arr::get($parsedUrl, 'port'))) {
-            $url .= ":{$port}";
-        }
-
-        return $url;
+        return sprintf('%s:%s:%s', $scheme, $url, $port);
     }
 
-    public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
+    public function connectToServerAndShareHttp(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
     {
         $deferred = new Deferred();
         $promise = $deferred->promise();
@@ -93,7 +88,7 @@ class Client
                     $this->logger->error('Connection to server closed.');
 
                     $this->retryConnectionOrExit(function () use ($sharedUrl, $subdomain, $authToken) {
-                        $this->connectToServer($sharedUrl, $subdomain, $authToken);
+                        $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $authToken);
                     });
                 });
 
@@ -126,7 +121,7 @@ class Client
             }, function (\Exception $e) use ($deferred, $sharedUrl, $subdomain, $authToken) {
                 if ($this->connectionRetries > 0) {
                     $this->retryConnectionOrExit(function () use ($sharedUrl, $subdomain, $authToken) {
-                        $this->connectToServer($sharedUrl, $subdomain, $authToken);
+                        $this->connectToServerAndShareHttp($sharedUrl, $subdomain, $authToken);
                     });
 
                     return;
