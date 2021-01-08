@@ -392,7 +392,7 @@ class TunnelTest extends TestCase
 
     protected function createTestHttpServer()
     {
-        $server = new Server(function (ServerRequestInterface $request) {
+        $server = new Server($this->loop, function (ServerRequestInterface $request) {
             return new Response(200, ['Content-Type' => 'text/plain'], 'Hello World!');
         });
 

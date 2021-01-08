@@ -24,7 +24,7 @@ class RequestLoggerTest extends TestCase
         $cliLogger = m::mock(CliRequestLogger::class);
         $cliLogger->shouldReceive('logRequest')->once();
 
-        $requestString = str(new Request(200, '/example'));
+        $requestString = str(new Request('GET', '/example'));
         $parsedRequest = LaminasRequest::fromString($requestString);
 
         $logger = new RequestLogger($browser, $cliLogger);
@@ -42,7 +42,7 @@ class RequestLoggerTest extends TestCase
         $cliLogger = m::mock(CliRequestLogger::class);
         $cliLogger->shouldReceive('logRequest')->once();
 
-        $requestString = str(new Request(200, '/example'));
+        $requestString = str(new Request('GET', '/example'));
         $parsedRequest = LaminasRequest::fromString($requestString);
 
         $logger = new RequestLogger($browser, $cliLogger);
@@ -64,7 +64,7 @@ class RequestLoggerTest extends TestCase
         $cliLogger->shouldReceive('logRequest')
             ->twice();
 
-        $requestString = str(new Request(200, '/example'));
+        $requestString = str(new Request('GET', '/example'));
         $parsedRequest = LaminasRequest::fromString($requestString);
 
         $logger = new RequestLogger($browser, $cliLogger);
@@ -89,7 +89,7 @@ class RequestLoggerTest extends TestCase
         $cliLogger = m::mock(CliRequestLogger::class);
         $cliLogger->shouldReceive('logRequest')->once();
 
-        $requestString = str(new Request(200, '/example'));
+        $requestString = str(new Request('GET', '/example'));
         $parsedRequest = LaminasRequest::fromString($requestString);
 
         $logger = new RequestLogger($browser, $cliLogger);
@@ -107,7 +107,7 @@ class RequestLoggerTest extends TestCase
         $cliLogger = m::mock(CliRequestLogger::class);
         $cliLogger->shouldReceive('logRequest');
 
-        $requestString = str(new Request(200, '/example'));
+        $requestString = str(new Request('GET', '/example'));
         $parsedRequest = LaminasRequest::fromString($requestString);
 
         $logger = new RequestLogger($browser, $cliLogger);
