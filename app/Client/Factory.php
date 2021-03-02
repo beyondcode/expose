@@ -142,7 +142,7 @@ class Factory
 
         config()->set('expose.dashboard_port', $dashboardPort);
 
-        $this->app = new App('127.0.0.1', $dashboardPort, '0.0.0.0', $this->loop);
+        $this->app = new App('0.0.0.0', $dashboardPort, '0.0.0.0', $this->loop);
 
         $this->addRoutes();
 

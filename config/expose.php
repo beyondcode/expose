@@ -31,6 +31,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | DNS
+    |--------------------------------------------------------------------------
+    |
+    | The DNS server to use when resolving the shared URLs.
+    | When Expose is running from within Docker containers, you should set this to 
+    | `true` to fall-back to the system default DNS servers.
+    |
+    */
+    'dns' => '127.0.0.1',
+
+    /*
+    |--------------------------------------------------------------------------
     | Auth Token
     |--------------------------------------------------------------------------
     |
