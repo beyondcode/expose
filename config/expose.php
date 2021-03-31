@@ -57,6 +57,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default HTTPS
+    |--------------------------------------------------------------------------
+    |
+    | Whether to use HTTPS as a default when sharing your local sites. Expose
+    | will try to look up the protocol if you are using Laravel Valet
+    | automatically. Otherwise you can specify it here manually.
+    |
+    */
+    'default_https' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Maximum Logged Requests
     |--------------------------------------------------------------------------
     |
