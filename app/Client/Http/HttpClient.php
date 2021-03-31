@@ -11,10 +11,12 @@ use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
+use React\Stream\ReadableStreamInterface;
 
 class HttpClient
 {
@@ -84,22 +86,17 @@ class HttpClient
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)
     {
         (new Browser($this->loop, $this->createConnector()))
-            ->withOptions([
-                'followRedirects' => false,
-                'obeySuccessCode' => false,
-                'streaming' => true,
-            ])
-            ->send($request)
+            ->withFollowRedirects(false)
+            ->withRejectErrorResponse(false)
+            ->requestStreaming($request->getMethod(), $this->getExposeUri($request), $request->getHeaders(), $request->getBody())
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
                 if (! isset($response->buffer)) {
-                    $response = $this->rewriteResponseHeaders($response);
-
                     $response->buffer = str($response);
                 }
 
                 $this->sendChunkToServer($response->buffer, $proxyConnection);
 
-                /* @var $body \React\Stream\ReadableStreamInterface */
+                /* @var $body ReadableStreamInterface */
                 $body = $response->getBody();
 
                 $this->logResponse(str($response));
@@ -136,24 +133,14 @@ class HttpClient
         return Request::fromString($data);
     }
 
-    protected function rewriteResponseHeaders(ResponseInterface $response)
+    private function getExposeUri(RequestInterface $request): UriInterface
     {
-        if (! $response->hasHeader('Location')) {
-            return $response;
-        }
+        $exposeProto = $request->getHeader('x-expose-proto')[0];
+        $exposeHost = explode(':', $request->getHeader('x-expose-host')[0]);
 
-        $location = $response->getHeaderLine('Location');
-
-        if (! strstr($location, $this->connectionData->host)) {
-            return $response;
-        }
-
-        $location = str_replace(
-            $this->connectionData->host,
-            $this->configuration->getUrl($this->connectionData->subdomain),
-            $location
-        );
-
-        return $response->withHeader('Location', $location);
+        return $request->getUri()
+            ->withScheme($exposeProto)
+            ->withHost($exposeHost[0])
+            ->withPort($exposeHost[1]);
     }
 }

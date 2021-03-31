@@ -113,9 +113,13 @@ class TunnelMessageController extends Controller
             $host .= ":{$this->configuration->port()}";
         }
 
-        $request->headers->set('Host', $controlConnection->host);
+        $exposeUrl = parse_url($controlConnection->host);
+
+        $request->headers->set('Host', "{$controlConnection->subdomain}.{$host}");
         $request->headers->set('X-Forwarded-Proto', $request->isSecure() ? 'https' : 'http');
-        $request->headers->set('X-Expose-Request-ID', uniqid());
+        $request->headers->set('X-Expose-Request-ID', sha1(uniqid('', true)));
+        $request->headers->set('X-Expose-Host', sprintf('%s:%s', $exposeUrl['host'], $exposeUrl['port']));
+        $request->headers->set('X-Expose-Proto', $exposeUrl['scheme']);
         $request->headers->set('Upgrade-Insecure-Requests', 1);
         $request->headers->set('X-Exposed-By', config('app.name').' '.config('app.version'));
         $request->headers->set('X-Original-Host', "{$controlConnection->subdomain}.{$host}");

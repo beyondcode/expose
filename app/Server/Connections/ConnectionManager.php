@@ -45,15 +45,13 @@ class ConnectionManager implements ConnectionManagerContract
 
     public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection
     {
-        $clientId = (string) uniqid();
-
-        $connection->client_id = $clientId;
+        $connection->client_id = sha1(uniqid('', true));
 
         $storedConnection = new ControlConnection(
             $connection,
             $host,
             $subdomain ?? $this->subdomainGenerator->generateSubdomain(),
-            $clientId,
+            $connection->client_id,
             $this->getAuthTokenFromConnection($connection)
         );
 

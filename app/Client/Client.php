@@ -60,16 +60,11 @@ class Client
             return $sharedUrl;
         }
 
-        $url = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path'));
+        $host = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path', 'localhost'));
+        $scheme = Arr::get($parsedUrl, 'scheme', 'http');
+        $port = Arr::get($parsedUrl, 'port', $scheme === 'https' ? 443 : 80);
 
-        if (Arr::get($parsedUrl, 'scheme') === 'https') {
-            $url .= ':443';
-        }
-        if (! is_null($port = Arr::get($parsedUrl, 'port'))) {
-            $url .= ":{$port}";
-        }
-
-        return $url;
+        return sprintf('%s://%s:%s', $scheme, $host, $port);
     }
 
     public function connectToServer(string $sharedUrl, $subdomain, $authToken = ''): PromiseInterface
