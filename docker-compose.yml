@@ -3,7 +3,7 @@ services:
   expose:
     image: beyondcodegmbh/expose-server:latest
     ports:
-      - 127.0.0.1:8080:${PORT}
+      - 8080:${PORT}
     environment:
       port: ${PORT}
       domain: ${DOMAIN}
