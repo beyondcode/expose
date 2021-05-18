@@ -2,7 +2,21 @@
 <head>
     <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
+    <script defer src="https://unpkg.com/twind/twind.umd.js"></script>
+    <script defer src="https://unpkg.com/twind/observe/observe.umd.js"></script>
+    <script defer src="https://unpkg.com/twind/shim/shim.umd.js"></script>
+    <script type="twind-config">
+      {
+        "darkMode": "media",
+        "theme": {
+            "extend": {
+                "colors": {
+                    "dark-blue-800": "#ff9900"
+                }
+            }
+        }
+      }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/styles/github.min.css">
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/highlight.min.js" async></script>
@@ -88,21 +102,19 @@
         }
     </style>
 </head>
-<body>
-<div id="app" class="">
-    <div class="relative bg-indigo-600" style="marign-left: -1px">
-        <div class="max-w-screen-xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
-            <div class="pr-16 sm:text-center sm:px-16">
-                <p class="font-medium text-white flex justify-center">
-                    <span class="inline-block">Waiting for requests on:
-                        {% for subdomain in subdomains %}
-                            <a class="underline" target="_blank" href="{{ subdomain }}">{{ subdomain }}</a>
-                        {% endfor %}
-                    </span>
-                </p>
-            </div>
-        </div>
-    </div>
+<body class="dark:bg-gray-900 dark:text-white">
+<div id="app" class="container px-8 mx-auto dark:bg-gray-900">
+    <header class="text-pink-500 font-semibold pt-12 pb-6 flex items-center justify-center">
+        <a href="https://beyondco.de" target="_blank" class="inline-flex items-center self-start">
+            <img src="https://beyondco.de/apps/icons/expose.png" class="h-12">
+            <p class="ml-4 font-headline text-lg">Expose</p>
+        </a>
+        <span class="inline-block justify-self-stretch text-center w-full">Waiting for requests on:
+            {% for subdomain in subdomains %}
+                <a class="underline" target="_blank" href="{{ subdomain }}">{{ subdomain }}</a>
+            {% endfor %}
+        </span>
+    </header>
     <div class="p-5 flex flex-col md:flex-row">
         <div class="w-full md:w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -110,44 +122,51 @@
                         <span class="h-8 inline-flex rounded-md shadow-sm">
                               <button @click.prevent="clearLogs"
                                       type="button"
-                                      class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                      class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 text-gray-700 bg-white hover:text-gray-500 active:text-gray-800 active:bg-gray-50 border-gray-300
+                                      dark:text-gray-200 dark:bg-gray-700 dark:hover:text-gray-500 active:text-gray-800 dark:active:bg-gray-900 dark:border-gray-800
+                                      inline-flex items-center px-2.5 py-1.5 border text-xs leading-4 font-medium rounded focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150">
                                 Clear
                               </button>
                         </span>
 
                         <div class="ml-4 flex-grow relative rounded-md shadow-sm">
-                            <input class="h-8 form-input block w-full sm:text-sm sm:leading-5" v-model="search" placeholder="Search" />
+                            <input class="h-8 rounded-md dark:bg-gray-800 p-2 block w-full sm:text-sm sm:leading-5" v-model="search" placeholder="Search" />
                         </div>
                 </div>
                 <div
-                    class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+                    class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200 dark:border-gray-800">
                     <table class="min-w-full">
                         <thead>
                         <tr>
-                            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 border-b dark:border-gray-700 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:text-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                 URL
                             </th>
-                            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 border-b dark:border-gray-700 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:text-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                 Response
                             </th>
-                            <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 border-b dark:border-gray-700 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:text-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                 Duration
                             </th>
                         </tr>
                         </thead>
-                        <tbody class="bg-white">
+                        <tbody class="bg-white dark:bg-gray-700">
                         <tr v-for="log in filteredLogs"
-                            :class="{'bg-gray-100': currentLog === log}"
+                            :class="{'dark:bg-gray-800 bg-gray-100': currentLog === log}"
                             @click="setLog(log)">
-                            <td class="cursor-pointer px-6 py-4 whitespace-normal border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
-                                <p>
-                                    @{ log.request.method }
-                                    @{ log.request.uri }
+                            <td class="cursor-pointer px-6 py-4 whitespace-normal border-b dark:border-gray-800 border-gray-200 text-sm leading-5 font-medium text-gray-900 dark:text-gray-200">
+                                <p class="flex">
+                                    <span class="text-xs">@{ log.request.method }</span>
+                                    <span
+                                        style="max-width: 150px"
+                                        :title="log.request.uri"
+                                        class="font-mono pl-1 text-xs truncate">@{ log.request.uri }</span>
                                 </p>
-                                <span class="text-xs">@{ log.subdomain }</span>
-                                <span class="text-xs text-gray-600">@{ log.performed_at }</span>
+                                {% if subdomains|length > 1 %}
+                                    <span class="text-xs font-mono">@{ log.subdomain }</span>
+                                {% endif %}
+                                <span class="text-xs text-gray-600 dark:text-gray-50">@{ log.performed_at }</span>
                             </td>
-                            <td class="cursor-pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                            <td class="cursor-pointer px-6 py-4 whitespace-nowrap border-b dark:border-gray-800 border-gray-200 text-sm leading-5 text-gray-500 dark:text-gray-200 ">
                                 <div v-if="log.response">
                                     <span
                                         v-if="log.response.status >= 200 && log.response.status < 300"
@@ -174,7 +193,7 @@
                                     ...
                                 </div>
                             </td>
-                            <td class="cursor-pointer px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                            <td class="cursor-pointer px-6 py-4 whitespace-no-wrap border-b dark:border-gray-800 border-gray-200 text-sm leading-5 dark:text-gray-200 text-gray-500">
                                 <div v-if="log.response">
                                     @{ log.duration }ms
                                 </div>
@@ -186,15 +205,17 @@
             </div>
         </div>
         <div class="w-full md:w-2/3 mt-5 md:mt-0 md:ml-5">
-            <div v-if="currentLog" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 flex">
-                        @{ currentLog.request.method } @{ currentLog.request.uri }
+            <div v-if="currentLog" class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg dark:border-gray-700 border">
+                <div class="dark:bg-gray-700 px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium dark:text-gray-50 text-gray-900 flex">
+                        <span>@{ currentLog.request.method } @{ currentLog.request.uri }</span>
                         <div class="flex-grow"></div>
                         <span class="inline-flex rounded-md shadow-sm">
                               <button @click.prevent="replay(currentLog)"
                                       type="button"
-                                      class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                      class="
+                                      dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500
+                                      inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 Replay
                               </button>
                         </span>
@@ -202,42 +223,41 @@
                         <button
                             :data-clipboard-text="currentLog.request.curl"
                             type="button"
-                            class="clipboard inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                            class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                             Copy as curl
                         </button>
                         </span>
                     </h3>
-                    <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-
-                        <span class="text-xs text-gray-600">Received at: @{ currentLog.performed_at }</span>
-                        <div v-if="currentLog.response">
-                            <span
-                                v-if="currentLog.response.status >= 200 && currentLog.response.status < 300"
-                                class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
-                                          @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                        </span>
+                    <div class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 flex items-center">
+                        <div class="mr-4" v-if="currentLog.response">
+                                <span
+                                    v-if="currentLog.response.status >= 200 && currentLog.response.status < 300"
+                                    class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
+                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
+                                            </span>
                             <span
                                 v-if="currentLog.response.status >= 400 && currentLog.response.status < 500"
                                 class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
-                                          @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                        </span>
+                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
+                                            </span>
                             <span
                                 v-if="currentLog.response.status >= 500"
                                 class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-red-100 text-red-800">
-                                          @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                        </span>
+                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
+                                            </span>
                         </div>
-                    </p>
+                        <span class="text-xs text-gray-600 dark:text-gray-200">Received at: @{ currentLog.performed_at }</span>
+                    </div>
                 </div>
                 <div>
                     <div class="hidden sm:block">
-                        <div class="border-b border-gray-200">
+                        <div class="border-b border-gray-200 dark:border-gray-700">
                             <nav class="-mb-px flex">
                                 <a href="#"
                                    @click.prevent="setView('request')"
                                    :class="{
-                                        'border-indigo-500 text-indigo-600 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': view === 'request',
-                                        'border-border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'response',
+                                        'dark:bg-gray-900 dark:border-pink-500 border-indigo-500 dark:text-pink-500 text-indigo-600 dark:focus:text-pink-400 focus:text-indigo-800 dark:focus:border-pink-400 focus:border-indigo-700': view === 'request',
+                                        'border-border-transparent dark:text-gray-200 text-gray-500 dark:hover:text-gray-100 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'response',
                                    }"
                                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
                                     Request
@@ -245,8 +265,8 @@
                                 <a href="#"
                                    @click.prevent="setView('response')"
                                    :class="{
-                                        'border-indigo-500 text-indigo-600': view === 'response',
-                                        'border-border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'request',
+                                        'dark:bg-gray-900 dark:border-pink-500 border-indigo-500 dark:text-pink-500 text-indigo-600 dark:focus:text-pink-400 focus:text-indigo-800 dark:focus:border-pink-400 focus:border-indigo-700': view === 'response',
+                                        'border-border-transparent dark:text-gray-200 text-gray-500 dark:hover:text-gray-100 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'request',
                                    }"
                                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
                                     Response
@@ -257,37 +277,37 @@
                 </div>
 
                 <div v-if="view === 'request'">
-                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.query).length > 0">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.query).length > 0">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Query Parameters
                         </h3>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
                             <button
                                 type="button"
-                                class="clipboard-query inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard-query inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 Copy as PHP array
                             </button>
                         </span>
                     </div>
                     <div v-for="(value, name) in currentLog.request.query"
                          :key="'query_' + name"
-                         class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-700">
+                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ name }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
+                        <dd class="mt-1 text-sm leading-5 dark:text-gray-200 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             @{ value }
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Post Parameters
                         </h3>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
                             <button
                                 type="button"
-                                class="clipboard-post inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard-post inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 Copy as PHP array
                             </button>
                         </span>
@@ -305,31 +325,31 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6 flex justify-between">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between">
+                        <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Headers
                         </h3>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
                             <button
                                 type="button"
-                                class="clipboard-headers inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard-headers inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 Copy as PHP array
                             </button>
                         </span>
                     </div>
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
-                         class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-700">
+                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ header }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                        <dd class="mt-1 text-sm leading-5 dark:text-gray-200 text-gray-900 sm:mt-0 sm:col-span-2">
                             @{ value }
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Request Body
                         </h3>
                     </div>
@@ -339,18 +359,18 @@
                 </div>
 
                 <div v-if="view === 'response'">
-                    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Headers
                         </h3>
                     </div>
                     <div v-for="(value, header) in currentLog.response.headers"
                          :key="header"
-                         class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-700">
+                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ header }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
+                        <dd class="mt-1 text-sm leading-5 dark:text-gray-100 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             @{ value }
                         </dd>
                     </div>
@@ -372,33 +392,24 @@
                         </div>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t border-gray-200 sm:px-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            Response
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex justify-between">
+                            <span>Response</span>
+                            <nav class="flex">
+                                <a href="#"
+                                   @click.prevent="setActiveTab('raw')"
+                                   :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'raw'}"
+                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700">
+                                    Raw
+                                </a>
+                                <a href="#"
+                                   @click.prevent="setActiveTab('preview')"
+                                   :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'preview'}"
+                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:bg-gray-100">
+                                    Preview
+                                </a>
+                            </nav>
                         </h3>
-                    </div>
-                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-900">
-
-                        </dt>
-                        <div>
-                            <div>
-                                <nav class="flex">
-                                    <a href="#"
-                                       @click.prevent="setActiveTab('raw')"
-                                       :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'raw'}"
-                                       class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700">
-                                        Raw
-                                    </a>
-                                    <a href="#"
-                                       @click.prevent="setActiveTab('preview')"
-                                       :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'preview'}"
-                                       class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:bg-gray-100">
-                                        Preview
-                                    </a>
-                                </nav>
-                            </div>
-                        </div>
                     </div>
                     <div v-if="activeTab === 'raw'">
                         <pre class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
@@ -411,9 +422,9 @@
                     </div>
                 </div>
             </div>
-            <div v-else  class="flex-col bg-white shadow overflow-hidden sm:rounded-lg justify-center items-center flex py-4">
+            <div v-else  class="flex-col bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg justify-center items-center flex py-4">
                 <h1 class="text-lg">Waiting for connections...</h1>
-                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ subdomains[0] | url_encode }}&choe=UTF-8" />
+                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ subdomains[0] | url_encode }}&choe=UTF-8&chf=bg,s,FFFFFF00" />
                 <a class="text-sm" href="{{ subdomains[0] }}" target="_blank">{{ subdomains[0] }}</a>
             </div>
         </div>

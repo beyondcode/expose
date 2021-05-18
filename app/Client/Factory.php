@@ -120,7 +120,7 @@ class Factory
         $this->router->post('/api/logs/{request_id}/data', AttachDataToLogController::class);
         $this->router->get('/api/logs/clear', ClearLogsController::class);
 
-        $this->app->route('/socket', new WsServer(new Socket()), ['*']);
+        $this->app->route('/socket', new WsServer(new Socket()), ['*'], "");
 
         foreach ($this->router->getRoutes()->all() as $name => $route) {
             $this->app->routes->add($name, $route);

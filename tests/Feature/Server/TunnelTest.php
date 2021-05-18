@@ -48,7 +48,7 @@ class TunnelTest extends TestCase
         $this->expectException(ResponseException::class);
         $this->expectExceptionMessage(404);
 
-        $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
+        $this->await($this->browser->get('http://127.0.0.1:8080/', [
             'Host' => 'tunnel.localhost',
         ]));
     }
@@ -56,6 +56,8 @@ class TunnelTest extends TestCase
     /** @test */
     public function it_sends_incoming_requests_to_the_connected_client()
     {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
         $this->createTestHttpServer();
 
         /**

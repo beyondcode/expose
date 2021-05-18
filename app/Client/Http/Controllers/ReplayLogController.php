@@ -4,8 +4,11 @@ namespace App\Client\Http\Controllers;
 
 use App\Client\Http\HttpClient;
 use App\Http\Controllers\Controller;
+use App\Logger\LoggedRequest;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Str;
+use Laminas\Http\Header\GenericHeader;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
@@ -34,7 +37,9 @@ class ReplayLogController extends Controller
             return;
         }
 
-        $this->httpClient->performRequest($loggedRequest->getRequestData());
+        $loggedRequest->refreshId();
+
+        $this->httpClient->performRequest($loggedRequest->getRequest()->toString());
 
         $httpConnection->send(str(new Response(200)));
     }
