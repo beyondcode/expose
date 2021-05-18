@@ -37,6 +37,14 @@ class AppServiceProvider extends ServiceProvider
     {
         $builtInConfig = config('expose');
 
+        $keyServerVariable = 'EXPOSE_CONFIG_FILE';
+        if (array_key_exists($keyServerVariable, $_SERVER) && is_string($_SERVER[$keyServerVariable]) && file_exists($_SERVER[$keyServerVariable])) {
+            $localConfig = require $_SERVER[$keyServerVariable];
+            config()->set('expose', array_merge($builtInConfig, $localConfig));
+
+            return;
+        }
+
         $localConfigFile = getcwd().DIRECTORY_SEPARATOR.'.expose.php';
 
         if (file_exists($localConfigFile)) {

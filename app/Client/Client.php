@@ -45,13 +45,13 @@ class Client
         $sharedUrl = $this->prepareSharedUrl($sharedUrl);
 
         foreach ($subdomains as $subdomain) {
-            $this->connectToServer($sharedUrl, $subdomain, config('expose.auth_token'));
+            $this->connectToServer($sharedUrl, $subdomain, $this->configuration->auth());
         }
     }
 
     public function sharePort(int $port)
     {
-        $this->connectToServerAndShareTcp($port, config('expose.auth_token'));
+        $this->connectToServerAndShareTcp($port, $this->configuration->auth());
     }
 
     protected function prepareSharedUrl(string $sharedUrl): string

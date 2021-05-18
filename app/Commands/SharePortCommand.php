@@ -27,11 +27,13 @@ class SharePortCommand extends Command
     {
         $this->configureConnectionLogger();
 
+        $auth = $this->option('auth') ?? config('expose.auth_token', '');
+
         (new Factory())
             ->setLoop(app(LoopInterface::class))
             ->setHost(config('expose.host', 'localhost'))
             ->setPort(config('expose.port', 8080))
-            ->setAuth($this->option('auth'))
+            ->setAuth($auth)
             ->createClient()
             ->sharePort($this->argument('port'))
             ->createHttpServer()
