@@ -5,7 +5,6 @@ namespace App\Commands;
 use App\Logger\CliRequestLogger;
 use Illuminate\Console\Parser;
 use LaravelZero\Framework\Commands\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 abstract class ServerAwareCommand extends Command
