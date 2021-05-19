@@ -251,7 +251,7 @@ class ControlMessageController implements MessageComponentInterface
 
                     $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
 
-                    if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain')) {
+                    if (! is_null($controlConnection) || $subdomain === config('expose.admin.subdomain') || in_array($subdomain, config('expose.admin.reserved_subdomains', []))) {
                         $message = config('expose.admin.messages.subdomain_taken');
                         $message = str_replace(':subdomain', $subdomain, $message);
 
@@ -279,7 +279,7 @@ class ControlMessageController implements MessageComponentInterface
             $connection->send(json_encode([
                 'event' => 'authenticationFailed',
                 'data' => [
-                    'message' => config('expose.admin.messages.custom_subdomain_unauthorized'),
+                    'message' => config('expose.admin.messages.tcp_port_sharing_unauthorized'),
                 ],
             ]));
             $connection->close();

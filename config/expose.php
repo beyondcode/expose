@@ -4,30 +4,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Host
+    | Servers
     |--------------------------------------------------------------------------
     |
-    | The expose server to connect to. By default, expose is using the free
-    | sharedwithexpose.com server, offered by Beyond Code. You will need a free
-    | Beyond Code account in order to authenticate with the server.
-    | Feel free to host your own server and change this value.
+    | The available Expose servers that your client can connect to.
+    | When sharing sites or TCP ports, you can specify the server
+    | that should be used using the `--server=` option.
     |
     */
-    'host' => 'sharedwithexpose.com',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Port
-    |--------------------------------------------------------------------------
-    |
-    | The port that expose will try to connect to. If you want to bypass
-    | firewalls and have proper SSL encrypted tunnels, make sure to use
-    | port 443 and use a reverse proxy for Expose.
-    |
-    | The free default server is already running on port 443.
-    |
-    */
-    'port' => 443,
+    'servers' => [
+        'default' => [
+            'host' => 'sharedwithexpose.com',
+            'port' => 443,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -220,6 +210,17 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Reserved Subdomain
+        |--------------------------------------------------------------------------
+        |
+        | Specify any subdomains that you don't want to be able to register
+        | on your expose server.
+        |
+        */
+        'reserved_subdomains' => [],
+
+        /*
+        |--------------------------------------------------------------------------
         | Subdomain Generator
         |--------------------------------------------------------------------------
         |
@@ -276,6 +277,8 @@ return [
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
 
             'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro. Assigning a random subdomain instead.',
+
+            'tcp_port_sharing_unauthorized' => 'You are not allowed to share TCP ports. Please upgrade to Expose Pro.',
 
             'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',
         ],

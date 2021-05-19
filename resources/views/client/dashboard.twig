@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
     <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
     <script type="tailwind-config">
       {
@@ -15,6 +15,11 @@
         }
       }
     </script>
+    <style type="postcss">
+        ::selection {
+            @apply bg-pink-500 bg-opacity-50;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/styles/github.min.css">
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/highlight.min.js" async></script>
@@ -95,15 +100,13 @@
         });
     </script>
     <style>
-        .even\:bg-gray-50:nth-child(even) {
-            background-color: #f7fafc;
-        }
+        [v-cloak] {display: none}
     </style>
 </head>
 <body class="dark:bg-gray-900 dark:text-white">
-<div id="app" class="container px-8 mx-auto dark:bg-gray-900">
+<div id="app" class="container px-8 mx-auto dark:bg-gray-900" v-cloak>
     <header class="text-pink-500 font-semibold pt-12 pb-6 flex items-center justify-center">
-        <a href="https://beyondco.de" target="_blank" class="inline-flex items-center self-start">
+        <a href="https://expose.beyondco.de" target="_blank" class="inline-flex items-center self-start">
             <img src="https://beyondco.de/apps/icons/expose.png" class="h-12">
             <p class="ml-4 font-headline text-lg">Expose</p>
         </a>
@@ -113,9 +116,32 @@
             {% endfor %}
         </span>
     </header>
-    <div class="p-5 flex flex-col md:flex-row">
+    <div class="pt-8 flex flex-col md:flex-row">
         <div class="w-full md:w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                <div class="flex items-center pb-4">
+                    <span
+                        @click.prevent="followLogs = !followLogs"
+                        class="mr-3 cursor-pointer" id="annual-billing-label">
+                        <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Follow requests:</span>
+                   </span>
+                    <button type="button"
+                            :class="{
+                                'bg-pink-500': followLogs,
+                                'dark:bg-gray-700 bg-gray-200': ! followLogs,
+                            }"
+                            @click.prevent="followLogs = !followLogs"
+                            class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
+                            <span class="sr-only">Use setting</span>
+                            <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
+                            <span aria-hidden="true"
+                                  :class="{
+                                  'translate-x-5': followLogs,
+                                  'translate-x-0': ! followLogs,
+                                    }"
+                                  class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+                    </button>
+                </div>
                 <div class="flex mb-4">
                         <span class="h-8 inline-flex rounded-md shadow-sm">
                               <button @click.prevent="clearLogs"
@@ -128,7 +154,7 @@
                         </span>
 
                         <div class="ml-4 flex-grow relative rounded-md shadow-sm">
-                            <input class="h-8 rounded-md dark:bg-gray-800 p-2 block w-full sm:text-sm sm:leading-5" v-model="search" placeholder="Search" />
+                            <input class="h-8 rounded-md dark:bg-gray-800 p-2 block w-full sm:text-sm sm:leading-5 focus:outline-none focus:ring focus:ring-pink-500 focus:ring-opacity-75" v-model="search" placeholder="Search" />
                         </div>
                 </div>
                 <div
@@ -149,8 +175,11 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-700">
                         <tr v-for="log in filteredLogs"
-                            :class="{'dark:bg-gray-800 bg-gray-100': currentLog === log}"
-                            @click="setLog(log)">
+                            :class="{
+                                'dark:bg-pink-500 dark:bg-opacity-25 bg-gray-100': currentLog === log,
+                                'even:bg-gray-50 dark:even:bg-gray-800': currentLog !== log
+                            }"
+                            @click="setLog(log.id)">
                             <td class="cursor-pointer px-6 py-4 whitespace-normal border-b dark:border-gray-800 border-gray-200 text-sm leading-5 font-medium text-gray-900 dark:text-gray-200">
                                 <p class="flex">
                                     <span class="text-xs">@{ log.request.method }</span>
@@ -164,27 +193,31 @@
                                 {% endif %}
                                 <span class="text-xs text-gray-600 dark:text-gray-50">@{ log.performed_at }</span>
                             </td>
-                            <td class="cursor-pointer px-6 py-4 whitespace-nowrap border-b dark:border-gray-800 border-gray-200 text-sm leading-5 text-gray-500 dark:text-gray-200 ">
+                            <td class="cursor-pointer px-6 py-4 border-b dark:border-gray-800 border-gray-200 text-sm leading-5 text-gray-500 dark:text-gray-200 ">
                                 <div v-if="log.response">
                                     <span
                                         v-if="log.response.status >= 200 && log.response.status < 300"
+                                        :title="`${log.response.status} - ${log.response.reason}`"
                                         class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
-                                      @{ log.response.status } - @{ log.response.reason }
+                                      @{ log.response.status }
                                     </span>
                                     <span
                                         v-if="log.response.status >= 300 && log.response.status < 400"
+                                        :title="`${log.response.status} - ${log.response.reason}`"
                                         class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-blue-100 text-blue-800">
-                                      @{ log.response.status } - @{ log.response.reason }
+                                      @{ log.response.status }
                                     </span>
                                     <span
                                         v-if="log.response.status >= 400 && log.response.status < 500"
+                                        :title="`${log.response.status} - ${log.response.reason}`"
                                         class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
-                                      @{ log.response.status } - @{ log.response.reason }
+                                      @{ log.response.status }
                                     </span>
                                     <span
                                         v-if="log.response.status >= 500"
+                                        :title="`${log.response.status} - ${log.response.reason}`"
                                         class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-red-100 text-red-800">
-                                      @{ log.response.status } - @{ log.response.reason }
+                                      @{ log.response.status }
                                     </span>
                                 </div>
                                 <div v-else>
@@ -312,7 +345,7 @@
                     </div>
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
-                         class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                         class="even:bg-gray-100 bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium text-gray-700">
                             @{ parameter.name }
                         </dt>
@@ -337,7 +370,7 @@
                     </div>
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
-                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                         class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ header }
                         </dt>
@@ -396,14 +429,14 @@
                             <nav class="flex">
                                 <a href="#"
                                    @click.prevent="setActiveTab('raw')"
-                                   :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'raw'}"
-                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700">
+                                   :class="{'outline-none text-white bg-pink-500': activeTab === 'raw'}"
+                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-100">
                                     Raw
                                 </a>
                                 <a href="#"
                                    @click.prevent="setActiveTab('preview')"
-                                   :class="{'outline-none text-gray-700 bg-gray-100': activeTab === 'preview'}"
-                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 focus:bg-gray-100">
+                                   :class="{'outline-none text-white bg-pink-500': activeTab === 'preview'}"
+                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-100 focus:outline-nonedark:hover:text-gray-100">
                                     Preview
                                 </a>
                             </nav>
@@ -437,14 +470,21 @@
 
         data: {
             search: '',
-            currentLog: null,
+            currentLogId: null,
             view: 'request',
             activeTab: 'raw',
             logs: [],
             maxLogs: {{ max_logs }},
+            highlightNextLog: false,
+            followLogs: true,
         },
 
         computed: {
+            currentLog: function() {
+                return this.logs.find(log => {
+                    return log.id === this.currentLogId;
+                });
+            },
             filteredLogs: function() {
                 if (this.search === '') {
                     return this.logs;
@@ -498,8 +538,8 @@
 
                 return output;
             },
-            setLog: function (log) {
-                this.currentLog = log;
+            setLog: function (id) {
+                this.currentLogId = id;
                 this.formatJsonResponse();
 
                 this.$nextTick(function () {
@@ -529,6 +569,7 @@
                 this.view = view;
             },
             replay: function (log) {
+                this.highlightNextLog = true;
                 fetch('/api/replay/' + log.id);
             },
             connect: function () {
@@ -544,6 +585,12 @@
                   }
 
                   this.logs = this.logs.splice(0, this.maxLogs);
+
+                  if (this.highlightNextLog || this.followLogs) {
+                      this.setLog(this.logs[0].id);
+
+                      this.highlightNextLog = false;
+                  }
                 };
             },
             loadLogs: function (log) {
