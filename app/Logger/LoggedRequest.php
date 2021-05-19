@@ -3,10 +3,10 @@
 namespace App\Logger;
 
 use Carbon\Carbon;
-use Laminas\Http\Header\GenericHeader;
 use function GuzzleHttp\Psr7\parse_request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Laminas\Http\Header\GenericHeader;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
 use Namshi\Cuzzle\Formatter\CurlFormatter;

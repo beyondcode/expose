@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Logger\RequestLogger;
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 

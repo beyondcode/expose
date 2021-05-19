@@ -7,7 +7,6 @@ use App\WebSockets\Socket;
 use Exception;
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 

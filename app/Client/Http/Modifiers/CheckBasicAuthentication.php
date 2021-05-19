@@ -5,7 +5,6 @@ namespace App\Client\Http\Modifiers;
 use App\Client\Configuration;
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\Client\WebSocket;

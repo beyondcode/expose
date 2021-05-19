@@ -88,7 +88,8 @@ class ConnectionHandler
         }
 
         if ($this->name !== '') {
-            $filter = new class(basename($targetPath), [$this->name]) extends FilenameFilterIterator {
+            $filter = new class(basename($targetPath), [$this->name]) extends FilenameFilterIterator
+            {
                 protected $filename;
 
                 public function __construct(string $filename, array $matchPatterns)
