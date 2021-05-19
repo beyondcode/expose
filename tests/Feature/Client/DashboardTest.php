@@ -9,7 +9,9 @@ use App\Logger\LoggedRequest;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Arr;
 use function GuzzleHttp\Psr7\str;
 use Mockery as m;
 use Psr\Http\Message\RequestInterface;
@@ -63,7 +65,10 @@ class DashboardTest extends TestCase
         $httpClient = m::mock(HttpClient::class);
         $httpClient->shouldReceive('performRequest')
             ->once()
-            ->with(str($request));
+            ->withArgs(function ($arg) {
+                $sentRequest = Message::parseMessage($arg);
+                return Arr::get($sentRequest, 'start-line') === 'GET /example HTTP/1.1';
+            });
 
         app()->instance(HttpClient::class, $httpClient);
 

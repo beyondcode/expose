@@ -140,7 +140,7 @@ class Factory
         $this->router->post('/api/logs/{request_id}/data', AttachDataToLogController::class);
         $this->router->get('/api/logs/clear', ClearLogsController::class);
 
-        $this->app->route('/socket', new WsServer(new Socket()), ['*']);
+        $this->app->route('/socket', new WsServer(new Socket()), ['*'], "");
 
         foreach ($this->router->getRoutes()->all() as $name => $route) {
             $this->app->routes->add($name, $route);
@@ -162,7 +162,7 @@ class Factory
 
         config()->set('expose.dashboard_port', $dashboardPort);
 
-        $this->app = new App('127.0.0.1', $dashboardPort, '0.0.0.0', $this->loop);
+        $this->app = new App('0.0.0.0', $dashboardPort, '0.0.0.0', $this->loop);
 
         $this->addRoutes();
 
