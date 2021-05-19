@@ -14,7 +14,7 @@ class Fileserver
 
     public function __construct($rootFolder, $name, $port, $address, LoopInterface $loop)
     {
-        $server = new Server(function (ServerRequestInterface $request) use ($rootFolder, $name, $loop) {
+        $server = new Server($loop, function (ServerRequestInterface $request) use ($rootFolder, $name, $loop) {
             return (new ConnectionHandler($rootFolder, $name, $loop))->handle($request);
         });
 

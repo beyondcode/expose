@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Http\Request;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\LoopInterface;
-use React\Http\Response;
+use React\Http\Message\Response;
 use React\Stream\ReadableResourceStream;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Finder\Finder;
