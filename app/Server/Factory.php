@@ -248,7 +248,8 @@ class Factory
             ->files()
             ->ignoreDotFiles(true)
             ->in(database_path('migrations'))
-            ->name('*.sql');
+            ->name('*.sql')
+            ->sortByName();
 
         /** @var SplFileInfo $migration */
         foreach ($migrations as $migration) {
