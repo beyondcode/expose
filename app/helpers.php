@@ -2,7 +2,6 @@
 
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\str;
 
 function respond_json($responseData, int $statusCode = 200)
 {

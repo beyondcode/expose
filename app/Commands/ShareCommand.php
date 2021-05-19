@@ -3,9 +3,7 @@
 namespace App\Commands;
 
 use App\Client\Factory;
-use App\Logger\CliRequestLogger;
 use React\EventLoop\LoopInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ShareCommand extends ServerAwareCommand
 {

@@ -3,10 +3,7 @@
 namespace App\Commands;
 
 use App\Client\Factory;
-use App\Logger\CliRequestLogger;
-use LaravelZero\Framework\Commands\Command;
 use React\EventLoop\LoopInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ShareFilesCommand extends ServerAwareCommand
 {
