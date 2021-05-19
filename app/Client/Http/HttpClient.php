@@ -6,6 +6,7 @@ use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
+use GuzzleHttp\Psr7\Message;
 use function GuzzleHttp\Psr7\parse_request;
 use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
@@ -85,17 +86,19 @@ class HttpClient
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)
     {
         (new Browser($this->loop, $this->createConnector()))
-            ->withOptions([
-                'followRedirects' => false,
-                'obeySuccessCode' => false,
-                'streaming' => true,
-            ])
-            ->send($request)
+            ->withFollowRedirects(true)
+            ->withRejectErrorResponse(false)
+            ->requestStreaming(
+                $request->getMethod(),
+                $request->getUri(),
+                $request->getHeaders(),
+                $request->getBody()
+            )
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
                 if (! isset($response->buffer)) {
                     $response = $this->rewriteResponseHeaders($response);
 
-                    $response->buffer = str($response);
+                    $response->buffer = Message::toString($response);
                 }
 
                 $this->sendChunkToServer($response->buffer, $proxyConnection);

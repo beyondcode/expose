@@ -3,6 +3,7 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ abstract class AdminController extends Controller
 
             return true;
         } catch (\Throwable $e) {
-            $httpConnection->send(str(new Response(401, [
+            $httpConnection->send(Message::toString(new Response(401, [
                 'WWW-Authenticate' => 'Basic realm="Expose"',
             ])));
         }

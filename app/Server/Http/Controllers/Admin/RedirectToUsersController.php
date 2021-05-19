@@ -2,6 +2,7 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class RedirectToUsersController extends AdminController
 {
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $httpConnection->send(str(new Response(301, [
+        $httpConnection->send(Message::toString(new Response(301, [
             'Location' => '/sites',
         ])));
     }

@@ -3,6 +3,7 @@
 namespace App\Client\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class CreateTunnelController extends Controller
                 $httpConnection->send(respond_json($data));
                 $httpConnection->close();
             }, function () use ($httpConnection) {
-                $httpConnection->send(str(new Response(500)));
+                $httpConnection->send(Message::toString(new Response(500)));
                 $httpConnection->close();
             });
     }

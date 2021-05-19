@@ -5,6 +5,7 @@ namespace App\Client\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\WebSockets\Socket;
 use Exception;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
@@ -23,9 +24,9 @@ class PushLogsToDashboardController extends Controller
                 $webSocketConnection->send($request->getContent());
             }
 
-            $httpConnection->send(str(new Response(200)));
+            $httpConnection->send(Message::toString(new Response(200)));
         } catch (Exception $e) {
-            $httpConnection->send(str(new Response(500, [], $e->getMessage())));
+            $httpConnection->send(Message::toString(new Response(500, [], $e->getMessage())));
         }
     }
 }
