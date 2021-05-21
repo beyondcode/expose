@@ -45,7 +45,7 @@ abstract class ServerAwareCommand extends Command
         /**
          * Try to find the server in the servers array.
          * If no array exists at all (when upgrading from v1),
-         * always return sharedwithexpose.com
+         * always return sharedwithexpose.com.
          */
         if (config('expose.servers') === null) {
             return static::DEFAULT_HOSTNAME;
@@ -70,12 +70,11 @@ abstract class ServerAwareCommand extends Command
         /**
          * Try to find the server in the servers array.
          * If no array exists at all (when upgrading from v1),
-         * always return sharedwithexpose.com
+         * always return sharedwithexpose.com.
          */
         if (config('expose.servers') === null) {
             return static::DEFAULT_PORT;
         }
-
 
         $server = $this->option('server');
         $host = config('expose.servers.'.$server.'.port');

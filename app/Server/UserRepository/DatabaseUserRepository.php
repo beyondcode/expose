@@ -167,7 +167,6 @@ class DatabaseUserRepository implements UserRepository
 
         $this->database->query('SELECT * FROM users WHERE auth_token IN ('.$authTokenString.')')
             ->then(function (Result $result) use ($deferred) {
-
                 $users = collect($result->rows)->map(function ($user) {
                     return $this->getUserDetails($user);
                 })->toArray();
