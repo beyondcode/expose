@@ -2,17 +2,37 @@
 <head>
     <title>Expose</title>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
+    <script type="tailwind-config">
+      {
+        "darkMode": "class",
+        "theme": {
+            "extend": {
+                "colors": {
+                    "dark-blue-800": "#ff9900"
+                }
+            }
+        }
+      }
+    </script>
+    <style type="postcss">
+        ::selection {
+            @apply bg-pink-500 bg-opacity-50;
+        }
+    </style>
 </head>
 <body>
-<div class="min-h-screen bg-white" id="app">
+<div class="min-h-screen bg-white">
     <nav class="bg-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
-                <div class="flex">
+                <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center font-bold">
-                        Expose
+                        <a href="https://expose.beyondco.de" target="_blank" class="inline-flex items-center self-start">
+                            <img src="https://beyondco.de/apps/icons/expose.png" class="h-12">
+                            <p class="ml-4 font-headline text-lg">Expose</p>
+                        </a>
                     </div>
                     <div class="hidden sm:-my-px sm:ml-6 sm:flex">
                         <a href="/users"
@@ -60,6 +80,38 @@
             </div>
         </div>
     </nav>
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" id="stats">
+        <div class="py-8">
+            <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                        Total Users
+                    </dt>
+                    <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                        @{ users.total }
+                    </dd>
+                </div>
+
+                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                        Shared Sites
+                    </dt>
+                    <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                        @{ sites.length }
+                    </dd>
+                </div>
+
+                <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                        Shared TCP connections
+                    </dt>
+                    <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                        @{ tcp_connections.length }
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
 
     <div class="py-10">
         <header>
@@ -70,12 +122,60 @@
             </div>
         </header>
         <main>
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" id="app">
                 {% block content %}{% endblock %}
             </div>
         </main>
     </div>
 </div>
 {% block scripts %}{% endblock %}
+<script>
+    new Vue({
+        el: '#stats',
+
+        delimiters: ['@{', '}'],
+
+        data: {
+            users: [],
+            sites: [],
+            tcp_connections: [],
+        },
+
+        methods: {
+            getUsers(page) {
+                fetch('/api/users')
+                    .then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                    this.users = data.paginated;
+                });
+            },
+
+            getConnections() {
+                fetch('/api/tcp')
+                    .then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                    this.tcp_connections = data.tcp_connections;
+                });
+            },
+
+            getSites() {
+                fetch('/api/sites')
+                    .then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                    this.sites = data.sites;
+                });
+            },
+        },
+
+        mounted() {
+            this.getUsers();
+            this.getConnections();
+            this.getSites();
+        }
+    })
+</script>
 </body>
 </html>

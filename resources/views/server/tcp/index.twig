@@ -5,7 +5,7 @@
         <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
             <div
                 class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
-                <table class="min-w-full" v-if="connections.length > 0">
+                <table class="min-w-full" v-if="tcp_connections.length > 0">
                     <thead>
                     <tr>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
@@ -15,18 +15,24 @@
                             Expose Port
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            User
+                        </th>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                             Shared At
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
                     </tr>
                     </thead>
                     <tbody class="bg-white">
-                        <tr v-for="connection in connections">
+                        <tr v-for="connection in tcp_connections">
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
                                 @{ connection.port }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ connection.shared_port }
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                @{ connection.user?.name }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ connection.shared_at }
@@ -54,19 +60,32 @@
             delimiters: ['@{', '}'],
 
             data: {
-                connections: {{ connections|json_encode|raw }}
+                tcp_connections: []
             },
 
             methods: {
+                getConnections() {
+                    fetch('/api/tcp')
+                        .then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                        this.tcp_connections = data.tcp_connections;
+                    });
+                },
+
                 disconnectConnection(id) {
                     fetch('/api/tcp/' + id, {
                         method: 'DELETE',
                     }).then((response) => {
                         return response.json();
                     }).then((data) => {
-                        this.connections = data.connections;
+                        this.tcp_connections = data.tcp_connections;
                     });
                 }
+            },
+
+            mounted() {
+                this.getConnections();
             }
         })
     </script>

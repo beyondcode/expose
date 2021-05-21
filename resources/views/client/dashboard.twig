@@ -5,7 +5,7 @@
     <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
     <script type="tailwind-config">
       {
-        "darkMode": "media",
+        "darkMode": "class",
         "theme": {
             "extend": {
                 "colors": {
@@ -119,11 +119,34 @@
     <div class="pt-8 flex flex-col md:flex-row">
         <div class="w-full md:w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                <div class="flex items-center pb-4">
+                <div class="flex items-center pb-4 justify-between">
+                    <span
+                        @click.prevent="useDarkMode = !useDarkMode"
+                        class="mr-3 cursor-pointer" id="annual-billing-label">
+                        <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Dark-Mode:</span>
+                   </span>
+                    <button type="button"
+                            :class="{
+                                'bg-pink-500': useDarkMode,
+                                'dark:bg-gray-700 bg-gray-200': ! useDarkMode,
+                            }"
+                            @click.prevent="useDarkMode = !useDarkMode"
+                            class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
+                        <span class="sr-only">Use Dark Mode</span>
+                        <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
+                        <span aria-hidden="true"
+                              :class="{
+                                  'translate-x-5': useDarkMode,
+                                  'translate-x-0': ! useDarkMode,
+                                    }"
+                              class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+                    </button>
+                </div>
+                <div class="flex items-center pb-4 justify-between">
                     <span
                         @click.prevent="followLogs = !followLogs"
                         class="mr-3 cursor-pointer" id="annual-billing-label">
-                        <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Follow requests:</span>
+                        <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Follow Requests:</span>
                    </span>
                     <button type="button"
                             :class="{
@@ -132,14 +155,14 @@
                             }"
                             @click.prevent="followLogs = !followLogs"
                             class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
-                            <span class="sr-only">Use setting</span>
-                            <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
-                            <span aria-hidden="true"
-                                  :class="{
+                        <span class="sr-only">Follow Request</span>
+                        <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
+                        <span aria-hidden="true"
+                              :class="{
                                   'translate-x-5': followLogs,
                                   'translate-x-0': ! followLogs,
                                     }"
-                                  class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+                              class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
                     </button>
                 </div>
                 <div class="flex mb-4">
@@ -176,7 +199,7 @@
                         <tbody class="bg-white dark:bg-gray-700">
                         <tr v-for="log in filteredLogs"
                             :class="{
-                                'dark:bg-pink-500 dark:bg-opacity-25 bg-gray-100': currentLog === log,
+                                'dark:bg-pink-500 dark:bg-opacity-25 bg-pink-500 bg-opacity-25': currentLog === log,
                                 'even:bg-gray-50 dark:even:bg-gray-800': currentLog !== log
                             }"
                             @click="setLog(log.id)">
@@ -477,6 +500,20 @@
             maxLogs: {{ max_logs }},
             highlightNextLog: false,
             followLogs: true,
+            useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
+        },
+
+        watch: {
+            useDarkMode: {
+                handler: function(value) {
+                    if (value) {
+                        document.querySelector('html').classList.add('dark')
+                    } else {
+                        document.querySelector('html').classList.remove('dark')
+                    }
+                },
+                immediate: true,
+            }
         },
 
         computed: {

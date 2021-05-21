@@ -36,34 +36,52 @@ class DatabaseUserRepository implements UserRepository
         return $deferred->promise();
     }
 
-    public function paginateUsers(int $perPage, int $currentPage): PromiseInterface
+    public function paginateUsers(string $searchQuery, int $perPage, int $currentPage): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM users ORDER by created_at DESC LIMIT :limit OFFSET :offset', [
-                'limit' => $perPage + 1,
-                'offset' => $currentPage < 2 ? 0 : ($currentPage - 1) * $perPage,
-            ])
-            ->then(function (Result $result) use ($deferred, $perPage, $currentPage) {
-                if (count($result->rows) == $perPage + 1) {
-                    array_pop($result->rows);
-                    $nextPage = $currentPage + 1;
-                }
+            ->query('SELECT COUNT(*) AS count FROM users')
+            ->then(function (Result $result) use ($searchQuery, $deferred, $perPage, $currentPage) {
+                $totalUsers = $result->rows[0]['count'];
 
-                $users = collect($result->rows)->map(function ($user) {
-                    return $this->getUserDetails($user);
-                })->toArray();
+                $query = 'SELECT * FROM users ';
 
-                $paginated = [
-                    'users' => $users,
-                    'current_page' => $currentPage,
-                    'per_page' => $perPage,
-                    'next_page' => $nextPage ?? null,
-                    'previous_page' => $currentPage > 1 ? $currentPage - 1 : null,
+                $bindings = [
+                    'limit' => $perPage + 1,
+                    'offset' => $currentPage < 2 ? 0 : ($currentPage - 1) * $perPage,
                 ];
 
-                $deferred->resolve($paginated);
+                if ($searchQuery !== '') {
+                    $query .= "WHERE name LIKE '%".$searchQuery."%' ";
+                    $bindings['search'] = $searchQuery;
+                }
+
+                $query .= ' ORDER by created_at DESC LIMIT :limit OFFSET :offset';
+
+                $this->database
+                    ->query($query, $bindings)
+                    ->then(function (Result $result) use ($deferred, $perPage, $currentPage, $totalUsers) {
+                        if (count($result->rows) == $perPage + 1) {
+                            array_pop($result->rows);
+                            $nextPage = $currentPage + 1;
+                        }
+
+                        $users = collect($result->rows)->map(function ($user) {
+                            return $this->getUserDetails($user);
+                        })->toArray();
+
+                        $paginated = [
+                            'total' => $totalUsers,
+                            'users' => $users,
+                            'current_page' => $currentPage,
+                            'per_page' => $perPage,
+                            'next_page' => $nextPage ?? null,
+                            'previous_page' => $currentPage > 1 ? $currentPage - 1 : null,
+                        ];
+
+                        $deferred->resolve($paginated);
+                    });
             });
 
         return $deferred->promise();
@@ -134,6 +152,27 @@ class DatabaseUserRepository implements UserRepository
         $this->database->query('DELETE FROM users WHERE id = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result);
+            });
+
+        return $deferred->promise();
+    }
+
+    public function getUsersByTokens(array $authTokens): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $authTokenString = collect($authTokens)->map(function ($token) {
+            return '"'.$token.'"';
+        })->join(',');
+
+        $this->database->query('SELECT * FROM users WHERE auth_token IN ('.$authTokenString.')')
+            ->then(function (Result $result) use ($deferred) {
+
+                $users = collect($result->rows)->map(function ($user) {
+                    return $this->getUserDetails($user);
+                })->toArray();
+
+                $deferred->resolve($users);
             });
 
         return $deferred->promise();

@@ -15,6 +15,9 @@
                             Subdomain
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                            User
+                        </th>
+                        <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                             Shared At
                         </th>
                         <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
@@ -27,6 +30,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ site.subdomain }.{{ configuration.hostname()}}:{{ configuration.port() }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                                @{ site.user?.name }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ site.shared_at }
@@ -56,10 +62,18 @@
             delimiters: ['@{', '}'],
 
             data: {
-                sites: {{ sites|json_encode|raw }}
+                sites: []
             },
 
             methods: {
+                getSites() {
+                    fetch('/api/sites')
+                        .then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                            this.sites = data.sites;
+                        });
+                },
                 disconnectSite(id) {
                     fetch('/api/sites/' + id, {
                         method: 'DELETE',
@@ -69,6 +83,10 @@
                         this.sites = data.sites;
                     });
                 }
+            },
+
+            mounted() {
+                this.getSites();
             }
         })
     </script>

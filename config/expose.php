@@ -21,6 +21,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Server Endpoint
+    |--------------------------------------------------------------------------
+    |
+    | When you specify a server that does not exist in above static array,
+    | Expose will perform a GET request to this URL and tries to retrieve
+    | a JSON payload that looks like the configurations servers array.
+    |
+    | Expose then tries to load the configuration for the given server
+    | if available.
+    |
+    */
+    'server_endpoint' => 'https://beyondco.de/api/expose/servers',
+
+    /*
+    |--------------------------------------------------------------------------
     | DNS
     |--------------------------------------------------------------------------
     |
@@ -167,6 +182,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | TCP Port Sharing
+        |--------------------------------------------------------------------------
+        |
+        | Control if you want to allow users to share TCP ports with your Expose
+        | server. You can add fine-grained control per authentication token,
+        | but if you want to disable TCP port sharing in general, set this
+        | value to false.
+        |
+        */
+        'allow_tcp_port_sharing' => true,
+
+        /*
+        |--------------------------------------------------------------------------
         | TCP Port Range
         |--------------------------------------------------------------------------
         |
@@ -281,6 +309,8 @@ return [
             'tcp_port_sharing_unauthorized' => 'You are not allowed to share TCP ports. Please upgrade to Expose Pro.',
 
             'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',
+
+            'tcp_port_sharing_disabled' => 'TCP port sharing is not available on this Expose server.',
         ],
     ],
 ];

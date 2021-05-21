@@ -76,6 +76,7 @@ class TcpControlConnection extends ControlConnection
         return [
             'type' => 'tcp',
             'port' => $this->port,
+            'auth_token' => $this->authToken,
             'client_id' => $this->client_id,
             'shared_port' => $this->shared_port,
             'shared_at' => $this->shared_at,

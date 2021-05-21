@@ -26,17 +26,6 @@ class ListTcpConnectionsController extends AdminController
         $sites = $this->getView($httpConnection, 'server.tcp.index', [
             'scheme' => $this->configuration->port() === 443 ? 'https' : 'http',
             'configuration' => $this->configuration,
-            'connections' => collect($this->connectionManager->getConnections())
-                ->filter(function ($connection) {
-                    return get_class($connection) === TcpControlConnection::class;
-                })
-                ->map(function ($connection, $connectionId) {
-                    $connection = $connection->toArray();
-                    $connection['id'] = $connectionId;
-
-                    return $connection;
-                })
-                ->values(),
         ]);
 
         $httpConnection->send(

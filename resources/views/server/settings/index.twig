@@ -49,7 +49,7 @@
                                             <div class="max-w-lg flex rounded-md shadow-sm">
                                                 <textarea id="motd" name="motd" rows="3"
                                                           v-model="configuration.messages.message_of_the_day"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                                          class="form-textarea border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown when a
                                                 successful connection can be established.</p>
@@ -66,7 +66,7 @@
                                             <div class="max-w-lg flex rounded-md shadow-sm">
                                                 <input type="number" id="maximum_connection_length" name="maximum_connection_length"
                                                           v-model="configuration.maximum_connection_length"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                                                          class="form-input border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">The amount of minutes that clients may be connected to this expose server. 0 means there is no limit.</p>
                                         </div>
@@ -84,7 +84,7 @@
                                                           name="invalid_auth_token"
                                                           rows="3"
                                                           v-model="configuration.messages.invalid_auth_token"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                                          class="form-input border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown when a
                                                 user tries to connect with an invalid authentication token.</p>
@@ -101,12 +101,76 @@
                                             <div class="max-w-lg flex rounded-md shadow-sm">
                                                 <textarea id="subdomain_taken" name="subdomain_taken" rows="3"
                                                           v-model="configuration.messages.subdomain_taken"
-                                                          class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                                          class="border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500">This message will be shown when a
                                                 user tries to connect with an already registered subdomain. You can use
                                                 <code class="font-mono bg-gray-500 text-white p-1">:subdomain</code> as
                                                 a placeholder.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="motd"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            Custom Subdomain Unauthorized
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="motd" name="motd" rows="3"
+                                                          v-model="configuration.messages.custom_subdomain_unauthorized"
+                                                          class="form-textarea border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown when a user tries to use a custom subdomain, but is not allowed to.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="motd"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            TCP Port Sharing Unauthorized
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="motd" name="motd" rows="3"
+                                                          v-model="configuration.messages.tcp_port_sharing_unauthorized"
+                                                          class="form-textarea border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown when a user tries to use share a TCP port, but is not allowed to.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="motd"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            No free TCP port available
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="motd" name="motd" rows="3"
+                                                          v-model="configuration.messages.no_free_tcp_port_available"
+                                                          class="form-textarea border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown when no TCP port can be allocated.</p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                        <label for="motd"
+                                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                            TCP Port Sharing Disabled
+                                        </label>
+                                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                                <textarea id="motd" name="motd" rows="3"
+                                                          v-model="configuration.messages.tcp_port_sharing_disabled"
+                                                          class="form-textarea border-gray-300 rounded-md block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"></textarea>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-500">This message will be shown when TCP port sharing is not allowed.</p>
                                         </div>
                                     </div>
                                 </div>
