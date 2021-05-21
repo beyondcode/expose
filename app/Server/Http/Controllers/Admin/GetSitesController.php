@@ -49,6 +49,7 @@ class GetSitesController extends AdminController
                 $users = collect($users);
                 $sites = collect($sites)->map(function ($site) use ($users) {
                     $site['user'] = $users->firstWhere('auth_token', $site['auth_token']);
+
                     return $site;
                 })->toArray();
 

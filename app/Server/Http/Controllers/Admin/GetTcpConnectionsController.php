@@ -49,6 +49,7 @@ class GetTcpConnectionsController extends AdminController
                 $users = collect($users);
                 $connections = collect($connections)->map(function ($connection) use ($users) {
                     $connection['user'] = $users->firstWhere('auth_token', $connection['auth_token']);
+
                     return $connection;
                 })->toArray();
 

@@ -4,7 +4,6 @@ namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\ConnectionManager;
 use App\Server\Configuration;
-use App\Server\Connections\TcpControlConnection;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 

@@ -2,15 +2,12 @@
 
 namespace Tests\Feature\Server;
 
-use App\Contracts\ConnectionManager;
 use App\Server\Factory;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
-use Nyholm\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
-use Ratchet\Server\IoConnection;
 use Tests\Feature\TestCase;
 
 class AdminTest extends TestCase
