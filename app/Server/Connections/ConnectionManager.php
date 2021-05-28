@@ -6,6 +6,7 @@ use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
 use App\Server\Exceptions\NoFreePortAvailable;
+use Illuminate\Support\Collection;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\Server;
@@ -155,6 +156,20 @@ class ConnectionManager implements ConnectionManagerContract
         return collect($this->connections)->last(function ($connection) use ($clientId) {
             return $connection->client_id == $clientId;
         });
+    }
+
+    public function findControlConnectionsForIp(string $ip): array
+    {
+        return collect($this->connections)->filter(function (ControlConnection $connection) use ($ip) {
+            return $connection->socket->remoteAddress == $ip;
+        })->toArray();
+    }
+
+    public function findControlConnectionsForAuthToken(string $token): array
+    {
+        return collect($this->connections)->filter(function (ControlConnection $connection) use ($token) {
+            return $connection->authToken === $token;
+        })->toArray();
     }
 
     public function getConnections(): array

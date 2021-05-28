@@ -226,6 +226,21 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Maximum number of open connections
+        |--------------------------------------------------------------------------
+        |
+        | You can limit the amount of connections that one client/user can have
+        | open. A maximum connection count of 0 means that clients can open
+        | as many connections as they want.
+        |
+        | When creating users with the API/admin interface, you can
+        | override this setting per user.
+        |
+        */
+        'maximum_open_connections_per_user' => 0,
+
+        /*
+        |--------------------------------------------------------------------------
         | Subdomain
         |--------------------------------------------------------------------------
         |

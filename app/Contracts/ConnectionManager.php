@@ -29,4 +29,8 @@ interface ConnectionManager
     public function getConnectionsForAuthToken(string $authToken): array;
 
     public function getTcpConnectionsForAuthToken(string $authToken): array;
+
+    public function findControlConnectionsForIp(string $ip): array;
+
+    public function findControlConnectionsForAuthToken(string $token): array;
 }

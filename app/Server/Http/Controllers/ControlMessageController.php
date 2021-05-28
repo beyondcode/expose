@@ -7,11 +7,13 @@ use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
 use App\Server\Exceptions\NoFreePortAvailable;
+use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use stdClass;
+use function React\Promise\reject;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -85,7 +87,35 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function authenticate(ConnectionInterface $connection, $data)
     {
+        if (! isset($data->subdomain)) {
+            $data->subdomain = null;
+        }
+
         $this->verifyAuthToken($connection)
+            ->then(function ($user) use ($connection) {
+                $maximumConnectionCount = config('expose.admin.maximum_open_connections_per_user', 0);
+
+                if (is_null($user)) {
+                    $connectionCount = count($this->connectionManager->findControlConnectionsForIp($connection->remoteAddress));
+                } else {
+                    $maximumConnectionCount = Arr::get($user, 'max_connections', $maximumConnectionCount);
+
+                    $connectionCount = count($this->connectionManager->findControlConnectionsForAuthToken($user['auth_token']));
+                }
+
+                if ($maximumConnectionCount > 0 && $connectionCount + 1 > $maximumConnectionCount) {
+                    $connection->send(json_encode([
+                        'event' => 'authenticationFailed',
+                        'data' => [
+                            'message' => config('expose.admin.messages.maximum_connection_count'),
+                        ],
+                    ]));
+                    $connection->close();
+
+                    reject(null);
+                }
+                return $user;
+            })
             ->then(function ($user) use ($connection, $data) {
                 if ($data->type === 'http') {
                     $this->handleHttpConnection($connection, $data, $user);

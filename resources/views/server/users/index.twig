@@ -63,6 +63,21 @@
                             </div>
                         </div>
                     </div>
+                    <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+                        <label for="max_connections"
+                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                            Maximum Open Connections
+                        </label>
+                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                <input id="max_connections"
+                                       type="number"
+                                       min="0"
+                                       v-model="userForm.max_connections"
+                                       class="flex-1 border-gray-300 block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-8 border-t border-gray-200 pt-5">
                     <div class="flex justify-end">
@@ -100,6 +115,9 @@
                         Auth-Token
                     </th>
                     <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                        Max Connections
+                    </th>
+                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                         Custom Subdomains
                     </th>
                     <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
@@ -118,6 +136,9 @@
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                         @{ user.auth_token }
+                    </td>
+                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                        @{ user.max_connections }
                     </td>
                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                         <span v-if="user.can_specify_subdomains === 0">
@@ -186,6 +207,7 @@
                         name: '',
                         can_specify_subdomains: true,
                         can_share_tcp_ports: true,
+                        max_connections: 0,
                         errors: {},
                     },
                     paginated: {{ paginated|json_encode|raw }}
@@ -242,6 +264,7 @@
                                 this.userForm.name = '';
                                 this.userForm.can_specify_subdomains = true;
                                 this.userForm.can_share_tcp_ports = true;
+                                this.userForm.max_connections = 0;
                                 this.userForm.errors = {};
                                 this.users.unshift(data.user);
                             }
