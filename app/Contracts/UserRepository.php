@@ -19,4 +19,6 @@ interface UserRepository
     public function deleteUser($id): PromiseInterface;
 
     public function getUsersByTokens(array $authTokens): PromiseInterface;
+
+    public function updateLastSharedAt($id): PromiseInterface;
 }

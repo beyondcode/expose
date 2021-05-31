@@ -235,7 +235,12 @@ class ControlMessageController implements MessageComponentInterface
                 if (is_null($user)) {
                     $deferred->reject();
                 } else {
-                    $deferred->resolve($user);
+                    $this->userRepository
+                        ->updateLastSharedAt($user['id'])
+                        ->then(function () use ($deferred, $user) {
+                            $deferred->resolve($user);
+                        });
+
                 }
             });
 

@@ -3,6 +3,7 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
+use App\Contracts\StatisticsCollector;
 use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use App\Server\Connections\ControlConnection;
@@ -27,10 +28,14 @@ class TunnelMessageController extends Controller
 
     protected $modifiers = [];
 
-    public function __construct(ConnectionManager $connectionManager, Configuration $configuration)
+    /** @var StatisticsCollector */
+    protected $statisticsCollector;
+
+    public function __construct(ConnectionManager $connectionManager, StatisticsCollector $statisticsCollector, Configuration $configuration)
     {
         $this->connectionManager = $connectionManager;
         $this->configuration = $configuration;
+        $this->statisticsCollector = $statisticsCollector;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
@@ -56,6 +61,8 @@ class TunnelMessageController extends Controller
 
             return;
         }
+
+        $this->statisticsCollector->incomingRequest();
 
         $this->sendRequestToClient($request, $controlConnection, $httpConnection);
     }

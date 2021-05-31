@@ -8,13 +8,13 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 
     public function handle()
     {
-        $subdomain = $this->detectName();
-        $host = $this->prepareSharedHost($subdomain.'.'.$this->detectTld());
+        $folderName = $this->detectName();
+        $host = $this->prepareSharedHost($folderName.'.'.$this->detectTld());
 
         $this->input->setArgument('host', $host);
 
         if (! $this->option('subdomain')) {
-            $this->input->setOption('subdomain', $subdomain);
+            $this->input->setOption('subdomain', str_replace('.', '-', $folderName));
         }
 
         parent::handle();
@@ -56,7 +56,7 @@ class ShareCurrentWorkingDirectoryCommand extends ShareCommand
             }
         }
 
-        return str_replace('.', '-', basename($projectPath));
+        return basename($projectPath);
     }
 
     protected function detectProtocol($host): string

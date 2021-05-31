@@ -3,6 +3,8 @@
 namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
+use App\Contracts\StatisticsCollector;
+use App\Contracts\StatisticsRepository;
 use App\Contracts\SubdomainGenerator;
 use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
@@ -15,6 +17,7 @@ use App\Server\Http\Controllers\Admin\DisconnectSiteController;
 use App\Server\Http\Controllers\Admin\DisconnectTcpConnectionController;
 use App\Server\Http\Controllers\Admin\GetSettingsController;
 use App\Server\Http\Controllers\Admin\GetSitesController;
+use App\Server\Http\Controllers\Admin\GetStatisticsController;
 use App\Server\Http\Controllers\Admin\GetTcpConnectionsController;
 use App\Server\Http\Controllers\Admin\GetUserDetailsController;
 use App\Server\Http\Controllers\Admin\GetUsersController;
@@ -29,6 +32,8 @@ use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
 use App\Server\Http\Router;
+use App\Server\StatisticsCollector\DatabaseStatisticsCollector;
+use App\Server\StatisticsRepository\DatabaseStatisticsRepository;
 use Clue\React\SQLite\DatabaseInterface;
 use Phar;
 use Ratchet\Server\IoServer;
@@ -128,6 +133,7 @@ class Factory
         $this->router->get('/sites', ListSitesController::class, $adminCondition);
         $this->router->get('/tcp', ListTcpConnectionsController::class, $adminCondition);
 
+        $this->router->get('/api/statistics', GetStatisticsController::class, $adminCondition);
         $this->router->get('/api/settings', GetSettingsController::class, $adminCondition);
         $this->router->post('/api/settings', StoreSettingsController::class, $adminCondition);
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
@@ -179,6 +185,7 @@ class Factory
             ->bindSubdomainRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
+            ->registerStatisticsCollector()
             ->bindConnectionManager()
             ->addAdminRoutes();
 
@@ -263,6 +270,28 @@ class Factory
     {
         config()->set('expose.admin.validate_auth_tokens', $validate);
 
+        return $this;
+    }
+
+    protected function registerStatisticsCollector()
+    {
+        if (config('expose.admin.statistics.enable_statistics', true) === false) {
+            return;
+        }
+
+        app()->singleton(StatisticsRepository::class, function () {
+            return app(config('expose.admin.statistics.repository', DatabaseStatisticsRepository::class));
+        });
+
+        app()->singleton(StatisticsCollector::class, function () {
+            return app(DatabaseStatisticsCollector::class);
+        });
+
+        $intervalInSeconds = config('expose.admin.statistics.interval_in_seconds', 3600);
+
+        $this->loop->addPeriodicTimer($intervalInSeconds, function () {
+            app(StatisticsCollector::class)->save();
+        });
         return $this;
     }
 }

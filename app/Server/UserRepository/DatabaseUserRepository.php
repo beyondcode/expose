@@ -114,6 +114,19 @@ class DatabaseUserRepository implements UserRepository
         return $deferred->promise();
     }
 
+    public function updateLastSharedAt($id): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $this->database
+            ->query("UPDATE users SET last_shared_at = date('now') WHERE id = :id", ["id" => $id])
+            ->then(function (Result $result) use ($deferred) {
+                $deferred->resolve();
+            });
+
+        return $deferred->promise();
+    }
+
     public function getUserByToken(string $authToken): PromiseInterface
     {
         $deferred = new Deferred();
