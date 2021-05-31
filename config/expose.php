@@ -334,6 +334,6 @@ return [
             'interval_in_seconds' => 3600,
 
             'repository' => \App\Server\StatisticsRepository\DatabaseStatisticsRepository::class,
-        ]
+        ],
     ],
 ];
