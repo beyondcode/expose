@@ -90,6 +90,9 @@ class ControlMessageController implements MessageComponentInterface
         if (! isset($data->subdomain)) {
             $data->subdomain = null;
         }
+        if (! isset($data->type)) {
+            $data->type = "http";
+        }
 
         $this->verifyAuthToken($connection)
             ->then(function ($user) use ($connection) {
