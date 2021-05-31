@@ -2,11 +2,7 @@
 
 namespace App\Server\Http\Controllers\Admin;
 
-use App\Contracts\ConnectionManager;
 use App\Contracts\StatisticsRepository;
-use App\Contracts\UserRepository;
-use App\Server\Configuration;
-use App\Server\Connections\ControlConnection;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 

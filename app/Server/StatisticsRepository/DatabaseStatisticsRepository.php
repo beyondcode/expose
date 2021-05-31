@@ -32,7 +32,7 @@ class DatabaseStatisticsRepository implements StatisticsRepository
                 SUM(incoming_requests) as incoming_requests
                 FROM statistics
                 WHERE
-                `timestamp` >= "' . $from . '" AND `timestamp` <= "' . $until . '"')
+                `timestamp` >= "'.$from.'" AND `timestamp` <= "'.$until.'"')
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
             });

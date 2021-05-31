@@ -241,7 +241,6 @@ class ControlMessageController implements MessageComponentInterface
                         ->then(function () use ($deferred, $user) {
                             $deferred->resolve($user);
                         });
-
                 }
             });
 

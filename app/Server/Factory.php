@@ -292,6 +292,7 @@ class Factory
         $this->loop->addPeriodicTimer($intervalInSeconds, function () {
             app(StatisticsCollector::class)->save();
         });
+
         return $this;
     }
 }
