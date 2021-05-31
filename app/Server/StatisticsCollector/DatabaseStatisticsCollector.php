@@ -2,7 +2,6 @@
 
 namespace App\Server\StatisticsCollector;
 
-use App\Contracts\ConnectionManager;
 use App\Contracts\StatisticsCollector;
 use Clue\React\SQLite\DatabaseInterface;
 
@@ -84,17 +83,17 @@ class DatabaseStatisticsCollector implements StatisticsCollector
             $sharedPorts += $numPorts;
         });
 
-        $this->database->query("
+        $this->database->query('
                     INSERT INTO statistics (timestamp, shared_sites, shared_ports, unique_shared_sites, unique_shared_ports, incoming_requests)
                     VALUES (:timestamp, :shared_sites, :shared_ports, :unique_shared_sites, :unique_shared_ports, :incoming_requests)
-                ", [
-                'timestamp' => today()->toDateString(),
-                'shared_sites' => $sharedSites,
-                'shared_ports' => $sharedPorts,
-                'unique_shared_sites' => count($this->sharedSites),
-                'unique_shared_ports' => count($this->sharedPorts),
-                'incoming_requests' => $this->requests,
-            ])
+                ', [
+            'timestamp' => today()->toDateString(),
+            'shared_sites' => $sharedSites,
+            'shared_ports' => $sharedPorts,
+            'unique_shared_sites' => count($this->sharedSites),
+            'unique_shared_ports' => count($this->sharedPorts),
+            'incoming_requests' => $this->requests,
+        ])
         ->then(function () {
             $this->flush();
         });
