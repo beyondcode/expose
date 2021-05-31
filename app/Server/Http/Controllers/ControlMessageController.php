@@ -12,8 +12,8 @@ use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use stdClass;
 use function React\Promise\reject;
+use stdClass;
 
 class ControlMessageController implements MessageComponentInterface
 {
@@ -114,6 +114,7 @@ class ControlMessageController implements MessageComponentInterface
 
                     reject(null);
                 }
+
                 return $user;
             })
             ->then(function ($user) use ($connection, $data) {
