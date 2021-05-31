@@ -20,7 +20,7 @@ class DatabaseStatisticsCollector implements StatisticsCollector
     /** @var int */
     protected $requests = 0;
 
-    public function __construct(DatabaseInterface $database,)
+    public function __construct(DatabaseInterface $database)
     {
         $this->database = $database;
     }
