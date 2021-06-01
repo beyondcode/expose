@@ -33,8 +33,8 @@ class GetUserDetailsController extends AdminController
             $promise = $this->userRepository->getUserById($id);
         }
 
-        $promise->then(function ($user) use ($httpConnection, $request) {
-                $this->subdomainRepository->getSubdomainsByUserId($user['id'])
+        $promise->then(function ($user) use ($httpConnection) {
+            $this->subdomainRepository->getSubdomainsByUserId($user['id'])
                     ->then(function ($subdomains) use ($httpConnection, $user) {
                         $httpConnection->send(
                             respond_json([
@@ -45,6 +45,6 @@ class GetUserDetailsController extends AdminController
 
                         $httpConnection->close();
                     });
-            });
+        });
     }
 }
