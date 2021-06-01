@@ -39,7 +39,8 @@ class StoreSubdomainController extends AdminController
             return;
         }
 
-        $this->userRepository->getUserByToken($request->get('auth_token', ''))
+        $this->userRepository
+            ->getUserByToken($request->get('auth_token', ''))
             ->then(function ($user) use ($httpConnection, $request) {
                 if (is_null($user)) {
                     $httpConnection->send(respond_json(['error' => 'The user does not exist'], 404));
@@ -50,6 +51,13 @@ class StoreSubdomainController extends AdminController
 
                 if ($user['can_specify_subdomains'] === 0) {
                     $httpConnection->send(respond_json(['error' => 'The user is not allowed to reserve subdomains.'], 401));
+                    $httpConnection->close();
+
+                    return;
+                }
+
+                if (in_array($request->get('subdomain'), config('expose.admin.reserved_subdomains', []))) {
+                    $httpConnection->send(respond_json(['error' => 'The subdomain is already taken.'], 422));
                     $httpConnection->close();
 
                     return;

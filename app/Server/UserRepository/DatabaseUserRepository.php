@@ -134,7 +134,13 @@ class DatabaseUserRepository implements UserRepository
         $this->database
             ->query('SELECT * FROM users WHERE auth_token = :token', ['token' => $authToken])
             ->then(function (Result $result) use ($deferred) {
-                $deferred->resolve($result->rows[0] ?? null);
+                $user = $result->rows[0] ?? null;
+
+                if (! is_null($user)) {
+                    $user = $this->getUserDetails($user);
+                }
+
+                $deferred->resolve($user);
             });
 
         return $deferred->promise();

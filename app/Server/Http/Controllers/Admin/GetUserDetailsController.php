@@ -25,10 +25,16 @@ class GetUserDetailsController extends AdminController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $this->userRepository
-            ->getUserById($request->get('id'))
-            ->then(function ($user) use ($httpConnection, $request) {
-                $this->subdomainRepository->getSubdomainsByUserId($request->get('id'))
+        $id = $request->get('id');
+
+        if (! is_numeric($id)) {
+            $promise = $this->userRepository->getUserByToken($id);
+        } else {
+            $promise = $this->userRepository->getUserById($id);
+        }
+
+        $promise->then(function ($user) use ($httpConnection, $request) {
+                $this->subdomainRepository->getSubdomainsByUserId($user['id'])
                     ->then(function ($subdomains) use ($httpConnection, $user) {
                         $httpConnection->send(
                             respond_json([
