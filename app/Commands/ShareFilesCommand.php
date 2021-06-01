@@ -7,7 +7,7 @@ use React\EventLoop\LoopInterface;
 
 class ShareFilesCommand extends ServerAwareCommand
 {
-    protected $signature = 'share-files {folder=.} {--name=} {--subdomain=} {--auth=}';
+    protected $signature = 'share-files {folder=.} {--name=} {--subdomain=} {--auth=} {--domain=}';
 
     protected $description = 'Share a local folder with a remote expose server';
 
@@ -28,7 +28,8 @@ class ShareFilesCommand extends ServerAwareCommand
             ->shareFolder(
                 $this->argument('folder'),
                 $this->option('name') ?? '',
-                explode(',', $this->option('subdomain'))
+                explode(',', $this->option('subdomain')),
+                $this->option('domain')
             )
             ->createHttpServer()
             ->run();

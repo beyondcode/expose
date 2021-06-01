@@ -106,9 +106,9 @@ class Factory
         return $this;
     }
 
-    public function share($sharedUrl, $subdomain = null)
+    public function share($sharedUrl, $subdomain = null, $serverHost = null)
     {
-        app('expose.client')->share($sharedUrl, $subdomain);
+        app('expose.client')->share($sharedUrl, $subdomain, $serverHost);
 
         return $this;
     }
@@ -120,11 +120,11 @@ class Factory
         return $this;
     }
 
-    public function shareFolder(string $folder, string $name, $subdomain = null)
+    public function shareFolder(string $folder, string $name, $subdomain = null, $serverHost = null)
     {
         $host = $this->createFileServer($folder, $name);
 
-        $this->share($host, $subdomain);
+        $this->share($host, $subdomain, $serverHost);
 
         return $this;
     }

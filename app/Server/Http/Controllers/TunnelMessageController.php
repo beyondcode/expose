@@ -41,6 +41,7 @@ class TunnelMessageController extends Controller
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $subdomain = $this->detectSubdomain($request);
+        $serverHost = $this->detectServerHost($request);
 
         if (is_null($subdomain)) {
             $httpConnection->send(
@@ -51,7 +52,7 @@ class TunnelMessageController extends Controller
             return;
         }
 
-        $controlConnection = $this->connectionManager->findControlConnectionForSubdomain($subdomain);
+        $controlConnection = $this->connectionManager->findControlConnectionForSubdomainAndServerHost($subdomain, $serverHost);
 
         if (is_null($controlConnection)) {
             $httpConnection->send(
@@ -69,9 +70,14 @@ class TunnelMessageController extends Controller
 
     protected function detectSubdomain(Request $request): ?string
     {
-        $subdomain = Str::before($request->getHost(), '.'.$this->configuration->hostname());
+        $subdomain = Str::before($request->getHost(), '.');
 
         return $subdomain === $request->getHost() ? null : $subdomain;
+    }
+
+    protected function detectServerHost(Request $request): ?string
+    {
+        return Str::after($request->getHost(), '.');
     }
 
     protected function sendRequestToClient(Request $request, ControlConnection $controlConnection, ConnectionInterface $httpConnection)

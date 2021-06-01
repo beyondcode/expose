@@ -7,7 +7,7 @@ use React\EventLoop\LoopInterface;
 
 class ShareCommand extends ServerAwareCommand
 {
-    protected $signature = 'share {host} {--subdomain=} {--auth=} {--dns=}';
+    protected $signature = 'share {host} {--subdomain=} {--auth=} {--dns=} {--domain=}';
 
     protected $description = 'Share a local url with a remote expose server';
 
@@ -29,7 +29,11 @@ class ShareCommand extends ServerAwareCommand
             ->setPort($this->getServerPort())
             ->setAuth($auth)
             ->createClient()
-            ->share($this->argument('host'), explode(',', $this->option('subdomain')))
+            ->share(
+                $this->argument('host'),
+                explode(',', $this->option('subdomain')),
+                $this->option('domain')
+            )
             ->createHttpServer()
             ->run();
     }

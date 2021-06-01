@@ -284,11 +284,11 @@ class ApiTest extends TestCase
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken='.$createdUser->auth_token);
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', 'localhost', $connection);
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken=some-other-token');
-        $connectionManager->storeConnection('some-different-host.test', 'different-subdomain', $connection);
+        $connectionManager->storeConnection('some-different-host.test', 'different-subdomain', 'localhost', $connection);
 
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken='.$createdUser->auth_token);
@@ -307,6 +307,7 @@ class ApiTest extends TestCase
         $this->assertCount(1, $users[0]->sites);
         $this->assertCount(1, $users[0]->tcp_connections);
         $this->assertSame('some-host.test', $users[0]->sites[0]->host);
+        $this->assertSame('localhost', $users[0]->sites[0]->server_host);
         $this->assertSame('fixed-subdomain', $users[0]->sites[0]->subdomain);
     }
 
@@ -319,7 +320,7 @@ class ApiTest extends TestCase
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/?authToken=some-token');
 
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', 'localhost', $connection);
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites', [
@@ -346,7 +347,7 @@ class ApiTest extends TestCase
         $connection = \Mockery::mock(IoConnection::class);
         $connection->httpRequest = new Request('GET', '/');
 
-        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', $connection);
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', 'localhost', $connection);
 
         /** @var Response $response */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites', [

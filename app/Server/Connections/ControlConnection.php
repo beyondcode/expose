@@ -12,19 +12,21 @@ class ControlConnection
     /** @var ConnectionInterface */
     public $socket;
     public $host;
+    public $serverHost;
     public $authToken;
     public $subdomain;
     public $client_id;
     public $proxies = [];
     protected $shared_at;
 
-    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId, string $authToken = '')
+    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId, string $serverHost, string $authToken = '')
     {
         $this->socket = $socket;
         $this->host = $host;
         $this->subdomain = $subdomain;
         $this->client_id = $clientId;
         $this->authToken = $authToken;
+        $this->serverHost = $serverHost;
         $this->shared_at = now()->toDateTimeString();
     }
 
@@ -61,6 +63,7 @@ class ControlConnection
         return [
             'type' => 'http',
             'host' => $this->host,
+            'server_host' => $this->serverHost,
             'client_id' => $this->client_id,
             'auth_token' => $this->authToken,
             'subdomain' => $this->subdomain,

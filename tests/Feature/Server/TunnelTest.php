@@ -213,7 +213,7 @@ class TunnelTest extends TestCase
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', null, $user->auth_token));
 
         $this->assertSame('tunnel', $response->subdomain);
     }
@@ -235,7 +235,7 @@ class TunnelTest extends TestCase
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', $user->auth_token));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', null, $user->auth_token));
 
         $this->assertNotSame('tunnel', $response->subdomain);
     }
@@ -272,9 +272,54 @@ class TunnelTest extends TestCase
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', $user->auth_token));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', null, $user->auth_token));
 
         $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_rejects_users_that_want_to_use_a_subdomain_that_is_already_in_use()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->createTestHttpServer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $client = $this->createClient();
+
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'taken', null, $user->auth_token));
+        $this->assertSame('taken', $response->subdomain);
+
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'taken', null, $user->auth_token));
+        $this->assertSame('taken', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_users_to_use_a_subdomain_that_is_already_in_use_on_a_different_shared_host()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->createTestHttpServer();
+
+        $client = $this->createClient();
+
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'taken', null, $user->auth_token));
+        $this->assertSame('localhost', $response->server_host);
+        $this->assertSame('taken', $response->subdomain);
+
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'taken', 'share.beyondco.de', $user->auth_token));
+        $this->assertSame('share.beyondco.de', $response->server_host);
+        $this->assertSame('taken', $response->subdomain);
     }
 
     /** @test */
@@ -302,7 +347,7 @@ class TunnelTest extends TestCase
          * the created test HTTP server.
          */
         $client = $this->createClient();
-        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', $user->auth_token));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', null, $user->auth_token));
 
         $this->assertSame('reserved', $response->subdomain);
     }
@@ -363,7 +408,7 @@ class TunnelTest extends TestCase
         $this->createTestHttpServer();
 
         $client = $this->createClient();
-        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'foo', $user->auth_token));
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'foo', null, $user->auth_token));
 
         $this->assertNotSame('foo', $response->subdomain);
     }

@@ -6,6 +6,7 @@ use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\StatisticsCollector;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
+use App\Server\Configuration;
 use App\Server\Exceptions\NoFreePortAvailable;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
@@ -48,7 +49,7 @@ class ConnectionManager implements ConnectionManagerContract
         });
     }
 
-    public function storeConnection(string $host, ?string $subdomain, ConnectionInterface $connection): ControlConnection
+    public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ConnectionInterface $connection): ControlConnection
     {
         $clientId = (string) uniqid();
 
@@ -59,6 +60,7 @@ class ConnectionManager implements ConnectionManagerContract
             $host,
             $subdomain ?? $this->subdomainGenerator->generateSubdomain(),
             $clientId,
+            $serverHost,
             $this->getAuthTokenFromConnection($connection)
         );
 
@@ -152,10 +154,10 @@ class ConnectionManager implements ConnectionManagerContract
         }
     }
 
-    public function findControlConnectionForSubdomain($subdomain): ?ControlConnection
+    public function findControlConnectionForSubdomainAndServerHost($subdomain, $serverHost): ?ControlConnection
     {
-        return collect($this->connections)->last(function ($connection) use ($subdomain) {
-            return $connection->subdomain == $subdomain;
+        return collect($this->connections)->last(function ($connection) use ($subdomain, $serverHost) {
+            return $connection->subdomain == $subdomain && $connection->serverHost === $serverHost;
         });
     }
 

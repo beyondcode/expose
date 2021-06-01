@@ -4,7 +4,7 @@ namespace App\Commands;
 
 class ShareCurrentWorkingDirectoryCommand extends ShareCommand
 {
-    protected $signature = 'share-cwd {host?} {--subdomain=} {--auth=} {--dns=}';
+    protected $signature = 'share-cwd {host?} {--subdomain=} {--auth=} {--dns=} {--domain=}';
 
     public function handle()
     {
