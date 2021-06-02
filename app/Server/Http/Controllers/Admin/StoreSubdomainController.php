@@ -22,7 +22,7 @@ class StoreSubdomainController extends AdminController
     /** @var Configuration */
     protected $configuration;
 
-    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository, Configuration  $configuration)
+    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository, Configuration $configuration)
     {
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
