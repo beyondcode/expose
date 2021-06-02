@@ -34,6 +34,14 @@ class GetUserDetailsController extends AdminController
         }
 
         $promise->then(function ($user) use ($httpConnection) {
+            if (is_null($user)) {
+                $httpConnection->send(
+                    respond_json([], 404)
+                );
+
+                $httpConnection->close();
+                return;
+            }
             $this->subdomainRepository->getSubdomainsByUserId($user['id'])
                     ->then(function ($subdomains) use ($httpConnection, $user) {
                         $httpConnection->send(
