@@ -1,0 +1,10 @@
+ALTER TABLE users ADD can_specify_domains BOOLEAN DEFAULT 1;
+ALTER TABLE subdomains ADD domain STRING;
+
+CREATE TABLE IF NOT EXISTS domains (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  domain STRING NOT NULL,
+  created_at DATETIME,
+  updated_at DATETIME
+)

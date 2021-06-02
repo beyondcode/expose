@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Server\SubdomainRepository;
+namespace App\Server\DomainRepository;
 
-use App\Contracts\SubdomainRepository;
+use App\Contracts\DomainRepository;
 use Clue\React\SQLite\DatabaseInterface;
 use Clue\React\SQLite\Result;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
-class DatabaseSubdomainRepository implements SubdomainRepository
+class DatabaseDomainRepository implements DomainRepository
 {
     /** @var DatabaseInterface */
     protected $database;
@@ -18,12 +18,12 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $this->database = $database;
     }
 
-    public function getSubdomains(): PromiseInterface
+    public function getDomains(): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains ORDER by created_at DESC')
+            ->query('SELECT * FROM domains ORDER by created_at DESC')
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
             });
@@ -31,12 +31,12 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function getSubdomainById($id): PromiseInterface
+    public function getDomainById($id): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $id])
+            ->query('SELECT * FROM domains WHERE id = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);
             });
@@ -44,12 +44,12 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function getSubdomainByName(string $name): PromiseInterface
+    public function getDomainByName(string $name): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE subdomain = :name', ['name' => $name])
+            ->query('SELECT * FROM domains WHERE domain = :name', ['name' => $name])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);
             });
@@ -57,28 +57,12 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function getSubdomainByNameAndDomain(string $name, string $domain): PromiseInterface
+    public function getDomainsByUserId($id): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE subdomain = :name AND domain = :domain', [
-                'name' => $name,
-                'domain' => $domain
-            ])
-            ->then(function (Result $result) use ($deferred) {
-                $deferred->resolve($result->rows[0] ?? null);
-            });
-
-        return $deferred->promise();
-    }
-
-    public function getSubdomainsByUserId($id): PromiseInterface
-    {
-        $deferred = new Deferred();
-
-        $this->database
-            ->query('SELECT * FROM subdomains WHERE user_id = :user_id ORDER by created_at DESC', [
+            ->query('SELECT * FROM domains WHERE user_id = :user_id ORDER by created_at DESC', [
                 'user_id' => $id,
             ])
             ->then(function (Result $result) use ($deferred) {
@@ -88,24 +72,18 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function storeSubdomain(array $data): PromiseInterface
+    public function storeDomain(array $data): PromiseInterface
     {
         $deferred = new Deferred();
 
-        $this->getSubdomainByName($data['subdomain'])
-            ->then(function ($registeredSubdomain) use ($data, $deferred) {
-                if (! is_null($registeredSubdomain)) {
-                    $deferred->resolve(null);
-
-                    return;
-                }
-
+        $this->getDomainByName($data['domain'])
+            ->then(function ($registeredDomain) use ($data, $deferred) {
                 $this->database->query("
-                    INSERT INTO subdomains (user_id, subdomain, domain, created_at)
-                    VALUES (:user_id, :subdomain, :domain, DATETIME('now'))
+                    INSERT INTO domains (user_id, domain, created_at)
+                    VALUES (:user_id, :domain, DATETIME('now'))
                 ", $data)
                     ->then(function (Result $result) use ($deferred) {
-                        $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
+                        $this->database->query('SELECT * FROM domains WHERE id = :id', ['id' => $result->insertId])
                             ->then(function (Result $result) use ($deferred) {
                                 $deferred->resolve($result->rows[0]);
                             });
@@ -115,12 +93,12 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function getSubdomainsByUserIdAndName($id, $name): PromiseInterface
+    public function getDomainsByUserIdAndName($id, $name): PromiseInterface
     {
         $deferred = new Deferred();
 
         $this->database
-            ->query('SELECT * FROM subdomains WHERE user_id = :user_id AND subdomain = :name ORDER by created_at DESC', [
+            ->query('SELECT * FROM domains WHERE user_id = :user_id AND domain = :name ORDER by created_at DESC', [
                 'user_id' => $id,
                 'name' => $name,
             ])
@@ -131,17 +109,26 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
-    public function deleteSubdomainForUserId($userId, $subdomainId): PromiseInterface
+    public function deleteDomainForUserId($userId, $domainId): PromiseInterface
     {
         $deferred = new Deferred();
 
-        $this->database->query('DELETE FROM subdomains WHERE id = :id AND user_id = :user_id', [
-            'id' => $subdomainId,
+        $this->database->query('DELETE FROM domains WHERE id = :id AND user_id = :user_id', [
+            'id' => $domainId,
             'user_id' => $userId,
         ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result);
             });
+
+        return $deferred->promise();
+    }
+
+    public function updateDomain($id, array $data): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        // TODO
 
         return $deferred->promise();
     }

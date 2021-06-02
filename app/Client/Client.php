@@ -109,14 +109,11 @@ class Client
                     $httpProtocol = $this->configuration->port() === 443 ? 'https' : 'http';
                     $host = $data->server_host;
 
-                    if ($httpProtocol !== 'https') {
-                        $host .= ":{$this->configuration->port()}";
-                    }
-
                     $this->logger->info($data->message);
                     $this->logger->info("Local-URL:\t\t{$sharedUrl}");
                     $this->logger->info("Dashboard-URL:\t\thttp://127.0.0.1:".config()->get('expose.dashboard_port'));
-                    $this->logger->info("Expose-URL:\t\t{$httpProtocol}://{$data->subdomain}.{$host}");
+                    $this->logger->info("Expose-URL:\t\thttp://{$data->subdomain}.{$host}:{$this->configuration->port()}");
+                    $this->logger->info("Expose-URL:\t\thttps://{$data->subdomain}.{$host}");
                     $this->logger->line('');
 
                     static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$data->server_host}";

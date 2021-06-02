@@ -4,6 +4,7 @@ namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
+use App\Server\Configuration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Ratchet\ConnectionInterface;
@@ -18,10 +19,14 @@ class StoreSubdomainController extends AdminController
     /** @var UserRepository */
     protected $userRepository;
 
-    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository)
+    /** @var Configuration */
+    protected $configuration;
+
+    public function __construct(UserRepository $userRepository, SubdomainRepository $subdomainRepository, Configuration  $configuration)
     {
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
+        $this->configuration = $configuration;
     }
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
@@ -66,6 +71,7 @@ class StoreSubdomainController extends AdminController
                 $insertData = [
                     'user_id' => $user['id'],
                     'subdomain' => $request->get('subdomain'),
+                    'domain' => $request->get('domain', $this->configuration->hostname()),
                 ];
 
                 $this->subdomainRepository

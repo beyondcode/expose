@@ -3,6 +3,7 @@
 namespace App\Server\Http\Controllers;
 
 use App\Contracts\ConnectionManager;
+use App\Contracts\DomainRepository;
 use App\Contracts\SubdomainRepository;
 use App\Contracts\UserRepository;
 use App\Http\QueryParameters;
@@ -27,14 +28,18 @@ class ControlMessageController implements MessageComponentInterface
     /** @var SubdomainRepository */
     protected $subdomainRepository;
 
+    /** @var DomainRepository */
+    protected $domainRepository;
+
     /** @var Configuration */
     protected $configuration;
 
-    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository, SubdomainRepository $subdomainRepository, Configuration $configuration)
+    public function __construct(ConnectionManager $connectionManager, UserRepository $userRepository, SubdomainRepository $subdomainRepository, Configuration $configuration, DomainRepository $domainRepository)
     {
         $this->connectionManager = $connectionManager;
         $this->userRepository = $userRepository;
         $this->subdomainRepository = $subdomainRepository;
+        $this->domainRepository = $domainRepository;
         $this->configuration = $configuration;
     }
 
@@ -147,27 +152,31 @@ class ControlMessageController implements MessageComponentInterface
 
     protected function handleHttpConnection(ConnectionInterface $connection, $data, $user = null)
     {
-        $this->hasValidSubdomain($connection, $data->subdomain, $user, $data->server_host)->then(function ($subdomain) use ($data, $connection) {
-            if ($subdomain === false) {
-                return;
-            }
+        $this->hasValidDomain($connection, $data->server_host, $user)
+            ->then(function () use ($connection, $data, $user) {
+                return $this->hasValidSubdomain($connection, $data->subdomain, $user, $data->server_host);
+            })
+            ->then(function ($subdomain) use ($data, $connection) {
+                if ($subdomain === false) {
+                    return;
+                }
 
-            $data->subdomain = $subdomain;
+                $data->subdomain = $subdomain;
 
-            $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->server_host, $connection);
+                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->server_host, $connection);
 
-            $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
+                $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
-            $connection->send(json_encode([
-                'event' => 'authenticated',
-                'data' => [
-                    'message' => config('expose.admin.messages.message_of_the_day'),
-                    'subdomain' => $connectionInfo->subdomain,
-                    'server_host' => $connectionInfo->serverHost,
-                    'client_id' => $connectionInfo->client_id,
-                ],
-            ]));
-        });
+                $connection->send(json_encode([
+                    'event' => 'authenticated',
+                    'data' => [
+                        'message' => config('expose.admin.messages.message_of_the_day'),
+                        'subdomain' => $connectionInfo->subdomain,
+                        'server_host' => $connectionInfo->serverHost,
+                        'client_id' => $connectionInfo->client_id,
+                    ],
+                ]));
+            });
     }
 
     protected function handleTcpConnection(ConnectionInterface $connection, $data, $user = null)
@@ -259,6 +268,40 @@ class ControlMessageController implements MessageComponentInterface
         return $deferred->promise();
     }
 
+    protected function hasValidDomain(ConnectionInterface $connection, ?string $serverHost, ?array $user): PromiseInterface
+    {
+        if (! is_null($user) && $serverHost !== $this->configuration->hostname()) {
+            $deferred = new Deferred();
+
+            $this->domainRepository
+                ->getDomainsByUserId($user['id'])
+                ->then(function ($domains) use ($connection, $deferred, $user, $serverHost) {
+                    $userDomain = collect($domains)->first(function ($domain) use ($serverHost) {
+                        return strtolower($domain['domain']) === strtolower($serverHost);
+                    });
+
+                    if (is_null($userDomain)) {
+                        $connection->send(json_encode([
+                            'event' => 'authenticationFailed',
+                            'data' => [
+                                'message' => config('expose.admin.messages.custom_domain_unauthorized').PHP_EOL,
+                            ],
+                        ]));
+                        $connection->close();
+
+                        $deferred->reject(null);
+                        return;
+                    }
+
+                    $deferred->resolve(null);
+                });
+
+            return $deferred->promise();
+        } else {
+            return \React\Promise\resolve(null);
+        }
+    }
+
     protected function hasValidSubdomain(ConnectionInterface $connection, ?string $subdomain, ?array $user, string $serverHost): PromiseInterface
     {
         /**
@@ -279,9 +322,9 @@ class ControlMessageController implements MessageComponentInterface
          * Check if the given subdomain is reserved for a different user.
          */
         if (! is_null($subdomain)) {
-            return $this->subdomainRepository->getSubdomainByName($subdomain)
+            return $this->subdomainRepository->getSubdomainByNameAndDomain($subdomain, $serverHost)
                 ->then(function ($foundSubdomain) use ($connection, $subdomain, $user, $serverHost) {
-                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']) {
+                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']){
                         $message = config('expose.admin.messages.subdomain_reserved');
                         $message = str_replace(':subdomain', $subdomain, $message);
 

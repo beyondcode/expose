@@ -278,6 +278,53 @@ class TunnelTest extends TestCase
     }
 
     /** @test */
+    public function it_rejects_users_that_want_to_use_a_reserved_subdomain_on_a_custom_domain()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_domains' => 1,
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'domain' => 'share.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'domain' => 'share.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $user = $this->createUser([
+            'name' => 'Test-User',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->createTestHttpServer();
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', null, $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
     public function it_rejects_users_that_want_to_use_a_subdomain_that_is_already_in_use()
     {
         $this->app['config']['expose.admin.validate_auth_tokens'] = true;
@@ -306,8 +353,18 @@ class TunnelTest extends TestCase
 
         $user = $this->createUser([
             'name' => 'Marcel',
+            'can_specify_domains' => 1,
             'can_specify_subdomains' => 1,
         ]);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'domain' => 'share.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
 
         $this->createTestHttpServer();
 
@@ -320,6 +377,93 @@ class TunnelTest extends TestCase
         $response = $this->await($client->connectToServer('127.0.0.1:8085', 'taken', 'share.beyondco.de', $user->auth_token));
         $this->assertSame('share.beyondco.de', $response->server_host);
         $this->assertSame('taken', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_users_that_want_to_use_a_reserved_subdomain_on_a_custom_domain()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $user = $this->createUser([
+            'name' => 'Test-User',
+            'can_specify_subdomains' => 1,
+            'can_specify_domains' => 1,
+        ]);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'domain' => 'beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->createTestHttpServer();
+
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', 'beyondco.de', $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_rejects_users_that_want_to_use_a_reserved_subdomain_on_a_custom_domain_that_does_not_belong_them()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+            'can_specify_domains' => 1,
+        ]);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'domain' => 'beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'domain' => 'beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $user = $this->createUser([
+            'name' => 'Test-User',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $this->createTestHttpServer();
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', 'beyondco.de', $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
     }
 
     /** @test */
@@ -348,6 +492,47 @@ class TunnelTest extends TestCase
          */
         $client = $this->createClient();
         $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', null, $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
+    public function it_allows_users_to_use_their_own_reserved_subdomains_on_custom_domains()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_domains' => 1,
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'domain' => 'share.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'domain' => 'share.beyondco.de',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->createTestHttpServer();
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', 'share.beyondco.de', $user->auth_token));
 
         $this->assertSame('reserved', $response->subdomain);
     }

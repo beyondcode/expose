@@ -321,6 +321,8 @@ return [
 
             'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro. Assigning a random subdomain instead.',
 
+            'custom_domain_unauthorized' => 'You are not allowed to use this custom domain.',
+
             'tcp_port_sharing_unauthorized' => 'You are not allowed to share TCP ports. Please upgrade to Expose Pro.',
 
             'no_free_tcp_port_available' => 'There are no free TCP ports available on this server. Please try again later.',

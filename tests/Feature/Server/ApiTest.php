@@ -66,6 +66,60 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_allow_domain_reservation_for_users_without_the_right_flag()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $this->expectException(ResponseException::class);
+        $this->expectExceptionMessage('HTTP status code 401');
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+            'domain' => 'reserved',
+        ])));
+    }
+
+    /** @test */
+    public function it_allows_domain_reservation_for_users_with_the_right_flag()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_domains' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/domains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+            'domain' => 'reserved',
+        ])));
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    /** @test */
     public function it_does_not_allow_subdomain_reservation_for_users_without_the_right_flag()
     {
         /** @var Response $response */

@@ -3,6 +3,7 @@
 namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
+use App\Contracts\DomainRepository;
 use App\Contracts\StatisticsCollector;
 use App\Contracts\StatisticsRepository;
 use App\Contracts\SubdomainGenerator;
@@ -11,6 +12,7 @@ use App\Contracts\UserRepository;
 use App\Http\RouteGenerator;
 use App\Http\Server as HttpServer;
 use App\Server\Connections\ConnectionManager;
+use App\Server\DomainRepository\DatabaseDomainRepository;
 use App\Server\Http\Controllers\Admin\DeleteSubdomainController;
 use App\Server\Http\Controllers\Admin\DeleteUsersController;
 use App\Server\Http\Controllers\Admin\DisconnectSiteController;
@@ -26,6 +28,7 @@ use App\Server\Http\Controllers\Admin\ListTcpConnectionsController;
 use App\Server\Http\Controllers\Admin\ListUsersController;
 use App\Server\Http\Controllers\Admin\RedirectToUsersController;
 use App\Server\Http\Controllers\Admin\ShowSettingsController;
+use App\Server\Http\Controllers\Admin\StoreDomainController;
 use App\Server\Http\Controllers\Admin\StoreSettingsController;
 use App\Server\Http\Controllers\Admin\StoreSubdomainController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
@@ -34,6 +37,7 @@ use App\Server\Http\Controllers\TunnelMessageController;
 use App\Server\Http\Router;
 use App\Server\StatisticsCollector\DatabaseStatisticsCollector;
 use App\Server\StatisticsRepository\DatabaseStatisticsRepository;
+use App\Server\SubdomainRepository\DatabaseSubdomainRepository;
 use Clue\React\SQLite\DatabaseInterface;
 use Phar;
 use Ratchet\Server\IoServer;
@@ -139,6 +143,8 @@ class Factory
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
+        $this->router->post('/api/domains', StoreDomainController::class, $adminCondition);
+        $this->router->delete('/api/domains/{domain}', DeleteSubdomainController::class, $adminCondition);
         $this->router->post('/api/subdomains', StoreSubdomainController::class, $adminCondition);
         $this->router->delete('/api/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
         $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
@@ -183,6 +189,7 @@ class Factory
             ->bindSubdomainGenerator()
             ->bindUserRepository()
             ->bindSubdomainRepository()
+            ->bindDomainRepository()
             ->bindDatabase()
             ->ensureDatabaseIsInitialized()
             ->registerStatisticsCollector()
@@ -223,7 +230,16 @@ class Factory
     protected function bindSubdomainRepository()
     {
         app()->singleton(SubdomainRepository::class, function () {
-            return app(config('expose.admin.subdomain_repository'));
+            return app(config('expose.admin.subdomain_repository', DatabaseSubdomainRepository::class));
+        });
+
+        return $this;
+    }
+
+    protected function bindDomainRepository()
+    {
+        app()->singleton(DomainRepository::class, function () {
+            return app(config('expose.admin.domain_repository', DatabaseDomainRepository::class));
         });
 
         return $this;

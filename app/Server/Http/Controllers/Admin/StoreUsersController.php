@@ -39,6 +39,7 @@ class StoreUsersController extends AdminController
             'name' => $request->get('name'),
             'auth_token' => (string) Str::uuid(),
             'can_specify_subdomains' => (int) $request->get('can_specify_subdomains'),
+            'can_specify_domains' => (int) $request->get('can_specify_domains'),
             'can_share_tcp_ports' => (int) $request->get('can_share_tcp_ports'),
             'max_connections' => (int) $request->get('max_connections'),
         ];
