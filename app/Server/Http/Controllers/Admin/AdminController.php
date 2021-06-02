@@ -27,6 +27,8 @@ abstract class AdminController extends Controller
             $httpConnection->send(Message::toString(new Response(401, [
                 'WWW-Authenticate' => 'Basic realm="Expose"',
             ])));
+
+            $httpConnection->close();
         }
 
         return false;
