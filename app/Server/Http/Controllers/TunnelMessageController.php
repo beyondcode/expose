@@ -120,7 +120,7 @@ class TunnelMessageController extends Controller
     {
         $request::setTrustedProxies([$controlConnection->socket->remoteAddress, '127.0.0.1'], Request::HEADER_X_FORWARDED_ALL);
 
-        $host = $controlConnection->serverHost;;
+        $host = $controlConnection->serverHost;
 
         if (! $request->isSecure()) {
             $host .= ":{$this->configuration->port()}";
