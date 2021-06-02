@@ -40,6 +40,7 @@ class GetUserDetailsController extends AdminController
                 );
 
                 $httpConnection->close();
+
                 return;
             }
             $this->subdomainRepository->getSubdomainsByUserId($user['id'])
