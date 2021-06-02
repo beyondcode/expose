@@ -64,7 +64,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         $this->database
             ->query('SELECT * FROM subdomains WHERE subdomain = :name AND domain = :domain', [
                 'name' => $name,
-                'domain' => $domain
+                'domain' => $domain,
             ])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows[0] ?? null);

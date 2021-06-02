@@ -275,7 +275,7 @@ class ControlMessageController implements MessageComponentInterface
 
             $this->domainRepository
                 ->getDomainsByUserId($user['id'])
-                ->then(function ($domains) use ($connection, $deferred, $user, $serverHost) {
+                ->then(function ($domains) use ($connection, $deferred , $serverHost) {
                     $userDomain = collect($domains)->first(function ($domain) use ($serverHost) {
                         return strtolower($domain['domain']) === strtolower($serverHost);
                     });
@@ -290,6 +290,7 @@ class ControlMessageController implements MessageComponentInterface
                         $connection->close();
 
                         $deferred->reject(null);
+
                         return;
                     }
 
@@ -324,7 +325,7 @@ class ControlMessageController implements MessageComponentInterface
         if (! is_null($subdomain)) {
             return $this->subdomainRepository->getSubdomainByNameAndDomain($subdomain, $serverHost)
                 ->then(function ($foundSubdomain) use ($connection, $subdomain, $user, $serverHost) {
-                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']){
+                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']) {
                         $message = config('expose.admin.messages.subdomain_reserved');
                         $message = str_replace(':subdomain', $subdomain, $message);
 
