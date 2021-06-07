@@ -66,6 +66,34 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_can_specify_tokens_when_creating_a_user()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'token' => 'this-is-my-token'
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $users = $body->paginated->users;
+
+        $this->assertCount(1, $users);
+        $this->assertSame('Marcel', $users[0]->name);
+        $this->assertSame('this-is-my-token', $users[0]->auth_token);
+    }
+
+    /** @test */
     public function it_does_not_allow_domain_reservation_for_users_without_the_right_flag()
     {
         /** @var Response $response */
