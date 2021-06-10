@@ -75,7 +75,7 @@ class ApiTest extends TestCase
             'Content-Type' => 'application/json',
         ], json_encode([
             'name' => 'Marcel',
-            'token' => 'this-is-my-token'
+            'token' => 'this-is-my-token',
         ])));
 
         /** @var Response $response */
