@@ -168,7 +168,7 @@ class DatabaseUserRepository implements UserRepository
     {
         $deferred = new Deferred();
 
-        $this->database->query('DELETE FROM users WHERE id = :id', ['id' => $id])
+        $this->database->query('DELETE FROM users WHERE id = :id OR auth_token = :id', ['id' => $id])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result);
             });

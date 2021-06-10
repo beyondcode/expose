@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        UriFactory::registerScheme('capacitor', Uri::class);
         UriFactory::registerScheme('chrome-extension', Uri::class);
     }
 
