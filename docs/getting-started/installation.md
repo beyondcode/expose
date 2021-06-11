@@ -13,6 +13,31 @@ composer global require beyondcode/expose
 
 After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
 
+## As a docker container
+
+Expose has a `Dockerfile` already in the source root.
+You can build and use it without requiring any extra effort.
+
+```bash
+docker build -t expose .
+```
+
+Usage:
+
+```bash
+docker run expose <expose command>
+```
+
+Examples:
+
+```bash
+docker run expose share http://192.168.2.100 # share a local site
+docker run expose serve my-domain.com # start a server
+```
+
+Now you're ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
+
+
 ### Extending Expose
 
 By default, Expose comes as an executable PHAR file. This allows you to use all Expose features out of the box – without any additional setup required.
