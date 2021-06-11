@@ -65,6 +65,17 @@ class TunnelTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_404_for_non_existing_clients_on_custom_hosts()
+    {
+        $this->expectException(ResponseException::class);
+        $this->expectExceptionMessage(404);
+
+        $this->await($this->browser->get('http://127.0.0.1:8080/', [
+            'Host' => 'tunnel.share.beyondco.de',
+        ]));
+    }
+
+    /** @test */
     public function it_sends_incoming_requests_to_the_connected_client()
     {
         $this->app['config']['expose.admin.validate_auth_tokens'] = false;
@@ -86,6 +97,33 @@ class TunnelTest extends TestCase
          */
         $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
             'Host' => 'tunnel.localhost',
+        ]));
+
+        $this->assertSame('Hello World!', $response->getBody()->getContents());
+    }
+
+    /** @test */
+    public function it_sends_incoming_requests_to_the_connected_client_on_custom_hosts()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
+        $this->createTestHttpServer();
+
+        $this->app['config']['expose.admin.validate_auth_tokens'] = false;
+
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $this->await($client->connectToServer('127.0.0.1:8085', 'tunnel', 'share.beyondco.de'));
+
+        /**
+         * Once the client is connected, we perform a GET request on the
+         * created tunnel.
+         */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
+            'Host' => 'tunnel.share.beyondco.de',
         ]));
 
         $this->assertSame('Hello World!', $response->getBody()->getContents());

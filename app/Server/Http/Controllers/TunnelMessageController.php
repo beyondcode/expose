@@ -70,11 +70,9 @@ class TunnelMessageController extends Controller
 
     protected function detectSubdomain(Request $request): ?string
     {
-        if (substr_count($request->header('Host'), '.') === 1) {
-            return null;
-        }
+        $serverHost = $this->detectServerHost($request);
 
-        $subdomain = Str::before($request->header('Host'), '.');
+        $subdomain = Str::before($request->header('Host'), '.'.$serverHost);
 
         return $subdomain === $request->header('Host') ? null : $subdomain;
     }

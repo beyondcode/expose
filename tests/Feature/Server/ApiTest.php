@@ -66,6 +66,97 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_can_specify_a_token_when_creating_a_user()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'token' => 'my-token',
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $users = $body->paginated->users;
+
+        $this->assertCount(1, $users);
+        $this->assertSame('Marcel', $users[0]->name);
+        $this->assertSame('my-token', $users[0]->auth_token);
+        $this->assertSame([], $users[0]->sites);
+    }
+
+    /** @test */
+    public function it_updates_users_instead_of_creating_new_ones()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'token' => 'my-token',
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $users = $body->paginated->users;
+
+        $this->assertCount(1, $users);
+        $this->assertSame('Marcel', $users[0]->name);
+        $this->assertSame('my-token', $users[0]->auth_token);
+        $this->assertSame(0, $users[0]->can_specify_subdomains);
+        $this->assertSame(0, $users[0]->can_specify_domains);
+        $this->assertSame(0, $users[0]->can_share_tcp_ports);
+        $this->assertSame([], $users[0]->sites);
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel Changed',
+            'token' => 'my-token',
+            'can_specify_subdomains' => 1,
+            'can_specify_domains' => 1,
+            'can_share_tcp_ports' => 1,
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $users = $body->paginated->users;
+
+        $this->assertCount(1, $users);
+        $this->assertSame('Marcel Changed', $users[0]->name);
+        $this->assertSame('my-token', $users[0]->auth_token);
+        $this->assertSame(1, $users[0]->can_specify_subdomains);
+        $this->assertSame(1, $users[0]->can_specify_domains);
+        $this->assertSame(1, $users[0]->can_share_tcp_ports);
+        $this->assertSame([], $users[0]->sites);
+    }
+
+    /** @test */
     public function it_can_specify_tokens_when_creating_a_user()
     {
         /** @var Response $response */
@@ -268,6 +359,51 @@ class ApiTest extends TestCase
         ])));
 
         $this->await($this->browser->delete('http://127.0.0.1:8080/api/subdomains/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'auth_token' => $user->auth_token,
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/1', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $body = json_decode($response->getBody()->getContents());
+        $subdomains = $body->subdomains;
+
+        $this->assertCount(0, $subdomains);
+    }
+
+    /** @test */
+    public function it_can_delete_subdomains_by_name()
+    {
+        /** @var Response $response */
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ])));
+
+        $user = json_decode($response->getBody()->getContents())->user;
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/subdomains/reserved', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',

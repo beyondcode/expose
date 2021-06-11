@@ -150,15 +150,38 @@ class DatabaseUserRepository implements UserRepository
     {
         $deferred = new Deferred();
 
-        $this->database->query("
+        $this->getUserByToken($data['auth_token'])
+            ->then(function ($existingUser) use ($data, $deferred) {
+                if (is_null($existingUser)) {
+                    $this->database->query("
             INSERT INTO users (name, auth_token, can_specify_subdomains, can_specify_domains, can_share_tcp_ports, max_connections, created_at)
             VALUES (:name, :auth_token, :can_specify_subdomains, :can_specify_domains, :can_share_tcp_ports, :max_connections, DATETIME('now'))
         ", $data)
-            ->then(function (Result $result) use ($deferred) {
-                $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $result->insertId])
-                    ->then(function (Result $result) use ($deferred) {
-                        $deferred->resolve($result->rows[0]);
-                    });
+                        ->then(function (Result $result) use ($deferred) {
+                            $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $result->insertId])
+                                ->then(function (Result $result) use ($deferred) {
+                                    $deferred->resolve($result->rows[0]);
+                                });
+                        });
+                } else {
+                    $this->database->query('
+            UPDATE users
+            SET
+                name = :name,
+                can_specify_subdomains = :can_specify_subdomains,
+                can_specify_domains = :can_specify_domains,
+                can_share_tcp_ports = :can_share_tcp_ports,
+                max_connections = :max_connections
+            WHERE
+                auth_token = :auth_token
+        ', $data)
+                        ->then(function (Result $result) use ($existingUser, $deferred) {
+                            $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $existingUser['id']])
+                                ->then(function (Result $result) use ($deferred) {
+                                    $deferred->resolve($result->rows[0]);
+                                });
+                        });
+                }
             });
 
         return $deferred->promise();
