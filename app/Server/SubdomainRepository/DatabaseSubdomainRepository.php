@@ -135,7 +135,7 @@ class DatabaseSubdomainRepository implements SubdomainRepository
     {
         $deferred = new Deferred();
 
-        $this->database->query('DELETE FROM subdomains WHERE id = :id AND user_id = :user_id', [
+        $this->database->query('DELETE FROM subdomains WHERE (id = :id OR subdomain = :id) AND user_id = :user_id', [
             'id' => $subdomainId,
             'user_id' => $userId,
         ])
