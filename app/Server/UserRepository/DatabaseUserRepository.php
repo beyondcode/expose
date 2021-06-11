@@ -53,7 +53,7 @@ class DatabaseUserRepository implements UserRepository
                 ];
 
                 if ($searchQuery !== '') {
-                    $query .= "WHERE name LIKE '%" . $searchQuery . "%' ";
+                    $query .= "WHERE name LIKE '%".$searchQuery."%' ";
                     $bindings['search'] = $searchQuery;
                 }
 
@@ -104,7 +104,7 @@ class DatabaseUserRepository implements UserRepository
             ->then(function (Result $result) use ($deferred) {
                 $user = $result->rows[0] ?? null;
 
-                if (!is_null($user)) {
+                if (! is_null($user)) {
                     $user = $this->getUserDetails($user);
                 }
 
@@ -136,7 +136,7 @@ class DatabaseUserRepository implements UserRepository
             ->then(function (Result $result) use ($deferred) {
                 $user = $result->rows[0] ?? null;
 
-                if (!is_null($user)) {
+                if (! is_null($user)) {
                     $user = $this->getUserDetails($user);
                 }
 
@@ -164,7 +164,7 @@ class DatabaseUserRepository implements UserRepository
                                 });
                         });
                 } else {
-                    $this->database->query("
+                    $this->database->query('
             UPDATE users
             SET
                 name = :name,
@@ -174,7 +174,7 @@ class DatabaseUserRepository implements UserRepository
                 max_connections = :max_connections
             WHERE
                 auth_token = :auth_token
-        ", $data)
+        ', $data)
                         ->then(function (Result $result) use ($existingUser, $deferred) {
                             $this->database->query('SELECT * FROM users WHERE id = :id', ['id' => $existingUser['id']])
                                 ->then(function (Result $result) use ($deferred) {
@@ -204,10 +204,10 @@ class DatabaseUserRepository implements UserRepository
         $deferred = new Deferred();
 
         $authTokenString = collect($authTokens)->map(function ($token) {
-            return '"' . $token . '"';
+            return '"'.$token.'"';
         })->join(',');
 
-        $this->database->query('SELECT * FROM users WHERE auth_token IN (' . $authTokenString . ')')
+        $this->database->query('SELECT * FROM users WHERE auth_token IN ('.$authTokenString.')')
             ->then(function (Result $result) use ($deferred) {
                 $users = collect($result->rows)->map(function ($user) {
                     return $this->getUserDetails($user);
