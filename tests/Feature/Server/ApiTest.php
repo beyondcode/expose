@@ -425,65 +425,6 @@ class ApiTest extends TestCase
     }
 
     /** @test */
-    public function it_can_not_reserve_an_already_reserved_subdomain()
-    {
-        /** @var Response $response */
-        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
-            'Host' => 'expose.localhost',
-            'Authorization' => base64_encode('username:secret'),
-            'Content-Type' => 'application/json',
-        ], json_encode([
-            'name' => 'Marcel',
-            'can_specify_subdomains' => 1,
-        ])));
-
-        $user = json_decode($response->getBody()->getContents())->user;
-
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
-            'Host' => 'expose.localhost',
-            'Authorization' => base64_encode('username:secret'),
-            'Content-Type' => 'application/json',
-        ], json_encode([
-            'subdomain' => 'reserved',
-            'auth_token' => $user->auth_token,
-        ])));
-
-        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
-            'Host' => 'expose.localhost',
-            'Authorization' => base64_encode('username:secret'),
-            'Content-Type' => 'application/json',
-        ], json_encode([
-            'name' => 'Sebastian',
-            'can_specify_subdomains' => 1,
-        ])));
-
-        $user = json_decode($response->getBody()->getContents())->user;
-
-        $this->expectException(ResponseException::class);
-        $this->expectExceptionMessage('HTTP status code 422');
-
-        $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
-            'Host' => 'expose.localhost',
-            'Authorization' => base64_encode('username:secret'),
-            'Content-Type' => 'application/json',
-        ], json_encode([
-            'subdomain' => 'reserved',
-            'auth_token' => $user->auth_token,
-        ])));
-
-        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users/2', [
-            'Host' => 'expose.localhost',
-            'Authorization' => base64_encode('username:secret'),
-            'Content-Type' => 'application/json',
-        ]));
-
-        $body = json_decode($response->getBody()->getContents());
-        $subdomains = $body->subdomains;
-
-        $this->assertCount(0, $subdomains);
-    }
-
-    /** @test */
     public function it_can_list_all_currently_connected_sites_from_all_users()
     {
         /** @var Response $response */

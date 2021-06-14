@@ -79,7 +79,7 @@ class TunnelMessageController extends Controller
 
     protected function detectServerHost(Request $request): ?string
     {
-        return Str::after($request->header('Host'), '.');
+        return Str::before(Str::after($request->header('Host'), '.'), ':');
     }
 
     protected function sendRequestToClient(Request $request, ControlConnection $controlConnection, ConnectionInterface $httpConnection)

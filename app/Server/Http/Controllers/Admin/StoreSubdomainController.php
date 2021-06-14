@@ -77,12 +77,6 @@ class StoreSubdomainController extends AdminController
                 $this->subdomainRepository
                     ->storeSubdomain($insertData)
                     ->then(function ($subdomain) use ($httpConnection) {
-                        if (is_null($subdomain)) {
-                            $httpConnection->send(respond_json(['error' => 'The subdomain is already taken.'], 422));
-                            $httpConnection->close();
-
-                            return;
-                        }
                         $httpConnection->send(respond_json(['subdomain' => $subdomain], 200));
                         $httpConnection->close();
                     });
