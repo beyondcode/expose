@@ -92,23 +92,14 @@ class DatabaseSubdomainRepository implements SubdomainRepository
     {
         $deferred = new Deferred();
 
-        $this->getSubdomainByName($data['subdomain'])
-            ->then(function ($registeredSubdomain) use ($data, $deferred) {
-                if (! is_null($registeredSubdomain)) {
-                    $deferred->resolve(null);
-
-                    return;
-                }
-
-                $this->database->query("
-                    INSERT INTO subdomains (user_id, subdomain, domain, created_at)
-                    VALUES (:user_id, :subdomain, :domain, DATETIME('now'))
-                ", $data)
+        $this->database->query("
+            INSERT INTO subdomains (user_id, subdomain, domain, created_at)
+            VALUES (:user_id, :subdomain, :domain, DATETIME('now'))
+        ", $data)
+            ->then(function (Result $result) use ($deferred) {
+                $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
                     ->then(function (Result $result) use ($deferred) {
-                        $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
-                            ->then(function (Result $result) use ($deferred) {
-                                $deferred->resolve($result->rows[0]);
-                            });
+                        $deferred->resolve($result->rows[0]);
                     });
             });
 
