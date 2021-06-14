@@ -106,7 +106,7 @@ class HttpClient
                 /* @var $body \React\Stream\ReadableStreamInterface */
                 $body = $response->getBody();
 
-                $this->logResponse(str($response));
+                $this->logResponse(Message::toString($response));
 
                 $body->on('data', function ($chunk) use ($proxyConnection, $response) {
                     $response->buffer .= $chunk;
