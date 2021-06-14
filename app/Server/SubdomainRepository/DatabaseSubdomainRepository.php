@@ -73,6 +73,22 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
+    public function getSubdomainsByNameAndDomain(string $name, string $domain): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $this->database
+            ->query('SELECT * FROM subdomains WHERE subdomain = :name AND domain = :domain', [
+                'name' => $name,
+                'domain' => $domain,
+            ])
+            ->then(function (Result $result) use ($deferred) {
+                $deferred->resolve($result->rows);
+            });
+
+        return $deferred->promise();
+    }
+
     public function getSubdomainsByUserId($id): PromiseInterface
     {
         $deferred = new Deferred();
@@ -92,23 +108,14 @@ class DatabaseSubdomainRepository implements SubdomainRepository
     {
         $deferred = new Deferred();
 
-        $this->getSubdomainByName($data['subdomain'])
-            ->then(function ($registeredSubdomain) use ($data, $deferred) {
-                if (! is_null($registeredSubdomain)) {
-                    $deferred->resolve(null);
-
-                    return;
-                }
-
-                $this->database->query("
-                    INSERT INTO subdomains (user_id, subdomain, domain, created_at)
-                    VALUES (:user_id, :subdomain, :domain, DATETIME('now'))
-                ", $data)
+        $this->database->query("
+            INSERT INTO subdomains (user_id, subdomain, domain, created_at)
+            VALUES (:user_id, :subdomain, :domain, DATETIME('now'))
+        ", $data)
+            ->then(function (Result $result) use ($deferred) {
+                $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
                     ->then(function (Result $result) use ($deferred) {
-                        $this->database->query('SELECT * FROM subdomains WHERE id = :id', ['id' => $result->insertId])
-                            ->then(function (Result $result) use ($deferred) {
-                                $deferred->resolve($result->rows[0]);
-                            });
+                        $deferred->resolve($result->rows[0]);
                     });
             });
 

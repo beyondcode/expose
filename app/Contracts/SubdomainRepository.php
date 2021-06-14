@@ -14,6 +14,8 @@ interface SubdomainRepository
 
     public function getSubdomainByNameAndDomain(string $name, string $domain): PromiseInterface;
 
+    public function getSubdomainsByNameAndDomain(string $name, string $domain): PromiseInterface;
+
     public function getSubdomainsByUserId($id): PromiseInterface;
 
     public function getSubdomainsByUserIdAndName($id, $name): PromiseInterface;

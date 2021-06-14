@@ -107,7 +107,7 @@ class Client
 
                 $connection->on('authenticated', function ($data) use ($deferred, $sharedUrl) {
                     $httpProtocol = $this->configuration->port() === 443 ? 'https' : 'http';
-                    $host = $data->server_host;
+                    $host = $data->server_host ?? $this->configuration->host();
 
                     $this->logger->info($data->message);
                     $this->logger->info("Local-URL:\t\t{$sharedUrl}");
@@ -116,7 +116,7 @@ class Client
                     $this->logger->info("Expose-URL:\t\thttps://{$data->subdomain}.{$host}");
                     $this->logger->line('');
 
-                    static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$data->server_host}";
+                    static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";
 
                     $deferred->resolve($data);
                 });

@@ -275,7 +275,7 @@ class ControlMessageController implements MessageComponentInterface
 
             $this->domainRepository
                 ->getDomainsByUserId($user['id'])
-                ->then(function ($domains) use ($connection, $deferred , $serverHost) {
+                ->then(function ($domains) use ($connection, $deferred, $serverHost) {
                     $userDomain = collect($domains)->first(function ($domain) use ($serverHost) {
                         return strtolower($domain['domain']) === strtolower($serverHost);
                     });
@@ -323,9 +323,13 @@ class ControlMessageController implements MessageComponentInterface
          * Check if the given subdomain is reserved for a different user.
          */
         if (! is_null($subdomain)) {
-            return $this->subdomainRepository->getSubdomainByNameAndDomain($subdomain, $serverHost)
-                ->then(function ($foundSubdomain) use ($connection, $subdomain, $user, $serverHost) {
-                    if (! is_null($foundSubdomain) && ! is_null($user) && $foundSubdomain['user_id'] !== $user['id']) {
+            return $this->subdomainRepository->getSubdomainsByNameAndDomain($subdomain, $serverHost)
+                ->then(function ($foundSubdomains) use ($connection, $subdomain, $user, $serverHost) {
+                    $ownSubdomain = collect($foundSubdomains)->first(function ($subdomain) use ($user) {
+                        return $subdomain['user_id'] === $user['id'];
+                    });
+
+                    if (count($foundSubdomains) > 0 && ! is_null($user) && is_null($ownSubdomain)) {
                         $message = config('expose.admin.messages.subdomain_reserved');
                         $message = str_replace(':subdomain', $subdomain, $message);
 
