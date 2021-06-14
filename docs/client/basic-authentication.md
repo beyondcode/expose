@@ -7,7 +7,7 @@ order: 2
 
 Expose allows you to share your local sites with custom basic authentication credentials.
 
-This can be useful, if you have a static subdomain that you share with someone else, for example a client, and you want to provide some additional security to it. Before someone can access your shared site, they need to provide the correct credentials.
+This is useful, if you have a static subdomain that you share with someone else, for example a client, and you want to provide some additional security to it. Before someone can access your shared site, they need to provide the correct credentials.
 
 > **Warning**: You can not add basic authentication to a website that already uses basic authentication.
 
