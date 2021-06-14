@@ -316,6 +316,50 @@ class TunnelTest extends TestCase
     }
 
     /** @test */
+    public function it_allows_users_that_both_have_the_same_reserved_subdomain()
+    {
+        $this->app['config']['expose.admin.validate_auth_tokens'] = true;
+
+        $user = $this->createUser([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $user = $this->createUser([
+            'name' => 'Test-User',
+            'can_specify_subdomains' => 1,
+        ]);
+
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/subdomains', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'subdomain' => 'reserved',
+            'auth_token' => $user->auth_token,
+        ])));
+
+        $this->createTestHttpServer();
+        /**
+         * We create an expose client that connects to our server and shares
+         * the created test HTTP server.
+         */
+        $client = $this->createClient();
+        $response = $this->await($client->connectToServer('127.0.0.1:8085', 'reserved', null, $user->auth_token));
+
+        $this->assertSame('reserved', $response->subdomain);
+    }
+
+    /** @test */
     public function it_rejects_users_that_want_to_use_a_reserved_subdomain_on_a_custom_domain()
     {
         $this->app['config']['expose.admin.validate_auth_tokens'] = true;

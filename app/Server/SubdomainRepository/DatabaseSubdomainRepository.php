@@ -73,6 +73,22 @@ class DatabaseSubdomainRepository implements SubdomainRepository
         return $deferred->promise();
     }
 
+    public function getSubdomainsByNameAndDomain(string $name, string $domain): PromiseInterface
+    {
+        $deferred = new Deferred();
+
+        $this->database
+            ->query('SELECT * FROM subdomains WHERE subdomain = :name AND domain = :domain', [
+                'name' => $name,
+                'domain' => $domain,
+            ])
+            ->then(function (Result $result) use ($deferred) {
+                $deferred->resolve($result->rows);
+            });
+
+        return $deferred->promise();
+    }
+
     public function getSubdomainsByUserId($id): PromiseInterface
     {
         $deferred = new Deferred();
