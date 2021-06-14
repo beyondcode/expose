@@ -29,11 +29,13 @@ For example:
 ~/Sites/api.my-site/ expose
 ```
 
+If you are using the Expose network on the free plan, you get a random subdomain on every connect. You can upgrade to Expose Pro and use custom subdomains as if you'd host your own server.
+
 ## Sharing a local site explicitly
 
-If you want to explicitly share a local URL, without going into a specific folder first, you can do this by using the `expose share` command.
+If your local sites are not available at `foldername.test` you can explicitly share a local URL, without going into a specific folder first. You can do this by using the `expose share` command and specify the domain directly.
 
-> By default, this command will generate a unique subdomain for the shared URL.
+This is required when sharing sites that have HTTPS locally or Expose can't map local directory names to URLs automatically.
 
 ```bash
 # Will share access to http://192.168.2.100 using a randomly generated subdomain

@@ -5,7 +5,7 @@ order: 1
 
 # Installation
  
-Expose is a PHP package and you can install the client for your local machine as a global composer dependency:
+Expose is a PHP application and you can install the client for your local machine as a global composer dependency:
 
 ```bash
 composer global require beyondcode/expose
