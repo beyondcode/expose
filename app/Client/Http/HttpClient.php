@@ -86,7 +86,7 @@ class HttpClient
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)
     {
         (new Browser($this->loop, $this->createConnector()))
-            ->withFollowRedirects(true)
+            ->withFollowRedirects(false)
             ->withRejectErrorResponse(false)
             ->requestStreaming(
                 $request->getMethod(),
