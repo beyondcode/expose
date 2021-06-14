@@ -275,7 +275,7 @@ class ControlMessageController implements MessageComponentInterface
 
             $this->domainRepository
                 ->getDomainsByUserId($user['id'])
-                ->then(function ($domains) use ($connection, $deferred , $serverHost) {
+                ->then(function ($domains) use ($connection, $deferred, $serverHost) {
                     $userDomain = collect($domains)->first(function ($domain) use ($serverHost) {
                         return strtolower($domain['domain']) === strtolower($serverHost);
                     });
