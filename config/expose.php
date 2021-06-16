@@ -32,7 +32,7 @@ return [
     | if available.
     |
     */
-    'server_endpoint' => 'https://beyondco.de/api/expose/servers',
+    'server_endpoint' => 'https://expose.beyondco.de/api/expose/servers',
 
     /*
     |--------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 
 namespace App\Server\Connections;
 
+use App\Http\QueryParameters;
 use Evenement\EventEmitterTrait;
 use Ratchet\ConnectionInterface;
 
@@ -16,6 +17,7 @@ class ControlConnection
     public $authToken;
     public $subdomain;
     public $client_id;
+    public $client_version;
     public $proxies = [];
     protected $shared_at;
 
@@ -28,6 +30,7 @@ class ControlConnection
         $this->authToken = $authToken;
         $this->serverHost = $serverHost;
         $this->shared_at = now()->toDateTimeString();
+        $this->client_version = QueryParameters::create($socket->httpRequest)->get('version');
     }
 
     public function setMaximumConnectionLength(int $maximumConnectionLength)
@@ -65,6 +68,7 @@ class ControlConnection
             'host' => $this->host,
             'server_host' => $this->serverHost,
             'client_id' => $this->client_id,
+            'client_version' => $this->client_version,
             'auth_token' => $this->authToken,
             'subdomain' => $this->subdomain,
             'shared_at' => $this->shared_at,

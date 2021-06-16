@@ -77,9 +77,11 @@ class Client
         $deferred = new Deferred();
         $promise = $deferred->promise();
 
+        $exposeVersion = config('app.version');
+
         $wsProtocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
 
-        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
+        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}&version={$exposeVersion}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $serverHost, $deferred, $authToken) {
