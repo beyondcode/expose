@@ -72,8 +72,8 @@ class SetDefaultDomainCommand extends Command
 
         $nodeFinder = new NodeFinder;
 
-        $defaultDomainNode = $nodeFinder->findFirst($newStmts, function(Node $node) {
-            return ($node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_domain');
+        $defaultDomainNode = $nodeFinder->findFirst($newStmts, function (Node $node) {
+            return $node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_domain';
         });
 
         if (is_null($defaultDomainNode)) {
