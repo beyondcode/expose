@@ -8,7 +8,6 @@ use App\Logger\RequestLogger;
 use Clue\React\Buzz\Browser;
 use GuzzleHttp\Psr7\Message;
 use function GuzzleHttp\Psr7\parse_request;
-use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
