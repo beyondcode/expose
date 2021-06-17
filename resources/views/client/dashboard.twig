@@ -2,7 +2,7 @@
 <head>
     <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-    <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
+    <script src="https://unpkg.com/tailwindcss-jit-cdn@1.2.0"></script>
     <script type="tailwind-config">
       {
         "darkMode": "class",
@@ -119,6 +119,12 @@
     <div class="pt-8 flex flex-col md:flex-row">
         <div class="w-full md:w-1/3 flex flex-col mr-5">
             <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                {% if user.can_specify_subdomains == 1 %}
+                    <p class="text-pink-500 font-medium pb-4 leading-loose">
+                        You are using Expose Free -
+                        <a class="underline" href="https://expose.beyondco.de">Upgrade now</a>
+                    </p>
+                {% endif %}
                 <div class="flex items-center pb-4 justify-between">
                     <span
                         @click.prevent="useDarkMode = !useDarkMode"

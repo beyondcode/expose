@@ -12,6 +12,7 @@ class DashboardController extends Controller
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
         $httpConnection->send(respond_html($this->getView($httpConnection, 'client.dashboard', [
+            'user' => Client::$user,
             'subdomains' => Client::$subdomains,
             'max_logs'=> config()->get('expose.max_logged_requests', 10),
         ])));

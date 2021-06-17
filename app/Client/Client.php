@@ -31,6 +31,7 @@ class Client
     /** @var int */
     protected $timeConnected = 0;
 
+    public static $user = [];
     public static $subdomains = [];
 
     public function __construct(LoopInterface $loop, Configuration $configuration, CliRequestLogger $logger)
@@ -119,6 +120,7 @@ class Client
                     $this->logger->line('');
 
                     static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";
+                    static::$user = $data->user;
 
                     $deferred->resolve($data);
                 });
