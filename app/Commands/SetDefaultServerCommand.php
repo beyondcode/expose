@@ -2,9 +2,7 @@
 
 namespace App\Commands;
 
-use App\Client\Support\DefaultDomainNodeVisitor;
 use App\Client\Support\DefaultServerNodeVisitor;
-use App\Client\Support\InsertDefaultDomainNodeVisitor;
 use App\Client\Support\InsertDefaultServerNodeVisitor;
 use Illuminate\Console\Command;
 use PhpParser\Lexer\Emulative;
@@ -72,8 +70,8 @@ class SetDefaultServerCommand extends Command
 
         $nodeFinder = new NodeFinder;
 
-        $defaultServerNode = $nodeFinder->findFirst($newStmts, function(Node $node) {
-            return ($node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_server');
+        $defaultServerNode = $nodeFinder->findFirst($newStmts, function (Node $node) {
+            return $node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_server';
         });
 
         if (is_null($defaultServerNode)) {

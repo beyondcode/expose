@@ -3,8 +3,6 @@
 namespace App\Commands;
 
 use App\Client\Support\ClearDomainNodeVisitor;
-use App\Client\Support\DefaultDomainNodeVisitor;
-use App\Client\Support\DefaultServerNodeVisitor;
 use App\Client\Support\InsertDefaultDomainNodeVisitor;
 use Illuminate\Console\Command;
 use PhpParser\Lexer\Emulative;
@@ -61,8 +59,8 @@ class ClearDefaultDomainCommand extends Command
 
         $nodeFinder = new NodeFinder;
 
-        $defaultDomainNode = $nodeFinder->findFirst($newStmts, function(Node $node) {
-            return ($node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_domain');
+        $defaultDomainNode = $nodeFinder->findFirst($newStmts, function (Node $node) {
+            return $node instanceof Node\Expr\ArrayItem && $node->key && $node->key->value === 'default_domain';
         });
 
         if (is_null($defaultDomainNode)) {
