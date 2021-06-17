@@ -348,6 +348,8 @@ return [
 
             'subdomain_taken' => 'The chosen subdomain :subdomain is already taken. Please choose a different subdomain.',
 
+            'subdomain_reserved' => 'The chosen subdomain :subdomain is not available. Please choose a different subdomain.',
+
             'custom_subdomain_unauthorized' => 'You are not allowed to specify custom subdomains. Please upgrade to Expose Pro. Assigning a random subdomain instead.',
 
             'custom_domain_unauthorized' => 'You are not allowed to use this custom domain.',
