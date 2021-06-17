@@ -14,7 +14,7 @@ class StoreAuthenticationTokenCommand extends Command
 {
     protected $signature = 'token {token?}';
 
-    protected $description = 'Set or retrieve the authentication token to use with expose.';
+    protected $description = 'Set or retrieve the authentication token to use with Expose.';
 
     public function handle()
     {

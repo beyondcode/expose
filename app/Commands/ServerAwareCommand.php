@@ -14,13 +14,13 @@ abstract class ServerAwareCommand extends Command
 {
     const DEFAULT_HOSTNAME = 'sharedwithexpose.com';
     const DEFAULT_PORT = 443;
-    const DEFAULT_SERVER_ENDPOINT = 'https://beyondco.de/api/expose/servers';
+    const DEFAULT_SERVER_ENDPOINT = 'https://expose.beyondco.de/api/servers';
 
     public function __construct()
     {
         parent::__construct();
 
-        $inheritedSignature = '{--server=default} {--server-host=} {--server-port=}';
+        $inheritedSignature = '{--server=} {--server-host=} {--server-port=}';
 
         $this->getDefinition()->addOptions(Parser::parse($inheritedSignature)[2]);
 
@@ -51,7 +51,7 @@ abstract class ServerAwareCommand extends Command
             return static::DEFAULT_HOSTNAME;
         }
 
-        $server = $this->option('server');
+        $server = $this->option('server') ?? config('expose.default_server');
         $host = config('expose.servers.'.$server.'.host');
 
         if (! is_null($host)) {
@@ -76,7 +76,7 @@ abstract class ServerAwareCommand extends Command
             return static::DEFAULT_PORT;
         }
 
-        $server = $this->option('server');
+        $server = $this->option('server') ?? config('expose.default_server');
         $host = config('expose.servers.'.$server.'.port');
 
         if (! is_null($host)) {

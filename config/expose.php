@@ -13,7 +13,7 @@ return [
     |
     */
     'servers' => [
-        'default' => [
+        'main' => [
             'host' => 'sharedwithexpose.com',
             'port' => 443,
         ],
@@ -32,7 +32,18 @@ return [
     | if available.
     |
     */
-    'server_endpoint' => 'https://expose.beyondco.de/api/expose/servers',
+    'server_endpoint' => 'https://expose.beyondco.de/api/servers',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Server
+    |--------------------------------------------------------------------------
+    |
+    | The default server from the servers array,
+    | or the servers endpoint above.
+    |
+    */
+    'default_server' => 'main',
 
     /*
     |--------------------------------------------------------------------------
@@ -59,6 +70,20 @@ return [
     |
     */
     'auth_token' => '',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Domain
+    |--------------------------------------------------------------------------
+    |
+    | The custom domain to use when sharing sites with Expose.
+    | You can register your own custom domain using Expose Pro
+    | Learn more at: https://expose.beyondco.de/docs/TODO
+    |
+    | > expose default-domain YOUR-CUSTOM-WHITELABEL-DOMAIN
+    |
+    */
+    'default_domain' => null,
 
     /*
     |--------------------------------------------------------------------------

@@ -26,6 +26,20 @@
                         </div>
                     </div>
                     <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+                        <label for="token"
+                               class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                            Token
+                        </label>
+                        <div class="mt-1 sm:mt-0 sm:col-span-2">
+                            <div class="max-w-lg flex rounded-md shadow-sm">
+                                <input id="token"
+                                       type="text"
+                                       v-model="userForm.token"
+                                       class="flex-1 border-gray-300 block w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
                         <label for="can_specify_subdomains"
                                class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
                             Can specify custom subdomains
@@ -205,6 +219,7 @@
                     search: '',
                     userForm: {
                         name: '',
+                        token: '',
                         can_specify_subdomains: true,
                         can_share_tcp_ports: true,
                         max_connections: 0,
@@ -262,6 +277,7 @@
                         }).then((data) => {
                             if (data.user) {
                                 this.userForm.name = '';
+                                this.userForm.token = '';
                                 this.userForm.can_specify_subdomains = true;
                                 this.userForm.can_share_tcp_ports = true;
                                 this.userForm.max_connections = 0;

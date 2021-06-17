@@ -23,6 +23,16 @@ class ShareCommand extends ServerAwareCommand
             config(['expose.dns' => empty($this->option('dns')) ? true : $this->option('dns')]);
         }
 
+        $domain = config('expose.default_domain');
+
+        if (! is_null($this->option('server'))) {
+            $domain = null;
+        }
+
+        if (! is_null($this->option('domain'))) {
+            $domain = $this->option('domain');
+        }
+
         (new Factory())
             ->setLoop(app(LoopInterface::class))
             ->setHost($this->getServerHost())
@@ -32,7 +42,7 @@ class ShareCommand extends ServerAwareCommand
             ->share(
                 $this->argument('host'),
                 explode(',', $this->option('subdomain')),
-                $this->option('domain')
+                $domain
             )
             ->createHttpServer()
             ->run();
