@@ -313,6 +313,10 @@ return [
         |
         */
         'messages' => [
+            'resolve_connection_message' => function ($connectionInfo, $user) {
+                return config('expose.admin.messages.message_of_the_day');
+            },
+
             'message_of_the_day' => 'Thank you for using expose.',
 
             'invalid_auth_token' => 'Authentication failed. Please check your authentication token and try again.',

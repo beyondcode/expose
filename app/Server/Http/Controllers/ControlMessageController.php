@@ -156,7 +156,7 @@ class ControlMessageController implements MessageComponentInterface
             ->then(function () use ($connection, $data, $user) {
                 return $this->hasValidSubdomain($connection, $data->subdomain, $user, $data->server_host);
             })
-            ->then(function ($subdomain) use ($data, $connection) {
+            ->then(function ($subdomain) use ($data, $connection, $user) {
                 if ($subdomain === false) {
                     return;
                 }
@@ -170,7 +170,7 @@ class ControlMessageController implements MessageComponentInterface
                 $connection->send(json_encode([
                     'event' => 'authenticated',
                     'data' => [
-                        'message' => config('expose.admin.messages.message_of_the_day'),
+                        'message' => config('expose.admin.messages.resolve_connection_message')($connectionInfo, $user),
                         'subdomain' => $connectionInfo->subdomain,
                         'server_host' => $connectionInfo->serverHost,
                         'client_id' => $connectionInfo->client_id,

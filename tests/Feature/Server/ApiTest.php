@@ -498,6 +498,53 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_can_return_site_details()
+    {
+        /** @var ConnectionManager $connectionManager */
+        $connectionManager = app(ConnectionManager::class);
+
+        $connection = \Mockery::mock(IoConnection::class);
+        $connection->httpRequest = new Request('GET', '/?authToken=some-token');
+
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', 'localhost', $connection);
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites/fixed-subdomain.localhost', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+
+        $site = json_decode($response->getBody()->getContents());
+
+        $this->assertSame('some-host.test', $site->host);
+        $this->assertSame('some-token', $site->auth_token);
+        $this->assertSame('fixed-subdomain', $site->subdomain);
+    }
+
+    /** @test */
+    public function it_returns_404_for_invalid_site_details()
+    {
+        /** @var ConnectionManager $connectionManager */
+        $connectionManager = app(ConnectionManager::class);
+
+        $connection = \Mockery::mock(IoConnection::class);
+        $connection->httpRequest = new Request('GET', '/?authToken=some-token');
+
+        $connectionManager->storeConnection('some-host.test', 'fixed-subdomain', 'localhost', $connection);
+
+        $this->expectException(ResponseException::class);
+        $this->expectExceptionMessage('HTTP status code 404 (Not Found)');
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/sites/invalid-subdomain.localhost', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+    }
+
+    /** @test */
     public function it_can_list_all_currently_connected_sites_without_auth_tokens()
     {
         /** @var ConnectionManager $connectionManager */
