@@ -2,7 +2,6 @@
 
 namespace App\Commands;
 
-
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LaravelZero\Framework\Commands\Command;
