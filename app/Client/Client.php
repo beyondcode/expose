@@ -147,8 +147,9 @@ class Client
         $promise = $deferred->promise();
 
         $wsProtocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
+        $exposeVersion = config('app.version');
 
-        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}", [], [
+        connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}&version={$exposeVersion}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $clientConnection) use ($port, $deferred, $authToken) {
