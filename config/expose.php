@@ -32,7 +32,7 @@ return [
     | if available.
     |
     */
-    'server_endpoint' => 'https://expose.beyondco.de/api/servers',
+    'server_endpoint' => 'https://expose.dev/api/servers',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
     |
     | The custom domain to use when sharing sites with Expose.
     | You can register your own custom domain using Expose Pro
-    | Learn more at: https://expose.beyondco.de/docs/TODO
+    | Learn more at: https://expose.dev/docs/TODO
     |
     | > expose default-domain YOUR-CUSTOM-WHITELABEL-DOMAIN
     |

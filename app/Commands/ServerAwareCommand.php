@@ -14,7 +14,7 @@ abstract class ServerAwareCommand extends Command
 {
     const DEFAULT_HOSTNAME = 'sharedwithexpose.com';
     const DEFAULT_PORT = 443;
-    const DEFAULT_SERVER_ENDPOINT = 'https://expose.beyondco.de/api/servers';
+    const DEFAULT_SERVER_ENDPOINT = 'https://expose.dev/api/servers';
 
     public function __construct()
     {
