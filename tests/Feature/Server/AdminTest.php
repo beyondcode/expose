@@ -18,8 +18,6 @@ class AdminTest extends TestCase
     /** @var Factory */
     protected $serverFactory;
 
-    protected $port = 8090;
-
     public function setUp(): void
     {
         parent::setUp();
@@ -46,7 +44,7 @@ class AdminTest extends TestCase
         $this->expectExceptionMessage(401);
 
         /** @var ResponseInterface $response */
-        $this->await($this->browser->get('http://127.0.0.1:'.$this->port, [
+        $this->await($this->browser->get('http://127.0.0.1:8080', [
             'Host' => 'expose.localhost',
         ]));
     }
@@ -55,7 +53,7 @@ class AdminTest extends TestCase
     public function it_accepts_valid_credentials()
     {
         /** @var ResponseInterface $response */
-        $response = $this->await($this->browser->get('http://127.0.0.1:'.$this->port, [
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
         ]));
@@ -68,7 +66,7 @@ class AdminTest extends TestCase
         $this->app['config']['expose.admin.validate_auth_tokens'] = false;
 
         /** @var ResponseInterface $response */
-        $this->await($this->browser->post('http://127.0.0.1:'.$this->port.'/api/settings', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/settings', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -83,7 +81,7 @@ class AdminTest extends TestCase
     public function it_can_create_users()
     {
         /** @var Response $response */
-        $response = $this->await($this->browser->post('http://127.0.0.1:'.$this->port.'/api/users', [
+        $response = $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -101,7 +99,7 @@ class AdminTest extends TestCase
     public function it_can_delete_users()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:'.$this->port.'/api/users', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -109,7 +107,7 @@ class AdminTest extends TestCase
             'name' => 'Marcel',
         ])));
 
-        $this->await($this->browser->delete('http://127.0.0.1:'.$this->port.'/api/users/1', [
+        $this->await($this->browser->delete('http://127.0.0.1:8080/api/users/1', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -122,7 +120,7 @@ class AdminTest extends TestCase
     public function it_can_list_all_users()
     {
         /** @var Response $response */
-        $this->await($this->browser->post('http://127.0.0.1:'.$this->port.'/api/users', [
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -131,7 +129,7 @@ class AdminTest extends TestCase
         ])));
 
         /** @var Response $response */
-        $response = $this->await($this->browser->get('http://127.0.0.1:'.$this->port.'/users', [
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
             'Content-Type' => 'application/json',
@@ -144,7 +142,6 @@ class AdminTest extends TestCase
 
     protected function startServer()
     {
-        $this->port++;
         $this->app['config']['expose.admin.subdomain'] = 'expose';
         $this->app['config']['expose.admin.database'] = ':memory:';
 
@@ -152,16 +149,9 @@ class AdminTest extends TestCase
             'username' => 'secret',
         ];
 
-        try {
-            $this->serverFactory->getSocket()->close();
-        } catch (\Throwable $e) {
-            //
-        }
-
         $this->serverFactory = new Factory();
 
         $this->serverFactory->setLoop($this->loop)
-            ->setPort($this->port)
             ->createServer();
     }
 }
