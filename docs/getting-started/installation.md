@@ -6,7 +6,7 @@ order: 1
 # Installation
 
 ## PHP Archive (PHAR)
-We distribute Expose as a PHAR archive that contains everytrhing you need in order to use Expose. Simply download it from [here]() and make it executable:
+We distribute Expose as a PHAR archive that contains everything you need in order to use Expose. Simply download it from [here]() and make it executable:
 
 ```
 wget -O expose https://link-to-expose
@@ -16,7 +16,7 @@ chmod +x expose
 ./expose
 ```
 
-Most likely, you want to put the `expose.phar` into a directory on your `PATH`, so you can simply call expose from any directory. For example:
+You most likely want to put the `expose.phar` into a directory on your `PATH`, so you can simply call expose from any directory. For example:
 
 ```
 sudo mv expose.phar /usr/local/bin/expose

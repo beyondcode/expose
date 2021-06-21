@@ -19,6 +19,6 @@ This will download and install the latest version of Expose. Your existing authe
 
 ## Upgrading to Expose ::pro
 
-Some of the Expose features are no longer available on our free server, such as custom subdomains, or the newly added TCP port sharing. 
+Some Expose features are not available on our free server and require self-hosting or a Pro plan. These features include custom subdomains, or the newly added sharing of TCP ports. 
 
-If you want to upgrade your existing authentication token to Expose Pro, please [create a new Expose account](/register) where you will receive a fresh authentication token and can then upgrade to Expose Pro.
+If you want to upgrade your existing setup to Expose Pro, please [create a new Expose account](/register) and you get a new authentication token that can upgrade to Expose Pro.
