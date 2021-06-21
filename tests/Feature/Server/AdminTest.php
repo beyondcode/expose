@@ -18,6 +18,8 @@ class AdminTest extends TestCase
     /** @var Factory */
     protected $serverFactory;
 
+    protected $port = 8090;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -142,7 +144,7 @@ class AdminTest extends TestCase
 
     protected function startServer()
     {
-        $this->port = rand(8080, 9000);
+        $this->port++;
         $this->app['config']['expose.admin.subdomain'] = 'expose';
         $this->app['config']['expose.admin.database'] = ':memory:';
 
