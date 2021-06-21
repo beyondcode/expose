@@ -120,7 +120,7 @@ class Client
                     $this->logger->line('');
 
                     static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";
-                    static::$user = $data->user;
+                    static::$user = $data->user ?? ['can_specify_subdomains' => 0];
 
                     $deferred->resolve($data);
                 });
