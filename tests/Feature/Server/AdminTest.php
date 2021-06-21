@@ -34,6 +34,8 @@ class AdminTest extends TestCase
     {
         $this->serverFactory->getSocket()->close();
 
+        sleep(0.5);
+
         parent::tearDown();
     }
 

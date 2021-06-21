@@ -50,6 +50,8 @@ class TunnelTest extends TestCase
             $this->testTcpServer->close();
         }
 
+        sleep(0.5);
+
         parent::tearDown();
     }
 
