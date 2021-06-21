@@ -2,8 +2,8 @@
 
 namespace App\Commands;
 
-use Illuminate\Support\Str;
 use App\Client\Factory;
+use Illuminate\Support\Str;
 use React\EventLoop\LoopInterface;
 
 class ShareCommand extends ServerAwareCommand
