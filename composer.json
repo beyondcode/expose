@@ -1,7 +1,7 @@
 {
     "name": "beyondcode/expose",
     "type": "project",
-    "description": "Expose",
+    "description": "Create public URLs for local sites through any firewall and VPN.",
     "keywords": [
         "expose",
         "tunnel",
