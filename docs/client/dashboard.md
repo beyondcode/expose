@@ -1,6 +1,6 @@
 ---
-title: Dashboard
-order: 5
+title: Local Dashboard
+order: 2
 ---
 
 # Dashboard

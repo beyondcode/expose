@@ -5,34 +5,29 @@ order: 2
 
 # Share your first site
 
-If you are on macOS and use Laravel Valet as your local development environment, the easiest way to share your local sites is by going into the folder that you want to share and run the `expose` command from your command line:
+Once your authentication token is setup, you are ready to share your first site with Expose.
+Expose creates a tunnel between your local development URLs/HTTP server and a publicly available web server.
+
+The easiest way to share your local URLs is by calling `expose share` followed by the local URL that you want to share:
 
 ```bash
-cd ~/Sites/my-awesome-project/
+# Will share access to http://192.168.2.100
+expose share http://localhost:3000
 
-expose
+# Will share access to http://my-local-site.dev
+expose share my-local-site.dev
 ```
 
-The `expose` command assumes that your local site is available at `http://my-awesome-project.test`.
-
-This command uses your Expose network token and connects to the Expose network server at sharedwithexpose.com and creates a tunnel. If you don't have an Expose token and don't want to host your own server, you can create a free account and get a token [here](https://beyondco.de/login). 
-
-If you run a different operating system or your local application runs in a virtual machine, Docker or uses a custom URL scheme, you can share the site by adding more parameters to the command. To learn more about sharing your local sites, check out the [sharing local sites](/docs/expose/client/sharing) documentation.
-
-## Using the Expose network at sharedwithexpose.com
-
-Expose is the only open source tunnel service that is written in PHP. This means that you can host your own server and this on its own makes it a fantastic alternative to ngrok.
-
-Before you install your own server, you can try Expose with the free plan of the Expose network and see if your like the features for PHP developers. To access the Expose network, you need an Expose token.
-
-You can obtain a token by signing in to your [Beyond Code account](https://beyondco.de/login). If you don't have an account, you can [sign up and create an account](https://beyondco.de/register) for free.
-
-## Authenticating with sharedwithexpose.com
-
-To register and use the given credentials, just run the following command:
+By default, Expose assumes that you want to share unenecrypted local traffic through HTTP. If you want to share a local HTTPS URL append the protocol to the url, like this:
 
 ```bash
-expose token [YOUR-AUTH-TOKEN]
+# Will share access to https://my-local-site.dev 
+# Note the https for tunneling locally encrypted sites
+expose share https://my-local-site.dev
 ```
 
-This will register the token globally in your expose configuration file and all following Expose calls will automatically use the token to authenticate with the network. In case that you have access to a team on an Expose Pro plan, you can use this command to switch to the team and get access to the reserved subdomains or white label domains. 
+## Custom Subdomains ::pro
+
+To make your life easier, Expose tries to share your local URLs using custom subdomains. This allows you to share your local URL `my-local-site.dev` as `my-local-site.us-1.sharedwithexpose.com`.
+
+By default, Expose uses a slugified version of the URL that you want to share, but you can also [choose your own custom subdomain](/docs/client/sharing#share-a-local-site-with-a-given-subdomain).

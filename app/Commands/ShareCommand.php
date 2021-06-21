@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use Illuminate\Support\Str;
 use App\Client\Factory;
 use React\EventLoop\LoopInterface;
 
@@ -33,6 +34,16 @@ class ShareCommand extends ServerAwareCommand
             $domain = $this->option('domain');
         }
 
+        if (! is_null($this->option('subdomain'))) {
+            $subdomains = explode(',', $this->option('subdomain'));
+            $this->info('Trying to use custom domain: '.$subdomains[0]);
+        } else {
+            $host = Str::beforeLast($this->argument('host'), '.');
+            $host = Str::beforeLast($host, ':');
+            $subdomains = [Str::slug($host)];
+            $this->info('Trying to use custom domain: '.$subdomains[0].PHP_EOL);
+        }
+
         (new Factory())
             ->setLoop(app(LoopInterface::class))
             ->setHost($this->getServerHost())
@@ -41,7 +52,7 @@ class ShareCommand extends ServerAwareCommand
             ->createClient()
             ->share(
                 $this->argument('host'),
-                explode(',', $this->option('subdomain')),
+                $subdomains,
                 $domain
             )
             ->createHttpServer()

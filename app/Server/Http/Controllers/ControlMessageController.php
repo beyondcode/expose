@@ -312,7 +312,7 @@ class ControlMessageController implements MessageComponentInterface
          */
         if (! is_null($user) && $user['can_specify_subdomains'] === 0 && ! is_null($subdomain)) {
             $connection->send(json_encode([
-                'event' => 'info',
+                'event' => 'error',
                 'data' => [
                     'message' => config('expose.admin.messages.custom_subdomain_unauthorized').PHP_EOL,
                 ],

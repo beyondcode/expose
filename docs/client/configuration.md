@@ -1,6 +1,6 @@
 ---
 title: Configuration
-order: 3
+order: 6
 ---
 
 # Configuration

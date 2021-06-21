@@ -38,17 +38,17 @@ If your local sites are not available at `foldername.test` you can explicitly sh
 This is required when sharing sites that have HTTPS locally or Expose can't map local directory names to URLs automatically.
 
 ```bash
-# Will share access to http://192.168.2.100 using a randomly generated subdomain
+# Will share access to http://192.168.2.100
 expose share http://192.168.2.100
 
-# Will share access to http://my-local-site.dev using a randomly generated subdomain
+# Will share access to http://my-local-site.dev
 expose share my-local-site.dev
 
-# Will share access to https://my-local-site.dev using a randomly generated subdomain (note the https)
+# Will share access to https://my-local-site.dev
 expose share https://my-local-site.dev
 ```
 
-## Share a local site with a given subdomain
+## Share a local site with a given subdomain ::pro
 
 You can also share one of your local sites explicitly and specify the exact subdomain that you want to use when sharing the site. This is very useful if you are testing webhooks and want to use the same webhook configuration and don't update the webhook endpoints on every Expose connect. Custom subdomains require an own Expose server in your infrastructure or Expose Pro.
 

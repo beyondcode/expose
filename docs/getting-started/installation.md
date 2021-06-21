@@ -4,14 +4,39 @@ order: 1
 ---
 
 # Installation
+
+## PHP Archive (PHAR)
+We distribute Expose as a PHAR archive that contains everytrhing you need in order to use Expose. Simply download it from [here]() and make it executable:
+
+```
+wget -O expose https://link-to-expose
+
+chmod +x expose
+
+./expose
+```
+
+Most likely, you want to put the `expose.phar` into a directory on your `PATH`, so you can simply call expose from any directory. For example:
+
+```
+sudo mv expose.phar /usr/local/bin/expose
+```
+
+After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
  
+## Via Composer
 Expose is a PHP application and you can install the client for your local machine as a global composer dependency:
 
 ```bash
 composer global require beyondcode/expose
 ```
 
-After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
+Make sure that your global composer directory is inside of your `PATH` environment variable.
+Simply add this directory to your `PATH` in your `~/.bash_profile` (or `~/.bashrc`) like this:
+
+```
+export PATH=~/.composer/vendor/bin:$PATH
+```
 
 ## As a docker container
 

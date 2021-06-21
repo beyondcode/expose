@@ -203,6 +203,10 @@ class Client
             $this->logger->info($data->message);
         });
 
+        $connection->on('warning', function ($data) {
+            $this->logger->warn($data->message);
+        });
+
         $connection->on('error', function ($data) {
             $this->logger->error($data->message);
         });

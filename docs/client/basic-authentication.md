@@ -1,6 +1,6 @@
 ---
 title: Basic Authentication
-order: 2
+order: 4
 ---
 
 # Sharing sites with basic authentication
