@@ -27,12 +27,6 @@ class AdminTest extends TestCase
             'followRedirects' => false,
         ]);
 
-        try {
-            $this->serverFactory->getSocket()->close();
-        } catch (\Throwable $e) {
-            //
-        }
-
         $this->startServer();
     }
 
@@ -69,8 +63,6 @@ class AdminTest extends TestCase
     /** @test */
     public function it_allows_saving_settings()
     {
-        $this->serverFactory->getSocket()->close();
-
         $this->app['config']['expose.admin.validate_auth_tokens'] = false;
 
         /** @var ResponseInterface $response */
