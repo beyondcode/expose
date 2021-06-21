@@ -27,6 +27,12 @@ class AdminTest extends TestCase
             'followRedirects' => false,
         ]);
 
+        try {
+            $this->serverFactory->getSocket()->close();
+        } catch (\Throwable $e) {
+            //
+        }
+
         $this->startServer();
     }
 
