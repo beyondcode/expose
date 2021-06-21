@@ -23,7 +23,7 @@
     "require-dev": {
         "cboden/ratchet": "^0.4.3",
         "clue/block-react": "^1.4",
-        "clue/buzz-react": "^2.7",
+        "clue/buzz-react": "^2.9",
         "clue/reactphp-sqlite": "dev-modular-worker-for-phar-support",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/psr7": "^1.7",

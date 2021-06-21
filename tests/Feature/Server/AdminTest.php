@@ -149,6 +149,12 @@ class AdminTest extends TestCase
             'username' => 'secret',
         ];
 
+        try {
+            $this->serverFactory->getSocket()->close();
+        } catch (\Throwable $e) {
+            //
+        }
+
         $this->serverFactory = new Factory();
 
         $this->serverFactory->setLoop($this->loop)
