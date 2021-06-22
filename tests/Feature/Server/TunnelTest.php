@@ -50,7 +50,7 @@ class TunnelTest extends TestCase
             $this->testTcpServer->close();
         }
 
-        sleep(0.5);
+        $this->await(\React\Promise\Timer\resolve(0.2, $this->loop));
 
         parent::tearDown();
     }

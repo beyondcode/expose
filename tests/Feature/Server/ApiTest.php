@@ -35,6 +35,8 @@ class ApiTest extends TestCase
     {
         $this->serverFactory->getSocket()->close();
 
+        $this->await(\React\Promise\Timer\resolve(0.2, $this->loop));
+
         parent::tearDown();
     }
 
