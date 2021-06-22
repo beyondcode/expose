@@ -10,7 +10,7 @@ A completely open-source ngrok alternative - written in pure PHP.
 
 ## Documentation
 
-For installation instructions, in-depth usage and deployment details, please take a look at the [official documentation](https://beyondco.de/docs/expose/).
+For installation instructions, in-depth usage and deployment details, please take a look at the [official documentation](https://expose.dev/docs).
 
 ### Security
 
