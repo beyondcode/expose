@@ -31,6 +31,9 @@ class Client
     /** @var int */
     protected $timeConnected = 0;
 
+    /** @var bool */
+    protected $shouldExit = true;
+
     public static $user = [];
     public static $subdomains = [];
 
@@ -39,6 +42,11 @@ class Client
         $this->loop = $loop;
         $this->configuration = $configuration;
         $this->logger = $logger;
+    }
+
+    public function shouldExit($shouldExit = true)
+    {
+        $this->shouldExit = $shouldExit;
     }
 
     public function share(string $sharedUrl, array $subdomains = [], $serverHost = null)
@@ -237,7 +245,9 @@ class Client
         $deferred->reject();
 
         $this->loop->futureTick(function () {
-            exit(1);
+            if ($this->shouldExit) {
+                exit(1);
+            }
         });
     }
 

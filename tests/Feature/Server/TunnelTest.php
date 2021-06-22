@@ -156,19 +156,6 @@ class TunnelTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_tcp_sharing_if_disabled()
-    {
-        $this->createTestTcpServer();
-
-        $this->app['config']['expose.admin.allow_tcp_port_sharing'] = false;
-
-        $this->expectException(\UnexpectedValueException::class);
-
-        $client = $this->createClient();
-        $this->await($client->connectToServerAndShareTcp(8085));
-    }
-
-    /** @test */
     public function it_rejects_tcp_sharing_if_forbidden()
     {
         $this->createTestTcpServer();
@@ -707,7 +694,9 @@ class TunnelTest extends TestCase
             ->setPort(8080)
             ->createClient();
 
-        return app(Client::class);
+        $client = app(Client::class);
+        $client->shouldExit(false);
+        return $client;
     }
 
     protected function createUser(array $data)
