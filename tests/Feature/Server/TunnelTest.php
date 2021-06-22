@@ -696,6 +696,7 @@ class TunnelTest extends TestCase
 
         $client = app(Client::class);
         $client->shouldExit(false);
+
         return $client;
     }
 
