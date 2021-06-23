@@ -9,6 +9,7 @@ services:
       domain: ${DOMAIN}
       username: ${ADMIN_USERNAME}
       password: ${ADMIN_PASSWORD}
+      token: ${TOKEN}
     restart: always
     volumes:
       - ./database/expose.db:/root/.expose
