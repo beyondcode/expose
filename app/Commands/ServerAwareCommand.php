@@ -89,7 +89,9 @@ abstract class ServerAwareCommand extends Command
     protected function lookupRemoteServers()
     {
         try {
-            return Http::get(config('expose.server_endpoint', static::DEFAULT_SERVER_ENDPOINT))->json();
+            return Http::withOptions([
+                'verify' => false,
+            ])->get(config('expose.server_endpoint', static::DEFAULT_SERVER_ENDPOINT))->json();
         } catch (\Throwable $e) {
             return [];
         }
