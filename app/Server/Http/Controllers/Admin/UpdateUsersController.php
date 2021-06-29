@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Ratchet\ConnectionInterface;
 
-class StoreUsersController extends AdminController
+class UpdateUsersController extends AdminController
 {
     protected $keepConnectionOpen = true;
 
