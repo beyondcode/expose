@@ -87,6 +87,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Subdomain
+    |--------------------------------------------------------------------------
+    |
+    | The custom subdomain to use when sharing sites with Expose.
+    | You can reserve subdomains using Expose Pro.
+    | Learn more at: https://expose.dev/get-pro
+    |
+    */
+    'default_subdomain' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default TLD
     |--------------------------------------------------------------------------
     |

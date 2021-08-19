@@ -25,6 +25,7 @@ class ShareCommand extends ServerAwareCommand
         }
 
         $domain = config('expose.default_domain');
+        $subdomain = config('expose.default_subdomain');
 
         if (! is_null($this->option('server'))) {
             $domain = null;
@@ -36,13 +37,15 @@ class ShareCommand extends ServerAwareCommand
 
         if (! is_null($this->option('subdomain'))) {
             $subdomains = explode(',', $this->option('subdomain'));
-            $this->info('Trying to use custom domain: '.$subdomains[0]);
+        } elseif (! is_null($subdomain)) {
+            $subdomains = [$subdomain];
         } else {
             $host = Str::beforeLast($this->argument('host'), '.');
             $host = Str::beforeLast($host, ':');
             $subdomains = [Str::slug($host)];
-            $this->info('Trying to use custom domain: '.$subdomains[0].PHP_EOL);
         }
+
+        $this->info('Trying to use custom domain: '.$subdomains[0].PHP_EOL);
 
         (new Factory())
             ->setLoop(app(LoopInterface::class))
