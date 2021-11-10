@@ -35,6 +35,7 @@ class Router implements HttpServerInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws \UnexpectedValueException If a controller is not \Ratchet\Http\HttpServerInterface
      */
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
