@@ -37,7 +37,7 @@ class DatabaseLogger implements LoggerRepository
 
     public function cleanOldLogs()
     {
-        $this->database->query("DELETE FROM logs WHERE created_at < date('now', '-10 day')");
+        $this->database->query("DELETE FROM logs WHERE created_at < date('now', '-30 day')");
     }
 
     public function getLogsBySubdomain($subdomain): PromiseInterface
