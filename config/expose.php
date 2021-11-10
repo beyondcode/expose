@@ -327,6 +327,8 @@ return [
 
         'subdomain_repository' => \App\Server\SubdomainRepository\DatabaseSubdomainRepository::class,
 
+        'logger_repository' => \App\Server\LoggerRepository\NullLogger::class,
+
         /*
         |--------------------------------------------------------------------------
         | Messages

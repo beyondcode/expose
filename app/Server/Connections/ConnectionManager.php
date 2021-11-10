@@ -7,6 +7,7 @@ use App\Contracts\StatisticsCollector;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
 use App\Server\Exceptions\NoFreePortAvailable;
+use App\Contracts\LoggerRepository;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\Server;
@@ -28,11 +29,15 @@ class ConnectionManager implements ConnectionManagerContract
     /** @var StatisticsCollector */
     protected $statisticsCollector;
 
-    public function __construct(SubdomainGenerator $subdomainGenerator, StatisticsCollector $statisticsCollector, LoopInterface $loop)
+    /** @var LoggerRepository */
+    protected $logger;
+
+    public function __construct(SubdomainGenerator $subdomainGenerator, StatisticsCollector $statisticsCollector, LoggerRepository $logger, LoopInterface $loop)
     {
         $this->subdomainGenerator = $subdomainGenerator;
         $this->loop = $loop;
         $this->statisticsCollector = $statisticsCollector;
+        $this->logger = $logger;
     }
 
     public function limitConnectionLength(ControlConnection $connection, int $maximumConnectionLength)
@@ -66,6 +71,8 @@ class ConnectionManager implements ConnectionManagerContract
         $this->connections[] = $storedConnection;
 
         $this->statisticsCollector->siteShared($this->getAuthTokenFromConnection($connection));
+
+        $this->logger->logSubdomain($storedConnection->authToken, $storedConnection->subdomain);
 
         return $storedConnection;
     }
