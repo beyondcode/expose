@@ -4,6 +4,7 @@ namespace App\Server;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
 use App\Contracts\DomainRepository;
+use App\Contracts\LoggerRepository;
 use App\Contracts\StatisticsCollector;
 use App\Contracts\StatisticsRepository;
 use App\Contracts\SubdomainGenerator;
@@ -39,7 +40,6 @@ use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
 use App\Server\Http\Router;
 use App\Server\LoggerRepository\NullLogger;
-use App\Contracts\LoggerRepository;
 use App\Server\StatisticsCollector\DatabaseStatisticsCollector;
 use App\Server\StatisticsRepository\DatabaseStatisticsRepository;
 use App\Server\SubdomainRepository\DatabaseSubdomainRepository;

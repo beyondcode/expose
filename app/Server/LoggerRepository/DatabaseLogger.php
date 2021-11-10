@@ -2,9 +2,9 @@
 
 namespace App\Server\LoggerRepository;
 
+use App\Contracts\LoggerRepository;
 use App\Contracts\UserRepository;
 use Clue\React\SQLite\DatabaseInterface;
-use App\Contracts\LoggerRepository;
 use Clue\React\SQLite\Result;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
@@ -45,7 +45,7 @@ class DatabaseLogger implements LoggerRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query("
+            ->query('
                 SELECT
                        logs.id AS log_id,
                        logs.subdomain,
@@ -53,7 +53,7 @@ class DatabaseLogger implements LoggerRepository
                 FROM logs
                 INNER JOIN users
                 ON users.id = logs.user_id
-                WHERE logs.subdomain = :subdomain", ['subdomain' => $subdomain])
+                WHERE logs.subdomain = :subdomain', ['subdomain' => $subdomain])
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
             });
@@ -66,14 +66,14 @@ class DatabaseLogger implements LoggerRepository
         $deferred = new Deferred();
 
         $this->database
-            ->query("
+            ->query('
                 SELECT
                        logs.id AS log_id,
                        logs.subdomain,
                        users.*
                 FROM logs
                 INNER JOIN users
-                ON users.id = logs.user_id")
+                ON users.id = logs.user_id')
             ->then(function (Result $result) use ($deferred) {
                 $deferred->resolve($result->rows);
             });

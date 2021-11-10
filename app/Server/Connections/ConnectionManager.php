@@ -3,11 +3,11 @@
 namespace App\Server\Connections;
 
 use App\Contracts\ConnectionManager as ConnectionManagerContract;
+use App\Contracts\LoggerRepository;
 use App\Contracts\StatisticsCollector;
 use App\Contracts\SubdomainGenerator;
 use App\Http\QueryParameters;
 use App\Server\Exceptions\NoFreePortAvailable;
-use App\Contracts\LoggerRepository;
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\Server;

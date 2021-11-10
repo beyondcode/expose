@@ -3,7 +3,6 @@
 namespace App\Server\Http\Controllers\Admin;
 
 use App\Contracts\LoggerRepository;
-use App\Contracts\UserRepository;
 use App\Server\Configuration;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
