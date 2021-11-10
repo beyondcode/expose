@@ -3,7 +3,6 @@
 namespace App\Server\LoggerRepository;
 
 use App\Contracts\LoggerRepository;
-use Clue\React\SQLite\DatabaseInterface;
 use React\Promise\PromiseInterface;
 
 class NullLogger implements LoggerRepository
