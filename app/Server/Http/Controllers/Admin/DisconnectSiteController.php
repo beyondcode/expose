@@ -22,7 +22,11 @@ class DisconnectSiteController extends AdminController
 
     public function handle(Request $request, ConnectionInterface $httpConnection)
     {
-        $connection = $this->connectionManager->findControlConnectionForClientId($request->get('id'));
+        if ($request->has('server_host')) {
+            $connection = $this->connectionManager->findControlConnectionForSubdomainAndServerHost($request->get('id'), $request->get('server_host'));
+        } else {
+            $connection = $this->connectionManager->findControlConnectionForClientId($request->get('id'));
+        }
 
         if (! is_null($connection)) {
             $connection->close();
