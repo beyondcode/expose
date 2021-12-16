@@ -14,7 +14,7 @@ abstract class AdminController extends Controller
     protected function shouldHandleRequest(Request $request, ConnectionInterface $httpConnection): bool
     {
         try {
-            $authorization = Str::after($request->header('Authorization'), 'Basic ');
+            $authorization = Str::after($request->header('Authorization', ''), 'Basic ');
             $authParts = explode(':', base64_decode($authorization), 2);
             [$user, $password] = $authParts;
 

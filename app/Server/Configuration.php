@@ -40,6 +40,7 @@ class Configuration implements \JsonSerializable
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return array_merge([

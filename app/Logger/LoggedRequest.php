@@ -49,6 +49,7 @@ class LoggedRequest implements \JsonSerializable
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $data = [

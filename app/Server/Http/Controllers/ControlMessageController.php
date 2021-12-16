@@ -332,7 +332,7 @@ class ControlMessageController implements MessageComponentInterface
                     });
 
                     if (count($foundSubdomains) > 0 && ! is_null($user) && is_null($ownSubdomain)) {
-                        $message = config('expose.admin.messages.subdomain_reserved');
+                        $message = config('expose.admin.messages.subdomain_reserved', '');
                         $message = str_replace(':subdomain', $subdomain, $message);
 
                         $connection->send(json_encode([

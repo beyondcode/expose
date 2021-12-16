@@ -19,7 +19,7 @@ define('LARAVEL_START', microtime(true));
 
 $autoloader = require file_exists(__DIR__.'/vendor/autoload.php') ?  __DIR__.'/vendor/autoload.php' : __DIR__.'/../../autoload.php';
 
-$options = getopt(null, [
+$options = getopt('', [
     'sqlite-worker',
 ]);
 if (isset($options['sqlite-worker'])) {

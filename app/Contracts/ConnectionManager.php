@@ -6,7 +6,7 @@ use App\Server\Connections\ControlConnection;
 use App\Server\Connections\HttpConnection;
 use Ratchet\ConnectionInterface;
 
-interface connectionmanager
+interface ConnectionManager
 {
     public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ConnectionInterface $connection): ControlConnection;
 
