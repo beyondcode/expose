@@ -2,6 +2,8 @@ version: "3.7"
 services:
   expose:
     image: beyondcodegmbh/expose-server:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - 8080:${PORT}
     environment:
