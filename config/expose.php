@@ -315,7 +315,7 @@ return [
             'webhook' => [
                 'url' => null,
                 'secret' => null,
-            ]
+            ],
         ],
 
         /*
