@@ -7,7 +7,7 @@ use Clue\React\Buzz\Browser;
 
 class WebHookConnectionCallback
 {
-    /** @var Browser  */
+    /** @var Browser */
     protected $browser;
 
     public function __construct(Browser $browser)
