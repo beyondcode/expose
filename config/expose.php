@@ -306,9 +306,17 @@ return [
         |
         | This is a callback method that will be called when a new connection is
         | established.
+        | The \App\Client\Callbacks\WebHookConnectionCallback::class is included out of the box.
         |
         */
         'connection_callback' => null,
+
+        'connection_callbacks' => [
+            'webhook' => [
+                'url' => null,
+                'secret' => null,
+            ]
+        ],
 
         /*
         |--------------------------------------------------------------------------
