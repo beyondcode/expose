@@ -74,7 +74,18 @@ class ConnectionManager implements ConnectionManagerContract
 
         $this->logger->logSubdomain($storedConnection->authToken, $storedConnection->subdomain);
 
+        $this->performConnectionCallback($storedConnection);
+
         return $storedConnection;
+    }
+
+    protected function performConnectionCallback(ControlConnection $connection)
+    {
+        $connectionCallback = config('expose.admin.connection_callback');
+
+        if ($connectionCallback !== null && class_exists($connectionCallback)) {
+            app($connectionCallback)->handle($connection);
+        }
     }
 
     public function storeTcpConnection(int $port, ConnectionInterface $connection): ControlConnection
