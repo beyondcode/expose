@@ -24,7 +24,7 @@
         "cboden/ratchet": "^0.4.3",
         "clue/block-react": "^1.4",
         "clue/buzz-react": "^2.9",
-        "clue/reactphp-sqlite": "dev-modular-worker-for-phar-support",
+        "clue/reactphp-sqlite": "^1.4",
         "guzzlehttp/guzzle": "^7.2",
         "guzzlehttp/psr7": "^1.7",
         "illuminate/log": "^8.0",
@@ -66,12 +66,6 @@
             "Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/seankndy/reactphp-sqlite"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "bin": [

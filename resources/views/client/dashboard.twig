@@ -2,9 +2,9 @@
 <head>
     <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-    <script src="https://unpkg.com/tailwindcss-jit-cdn@1.2.0"></script>
-    <script type="tailwind-config">
-      {
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
         "darkMode": "class",
         "theme": {
             "extend": {
@@ -15,7 +15,7 @@
         }
       }
     </script>
-    <style type="postcss">
+    <style type="text/tailwindcss">
         ::selection {
             @apply bg-pink-500 bg-opacity-50;
         }
