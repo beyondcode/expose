@@ -3,6 +3,7 @@
 namespace App\Logger;
 
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Message;
 use function GuzzleHttp\Psr7\parse_request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -173,7 +174,7 @@ class LoggedRequest implements \JsonSerializable
         return $postData;
     }
 
-    protected function detectSubdomain()
+    public function detectSubdomain()
     {
         return collect($this->parsedRequest->getHeaders()->toArray())
             ->mapWithKeys(function ($value, $key) {
@@ -212,6 +213,12 @@ class LoggedRequest implements \JsonSerializable
         } catch (\Throwable $e) {
             return '';
         }
+    }
+
+    public function getUrl()
+    {
+        $request = Message::parseRequest($this->rawRequest);
+        dd($request->getUri()->withFragment(''));
     }
 
     public function refreshId()
