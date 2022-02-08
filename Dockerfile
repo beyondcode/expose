@@ -1,4 +1,4 @@
-FROM php:7.4-cli
+FROM php:8.0-cli
 
 RUN apt-get update
 RUN apt-get install -y git libzip-dev zip
