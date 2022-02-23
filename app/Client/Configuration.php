@@ -6,7 +6,7 @@ class Configuration
 {
     /** @var string */
     protected $host;
-    
+
     /** @var string */
     protected $serverHost;
 
