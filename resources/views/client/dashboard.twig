@@ -361,7 +361,7 @@
                     </div>
 
                     <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Post Parameters
                         </h3>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
@@ -374,11 +374,11 @@
                     </div>
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
-                         class="even:bg-gray-100 bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-700">
+                         class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ parameter.name }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
+                        <dd class="mt-1 text-sm leading-5 dark:text-gray-200 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             <span
                                 v-if="parameter.is_file">File: @{ parameter.filename } (@{ parameter.mime_type })</span>
                             <span v-else>@{ parameter.value }</span>
@@ -585,6 +585,10 @@
                 this.currentLogId = id;
                 this.formatJsonResponse();
 
+                let url = new URL(window.location);
+                url.hash = id;
+                window.history.pushState({}, '', url);
+
                 this.$nextTick(function () {
                     this.formatJsonResponse()
                     new ClipboardJS('.clipboard');
@@ -645,10 +649,22 @@
                         this.logs = data;
                     });
             },
+
+            watchHash: function () {
+                window.addEventListener('hashchange', () => {
+                    this.setLog(document.location.hash.replace('#', ''))
+                })
+
+                if (document.location.hash !== '') {
+                    this.setLog(document.location.hash.replace('#', ''))
+                }
+            }
         },
 
         mounted: function () {
             this.connect();
+
+            this.watchHash();
 
             this.loadLogs();
         }

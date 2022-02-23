@@ -120,6 +120,8 @@ class Client
                     $httpProtocol = $this->configuration->port() === 443 ? 'https' : 'http';
                     $host = $data->server_host ?? $this->configuration->host();
 
+                    $this->configuration->setServerHost($host);
+
                     $this->logger->info($data->message);
                     $this->logger->info("Local-URL:\t\t{$sharedUrl}");
                     $this->logger->info("Dashboard-URL:\t\thttp://127.0.0.1:".config()->get('expose.dashboard_port'));

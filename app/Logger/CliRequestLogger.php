@@ -69,6 +69,8 @@ class CliRequestLogger extends Logger
 
     public function logRequest(LoggedRequest $loggedRequest)
     {
+        $dashboardUrl = 'http://127.0.0.1:'.config('expose.dashboard_port');
+
         if ($this->requests->has($loggedRequest->id())) {
             $this->requests[$loggedRequest->id()] = $loggedRequest;
         } else {
@@ -78,11 +80,11 @@ class CliRequestLogger extends Logger
 
         $this->section->clear();
 
-        $this->table->setRows($this->requests->map(function (LoggedRequest $loggedRequest) {
+        $this->table->setRows($this->requests->map(function (LoggedRequest $loggedRequest) use ($dashboardUrl) {
             return [
                 $loggedRequest->getRequest()->getMethod(),
                 $loggedRequest->getRequest()->getUri(),
-                '<href=foo;fg='.$this->getRequestColor($loggedRequest).';options=bold>'.
+                '<href='.$dashboardUrl.'/#'.$loggedRequest->id().';fg='.$this->getRequestColor($loggedRequest).';options=bold>'.
                 optional($loggedRequest->getResponse())->getStatusCode().' '.optional($loggedRequest->getResponse())->getReasonPhrase()
                 .'</>'
                 ,

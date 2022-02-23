@@ -29,7 +29,7 @@ abstract class ServerAwareCommand extends Command
 
     protected function configureConnectionLogger()
     {
-        app()->bind(CliRequestLogger::class, function () {
+        app()->singleton(CliRequestLogger::class, function () {
             return new CliRequestLogger(new ConsoleOutput());
         });
 

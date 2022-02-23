@@ -6,6 +6,9 @@ class Configuration
 {
     /** @var string */
     protected $host;
+    
+    /** @var string */
+    protected $serverHost;
 
     /** @var int */
     protected $port;
@@ -15,7 +18,7 @@ class Configuration
 
     public function __construct(string $host, int $port, ?string $auth = null)
     {
-        $this->host = $host;
+        $this->serverHost = $this->host = $host;
 
         $this->port = $port;
 
@@ -25,6 +28,11 @@ class Configuration
     public function host(): string
     {
         return $this->host;
+    }
+
+    public function serverHost(): string
+    {
+        return $this->serverHost;
     }
 
     public function auth(): ?string
@@ -37,10 +45,15 @@ class Configuration
         return intval($this->port);
     }
 
+    public function setServerHost($host)
+    {
+        $this->serverHost = $host;
+    }
+
     public function getUrl(string $subdomain): string
     {
         $httpProtocol = $this->port() === 443 ? 'https' : 'http';
-        $host = $this->host();
+        $host = $this->serverHost();
 
         if ($httpProtocol !== 'https') {
             $host .= ":{$this->port()}";
