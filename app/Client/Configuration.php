@@ -6,7 +6,7 @@ class Configuration
 {
     /** @var string */
     protected $host;
-    
+
     /** @var string */
     protected $serverHost;
 
@@ -35,6 +35,11 @@ class Configuration
         return $this->serverHost;
     }
 
+    public function setServerHost($serverHost)
+    {
+        $this->serverHost = $serverHost;
+    }
+
     public function auth(): ?string
     {
         return $this->auth;
@@ -43,11 +48,6 @@ class Configuration
     public function port(): int
     {
         return intval($this->port);
-    }
-
-    public function setServerHost($host)
-    {
-        $this->serverHost = $host;
     }
 
     public function getUrl(string $subdomain): string
