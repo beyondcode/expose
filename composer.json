@@ -18,7 +18,7 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "padraic/phar-updater": "^1.0.6"
+        "laravel-zero/phar-updater": "^1.2"
     },
     "require-dev": {
         "cboden/ratchet": "^0.4.3",
