@@ -2,32 +2,60 @@
 
 namespace App\Logger;
 
+use App\Client\Support\ConsoleSectionOutput;
 use Illuminate\Support\Collection;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Terminal;
 
 class CliRequestLogger extends Logger
 {
-    /** @var Table */
-    protected $table;
-
     /** @var Collection */
     protected $requests;
 
-    /** @var \Symfony\Component\Console\Output\ConsoleSectionOutput */
     protected $section;
+
+    protected $verbColors = [
+        'GET' => 'blue',
+        'HEAD' => '#6C7280',
+        'OPTIONS' => '#6C7280',
+        'POST' => 'yellow',
+        'PUT' => 'yellow',
+        'PATCH' => 'yellow',
+        'DELETE' => 'red',
+    ];
+
+    protected $consoleSectionOutputs = [];
+
+    /**
+     * The current terminal width.
+     *
+     * @var int|null
+     */
+    protected $terminalWidth;
+
+    /**
+     * Computes the terminal width.
+     *
+     * @return int
+     */
+    protected function getTerminalWidth()
+    {
+        if ($this->terminalWidth == null) {
+            $this->terminalWidth = (new Terminal)->getWidth();
+
+            $this->terminalWidth = $this->terminalWidth >= 30
+                ? $this->terminalWidth
+                : 30;
+        }
+
+        return $this->terminalWidth;
+    }
 
     public function __construct(ConsoleOutputInterface $consoleOutput)
     {
         parent::__construct($consoleOutput);
 
-        $this->section = $this->output->section();
-
-        $this->table = new Table($this->section);
-        $this->table->setStyle($this->getTableStyle());
-        $this->table->setHeaders(['Method', 'URI', 'Response', 'Time', 'Duration']);
+        $this->section = new ConsoleSectionOutput($this->output->getStream(), $this->consoleSectionOutputs, $this->output->getVerbosity(), $this->output->isDecorated(), $this->output->getFormatter());
 
         $this->requests = new Collection();
     }
@@ -38,15 +66,6 @@ class CliRequestLogger extends Logger
     public function getOutput()
     {
         return $this->output;
-    }
-
-    protected function getTableStyle()
-    {
-        return (new TableStyle())
-            ->setHorizontalBorderChars('─')
-            ->setVerticalBorderChars('│')
-            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
-        ;
     }
 
     protected function getRequestColor(?LoggedRequest $request)
@@ -78,21 +97,58 @@ class CliRequestLogger extends Logger
         }
         $this->requests = $this->requests->slice(0, config('expose.max_logged_requests', 10));
 
-        $this->section->clear();
+        $terminalWidth = $this->getTerminalWidth();
 
-        $this->table->setRows($this->requests->map(function (LoggedRequest $loggedRequest) use ($dashboardUrl) {
+        $requests = $this->requests->map(function (LoggedRequest $loggedRequest) use ($dashboardUrl) {
             return [
-                $loggedRequest->getRequest()->getMethod(),
-                $loggedRequest->getRequest()->getUri(),
-                '<href='.$dashboardUrl.'/#'.$loggedRequest->id().';fg='.$this->getRequestColor($loggedRequest).';options=bold>'.
-                optional($loggedRequest->getResponse())->getStatusCode().' '.optional($loggedRequest->getResponse())->getReasonPhrase()
-                .'</>'
-                ,
-                $loggedRequest->getStartTime()->isToday() ? $loggedRequest->getStartTime()->toTimeString() : $loggedRequest->getStartTime()->toDateTimeString(),
-                $loggedRequest->getDuration().'ms',
+                'method' => $loggedRequest->getRequest()->getMethod(),
+                'url' => $loggedRequest->getRequest()->getUri(),
+                'duration' => $loggedRequest->getDuration(),
+                'time' => $loggedRequest->getStartTime()->isToday() ? $loggedRequest->getStartTime()->toTimeString() : $loggedRequest->getStartTime()->toDateTimeString(),
+                'color' => $this->getRequestColor($loggedRequest),
+                'status' => optional($loggedRequest->getResponse())->getStatusCode(),
+                'dashboardUrl' => $dashboardUrl.'/#'.$loggedRequest->id(),
             ];
-        })->toArray());
+        });
 
-        $this->table->render();
+        $maxMethod = mb_strlen($requests->max('method'));
+        $maxDuration = mb_strlen($requests->max('duration'));
+
+        $output = $requests->map(function ($loggedRequest) use ($terminalWidth, $maxMethod, $maxDuration) {
+            $method = $loggedRequest['method'];
+            $spaces = str_repeat(' ', max($maxMethod + 2 - mb_strlen($method), 0));
+            $url = $loggedRequest['url'];
+            $duration = $loggedRequest['duration'];
+            $time = $loggedRequest['time'];
+            $durationSpaces = str_repeat(' ', max($maxDuration + 2 - mb_strlen($duration), 0));
+            $color = $loggedRequest['color'];
+            $status = $loggedRequest['status'];
+            $dashboardUrl = $loggedRequest['dashboardUrl'];
+
+            $dots = str_repeat('.', max($terminalWidth - strlen($method.$spaces.$url.$time.$durationSpaces.$duration) - 16, 0));
+
+            if (empty($dots)) {
+                $url = substr($url, 0, $terminalWidth - strlen($method.$spaces.$time.$durationSpaces.$duration) - 15 - 3).'...';
+            } else {
+                $dots .= ' ';
+            }
+
+            return sprintf(
+                '  <fg=%s;options=bold>%s </>   <fg=%s;options=bold>%s%s</> <href=%s;options=bold>%s</><fg=#6C7280> %s%s%s%s ms</>',
+                $color,
+                $status,
+                $this->verbColors[$method] ?? 'default',
+                $method,
+                $spaces,
+                $dashboardUrl,
+                $url,
+                $dots,
+                $time,
+                $durationSpaces,
+                $duration,
+            );
+        });
+
+        $this->section->overwrite($output);
     }
 }
