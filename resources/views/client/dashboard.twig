@@ -19,10 +19,16 @@
         ::selection {
             @apply bg-pink-500 bg-opacity-50;
         }
+        .dark {
+            color-scheme: dark;
+        }
+        #app .hljs {
+            background: transparent;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/styles/github.min.css">
-    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.0/build/highlight.min.js" async></script>
+    <link id="hljs-theme" rel="stylesheet">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/highlight.min.js" async></script>
     <script>
         !function (a, b) {
             "function" == typeof define && define.amd ? define([], b) : "undefined" != typeof module && module.exports ? module.exports = b() : a.ReconnectingWebSocket = b()
@@ -290,21 +296,26 @@
                     </h3>
                     <div class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 flex items-center">
                         <div class="mr-4" v-if="currentLog.response">
-                                <span
-                                    v-if="currentLog.response.status >= 200 && currentLog.response.status < 300"
-                                    class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
-                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                            </span>
+                            <span
+                                v-if="currentLog.response.status >= 200 && currentLog.response.status < 300"
+                                class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-green-100 text-green-800">
+                                @{ currentLog.response.status } - @{ currentLog.response.reason }
+                            </span>
+                            <span
+                                v-if="currentLog.response.status >= 300 && currentLog.response.status < 400"
+                                class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-blue-100 text-blue-800">
+                                @{ currentLog.response.status } - @{ currentLog.response.reason }
+                            </span>
                             <span
                                 v-if="currentLog.response.status >= 400 && currentLog.response.status < 500"
                                 class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-yellow-100 text-yellow-800">
-                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                            </span>
+                                @{ currentLog.response.status } - @{ currentLog.response.reason }
+                            </span>
                             <span
                                 v-if="currentLog.response.status >= 500"
                                 class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-red-100 text-red-800">
-                                              @{ currentLog.response.status } - @{ currentLog.response.reason }
-                                            </span>
+                                @{ currentLog.response.status } - @{ currentLog.response.reason }
+                            </span>
                         </div>
                         <span class="text-xs text-gray-600 dark:text-gray-200">Received at: @{ currentLog.performed_at }</span>
                     </div>
@@ -351,7 +362,7 @@
                     </div>
                     <div v-for="(value, name) in currentLog.request.query"
                          :key="'query_' + name"
-                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                         class="even:bg-gray-50 odd:bg-gray-100 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ name }
                         </dt>
@@ -361,7 +372,7 @@
                     </div>
 
                     <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Post Parameters
                         </h3>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
@@ -374,11 +385,11 @@
                     </div>
                     <div v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
-                         class="even:bg-gray-100 bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm leading-5 font-medium text-gray-700">
+                         class="even:bg-gray-50 bg-gray-100 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ parameter.name }
                         </dt>
-                        <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
+                        <dd class="mt-1 text-sm leading-5 dark:text-gray-200 text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                             <span
                                 v-if="parameter.is_file">File: @{ parameter.filename } (@{ parameter.mime_type })</span>
                             <span v-else>@{ parameter.value }</span>
@@ -399,7 +410,7 @@
                     </div>
                     <div v-for="(value, header) in currentLog.request.headers"
                          :key="header"
-                         class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                         class="even:bg-gray-50 bg-gray-100 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ header }
                         </dt>
@@ -426,7 +437,7 @@
                     </div>
                     <div v-for="(value, header) in currentLog.response.headers"
                          :key="header"
-                         class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                         class="even:bg-gray-50 odd:bg-gray-100 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
                             @{ header }
                         </dt>
@@ -442,7 +453,7 @@
                         </div>
                         <div v-for="(value, key) in currentLog.request.additional_data"
                              :key="'debug'+key"
-                             class="even:bg-gray-50 odd:bg-gray-50 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                             class="even:bg-gray-50 odd:bg-gray-100 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm leading-5 font-medium text-gray-700">
                                 @{ key }
                             </dt>
@@ -459,13 +470,13 @@
                                 <a href="#"
                                    @click.prevent="setActiveTab('raw')"
                                    :class="{'outline-none text-white bg-pink-500': activeTab === 'raw'}"
-                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-100">
+                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300">
                                     Raw
                                 </a>
                                 <a href="#"
                                    @click.prevent="setActiveTab('preview')"
                                    :class="{'outline-none text-white bg-pink-500': activeTab === 'preview'}"
-                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-100 focus:outline-nonedark:hover:text-gray-100">
+                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300">
                                     Preview
                                 </a>
                             </nav>
@@ -476,7 +487,7 @@
                     </div>
                     <div v-if="activeTab === 'preview'">
                         <div v-if="responseIsJson()">
-                            <pre><span id="jsonResponseBody" class="json"></span></pre>
+                            <pre class="p-6 overflow-x-auto"><span id="jsonResponseBody" class="json"></span></pre>
                         </div>
                         <iframe v-else :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
                     </div>
@@ -506,16 +517,21 @@
             maxLogs: {{ max_logs }},
             highlightNextLog: false,
             followLogs: true,
-            useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
+            useDarkMode: localStorage.theme === 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
         },
 
         watch: {
             useDarkMode: {
                 handler: function(value) {
+                    const themeUrl = '//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/styles';
                     if (value) {
+                        document.getElementById('hljs-theme').href = `${themeUrl}/github-dark.min.css`;
                         document.querySelector('html').classList.add('dark')
+                        localStorage.theme = 'dark';
                     } else {
+                        document.getElementById('hljs-theme').href = `${themeUrl}/github.min.css`;
                         document.querySelector('html').classList.remove('dark')
+                        localStorage.theme = 'light';
                     }
                 },
                 immediate: true,
@@ -553,8 +569,8 @@
             formatJsonResponse: function () {
                 if (this.view === 'response' && this.activeTab === 'preview' && this.responseIsJson()) {
                     const target = document.getElementById('jsonResponseBody');
-                    target.innerText = JSON.stringify(JSON.parse(this.currentLog.response.body), null, 2)
-                    hljs.highlightBlock(target);
+                    target.textContent = JSON.stringify(JSON.parse(this.currentLog.response.body), null, 2)
+                    hljs.highlightElement(target);
                 }
             },
             responseIsJson: function() {
