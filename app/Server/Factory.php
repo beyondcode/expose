@@ -145,19 +145,25 @@ class Factory
         $this->router->get('/api/statistics', GetStatisticsController::class, $adminCondition);
         $this->router->get('/api/settings', GetSettingsController::class, $adminCondition);
         $this->router->post('/api/settings', StoreSettingsController::class, $adminCondition);
+
         $this->router->get('/api/users', GetUsersController::class, $adminCondition);
         $this->router->post('/api/users', StoreUsersController::class, $adminCondition);
         $this->router->get('/api/users/{id}', GetUserDetailsController::class, $adminCondition);
+        $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
+
         $this->router->get('/api/logs', GetLogsController::class, $adminCondition);
         $this->router->get('/api/logs/{subdomain}', GetLogsForSubdomainController::class, $adminCondition);
+
         $this->router->post('/api/domains', StoreDomainController::class, $adminCondition);
         $this->router->delete('/api/domains/{domain}', DeleteSubdomainController::class, $adminCondition);
+
         $this->router->post('/api/subdomains', StoreSubdomainController::class, $adminCondition);
         $this->router->delete('/api/subdomains/{subdomain}', DeleteSubdomainController::class, $adminCondition);
-        $this->router->delete('/api/users/{id}', DeleteUsersController::class, $adminCondition);
+
         $this->router->get('/api/sites', GetSitesController::class, $adminCondition);
         $this->router->get('/api/sites/{site}', GetSiteDetailsController::class, $adminCondition);
         $this->router->delete('/api/sites/{id}', DisconnectSiteController::class, $adminCondition);
+
         $this->router->get('/api/tcp', GetTcpConnectionsController::class, $adminCondition);
         $this->router->delete('/api/tcp/{id}', DisconnectTcpConnectionController::class, $adminCondition);
     }

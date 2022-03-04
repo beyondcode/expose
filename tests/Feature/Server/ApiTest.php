@@ -68,6 +68,54 @@ class ApiTest extends TestCase
     }
 
     /** @test */
+    public function it_can_update_registered_users()
+    {
+        /** @var Response $response */
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'name' => 'Marcel',
+            'can_specify_subdomains' => true,
+        ])));
+
+        /** @var Response $response */
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+        $user = json_decode($response->getBody()->getContents())->paginated->users[0];
+
+        $this->assertSame('Marcel', $user->name);
+        $this->assertSame(1, $user->can_specify_subdomains);
+
+
+        $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ], json_encode([
+            'token' => $user->auth_token,
+            'name' => 'Julia',
+            'can_specify_subdomains' => false,
+        ])));
+
+        $response = $this->await($this->browser->get('http://127.0.0.1:8080/api/users', [
+            'Host' => 'expose.localhost',
+            'Authorization' => base64_encode('username:secret'),
+            'Content-Type' => 'application/json',
+        ]));
+        $users = json_decode($response->getBody()->getContents())->paginated;
+        $user = $users->users[0];
+
+        $this->assertCount(1, $users->users);
+        $this->assertSame('Julia', $user->name);
+        $this->assertSame(0, $user->can_specify_subdomains);
+    }
+
+    /** @test */
     public function it_can_specify_a_token_when_creating_a_user()
     {
         /** @var Response $response */
