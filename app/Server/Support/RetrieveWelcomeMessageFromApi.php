@@ -2,6 +2,7 @@
 
 namespace App\Server\Support;
 
+use App\Server\Connections\ControlConnection;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Clue\React\Buzz\Browser;
@@ -21,12 +22,16 @@ class RetrieveWelcomeMessageFromApi
         $this->url = config('expose.admin.welcome_message_api_url');
     }
 
-    public function forUser($user)
+    public function forUser(ControlConnection $connectionInfo, $user)
     {
         return $this->browser
-            ->get($this->url . '?' . http_build_query($user), [
+            ->post($this->url, [
+                'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])
+            ], json_encode([
+                'user' => $user,
+                'connectionInfo' => $connectionInfo->toArray(),
+            ]))
             ->then(function (ResponseInterface $response) {
                 $result = json_decode($response->getBody());
 
