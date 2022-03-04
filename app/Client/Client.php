@@ -127,7 +127,7 @@ class Client
 
                     $this->logger->info($data->message);
                     $this->logger->info("Local-URL:\t\t<options=bold>{$sharedUrl}</>");
-                    $this->logger->info("Dashboard-URL:\t\t<options=bold>http://127.0.0.1:".config()->get('expose.dashboard_port')."</>");
+                    $this->logger->info("Dashboard-URL:\t\t<options=bold>http://127.0.0.1:".config()->get('expose.dashboard_port').'</>');
                     $this->logger->info("Expose-URL:\t\t<options=bold>http://{$data->subdomain}.{$host}{$httpPort}</>");
                     $this->logger->info("Expose-URL:\t\t<options=bold>https://{$data->subdomain}.{$host}</>");
                     $this->logger->line('');

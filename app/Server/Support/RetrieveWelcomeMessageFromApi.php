@@ -2,9 +2,9 @@
 
 namespace App\Server\Support;
 
+use Clue\React\Buzz\Browser;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
-use Clue\React\Buzz\Browser;
 
 class RetrieveWelcomeMessageFromApi
 {
@@ -24,7 +24,7 @@ class RetrieveWelcomeMessageFromApi
     public function forUser($user)
     {
         return $this->browser
-            ->get($this->url . '?' . http_build_query($user), [
+            ->get($this->url.'?'.http_build_query($user), [
                 'Accept' => 'application/json',
             ])
             ->then(function (ResponseInterface $response) {
