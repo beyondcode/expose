@@ -91,7 +91,6 @@ class ApiTest extends TestCase
         $this->assertSame('Marcel', $user->name);
         $this->assertSame(1, $user->can_specify_subdomains);
 
-
         $this->await($this->browser->post('http://127.0.0.1:8080/api/users', [
             'Host' => 'expose.localhost',
             'Authorization' => base64_encode('username:secret'),
