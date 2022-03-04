@@ -12,7 +12,6 @@ use App\Server\Exceptions\NoFreePortAvailable;
 use Illuminate\Support\Arr;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
-use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use function React\Promise\reject;
@@ -151,7 +150,8 @@ class ControlMessageController implements MessageComponentInterface
             });
     }
 
-    protected function resolveConnectionMessage($connectionInfo, $user) {
+    protected function resolveConnectionMessage($connectionInfo, $user)
+    {
         $deferred = new Deferred();
 
         $connectionMessageResolver = config('expose.admin.messages.resolve_connection_message')($connectionInfo, $user);
@@ -163,6 +163,7 @@ class ControlMessageController implements MessageComponentInterface
             });
         } else {
             $connectionInfo->message = $connectionMessageResolver;
+
             return \React\Promise\resolve($connectionInfo);
         }
 
@@ -188,7 +189,7 @@ class ControlMessageController implements MessageComponentInterface
 
                 return $this->resolveConnectionMessage($connectionInfo, $user);
             })
-            ->then(function ($connectionInfo) use ($data, $connection, $user) {
+            ->then(function ($connectionInfo) use ($connection, $user) {
                 $connection->send(json_encode([
                     'event' => 'authenticated',
                     'data' => [

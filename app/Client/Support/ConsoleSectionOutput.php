@@ -2,9 +2,9 @@
 
 namespace App\Client\Support;
 
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Terminal;
 
 /**
@@ -19,8 +19,8 @@ class ConsoleSectionOutput extends StreamOutput
     private $terminal;
 
     /**
-     * @param resource               $stream
-     * @param \Symfony\Component\Console\Output\ConsoleSectionOutput[] $sections
+     * @param  resource  $stream
+     * @param  \Symfony\Component\Console\Output\ConsoleSectionOutput[]  $sections
      */
     public function __construct($stream, array &$sections, int $verbosity, bool $decorated, OutputFormatterInterface $formatter)
     {
@@ -33,11 +33,11 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * Clears previous output for this section.
      *
-     * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
+     * @param  int  $lines  Number of lines to clear. If null, then the entire output of this section is cleared
      */
     public function clear(int $lines = null)
     {
-        if (empty($this->content) || !$this->isDecorated()) {
+        if (empty($this->content) || ! $this->isDecorated()) {
             return;
         }
 
@@ -56,7 +56,7 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * Overwrites the previous output with a new message.
      *
-     * @param array|string $message
+     * @param  array|string  $message
      */
     public function overwrite($message)
     {
@@ -86,7 +86,7 @@ class ConsoleSectionOutput extends StreamOutput
      */
     protected function doWrite(string $message, bool $newline)
     {
-        if (!$this->isDecorated()) {
+        if (! $this->isDecorated()) {
             parent::doWrite($message, $newline);
 
             return;
