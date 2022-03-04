@@ -123,6 +123,7 @@ class Client
                     $this->configuration->setServerHost($host);
 
                     $this->logger->info($data->message);
+                    $this->logger->info("Expose-version:\t".config()->get('app.version'));
                     $this->logger->info("Local-URL:\t\t{$sharedUrl}");
                     $this->logger->info("Dashboard-URL:\t\thttp://127.0.0.1:".config()->get('expose.dashboard_port'));
                     $this->logger->info("Expose-URL:\t\thttp://{$data->subdomain}.{$host}:{$this->configuration->port()}");
@@ -183,6 +184,7 @@ class Client
                     $host = $this->configuration->host();
 
                     $this->logger->info($data->message);
+                    $this->logger->info("Expose version:\t\t".config()->get('app.version'));
                     $this->logger->info("Local-Port:\t\t{$port}");
                     $this->logger->info("Shared-Port:\t\t{$data->shared_port}");
                     $this->logger->info("Expose-URL:\t\ttcp://{$host}:{$data->shared_port}.");
