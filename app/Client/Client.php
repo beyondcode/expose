@@ -126,10 +126,10 @@ class Client
                     $this->configuration->setServerHost($host);
 
                     $this->logger->info($data->message);
-                    $this->logger->info("Local-URL:\t\t<options=bold>{$sharedUrl}</>");
-                    $this->logger->info("Dashboard-URL:\t\t<options=bold>http://127.0.0.1:".config()->get('expose.dashboard_port').'</>');
-                    $this->logger->info("Expose-URL:\t\t<options=bold>http://{$data->subdomain}.{$host}{$httpPort}</>");
-                    $this->logger->info("Expose-URL:\t\t<options=bold>https://{$data->subdomain}.{$host}</>");
+                    $this->logger->info("Shared URL:\t\t<options=bold>{$sharedUrl}</>");
+                    $this->logger->info("Dashboard:\t\t<options=bold>http://127.0.0.1:".config()->get('expose.dashboard_port').'</>');
+                    $this->logger->info("Public HTTP:\t\t<options=bold>http://{$data->subdomain}.{$host}{$httpPort}</>");
+                    $this->logger->info("Public HTTPS:\t\t<options=bold>https://{$data->subdomain}.{$host}</>");
                     $this->logger->line('');
 
                     static::$subdomains[] = "{$httpProtocol}://{$data->subdomain}.{$host}";

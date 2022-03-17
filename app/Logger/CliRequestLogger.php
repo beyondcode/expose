@@ -107,7 +107,6 @@ class CliRequestLogger extends Logger
                 'time' => $loggedRequest->getStartTime()->isToday() ? $loggedRequest->getStartTime()->toTimeString() : $loggedRequest->getStartTime()->toDateTimeString(),
                 'color' => $this->getRequestColor($loggedRequest),
                 'status' => optional($loggedRequest->getResponse())->getStatusCode(),
-                'dashboardUrl' => $dashboardUrl.'/#'.$loggedRequest->id(),
             ];
         });
 
@@ -123,7 +122,6 @@ class CliRequestLogger extends Logger
             $durationSpaces = str_repeat(' ', max($maxDuration + 2 - mb_strlen($duration), 0));
             $color = $loggedRequest['color'];
             $status = $loggedRequest['status'];
-            $dashboardUrl = $loggedRequest['dashboardUrl'];
 
             $dots = str_repeat('.', max($terminalWidth - strlen($method.$spaces.$url.$time.$durationSpaces.$duration) - 16, 0));
 
@@ -134,13 +132,12 @@ class CliRequestLogger extends Logger
             }
 
             return sprintf(
-                '  <fg=%s;options=bold>%s </>   <fg=%s;options=bold>%s%s</> <href=%s;options=bold>%s</><fg=#6C7280> %s%s%s%s ms</>',
+                '  <fg=%s;options=bold>%s </>   <fg=%s;options=bold>%s%s</> %s<fg=#6C7280> %s%s%s%s ms</>',
                 $color,
                 $status,
                 $this->verbColors[$method] ?? 'default',
                 $method,
                 $spaces,
-                $dashboardUrl,
                 $url,
                 $dots,
                 $time,
