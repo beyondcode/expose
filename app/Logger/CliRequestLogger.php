@@ -99,7 +99,7 @@ class CliRequestLogger extends Logger
 
         $terminalWidth = $this->getTerminalWidth();
 
-        $requests = $this->requests->map(function (LoggedRequest $loggedRequest) use ($dashboardUrl) {
+        $requests = $this->requests->map(function (LoggedRequest $loggedRequest) {
             return [
                 'method' => $loggedRequest->getRequest()->getMethod(),
                 'url' => $loggedRequest->getRequest()->getUri(),
