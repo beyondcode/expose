@@ -41,6 +41,8 @@ class ShareCommand extends ServerAwareCommand
             $this->info('Trying to use custom domain: '.$subdomains[0].PHP_EOL, OutputInterface::VERBOSITY_VERBOSE);
         } else {
             $host = Str::beforeLast($this->argument('host'), '.');
+            $host = str_replace('https://', '', $host);
+            $host = str_replace('http://', '', $host);
             $host = Str::beforeLast($host, ':');
             $subdomains = [Str::slug($host)];
             $this->info('Trying to use custom domain: '.$subdomains[0].PHP_EOL, OutputInterface::VERBOSITY_VERBOSE);
