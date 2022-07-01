@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ShareCommand extends ServerAwareCommand
 {
-    protected $signature = 'share {host} {--subdomain=} {--auth=} {--dns=} {--domain=}';
+    protected $signature = 'share {host} {--subdomain=} {--auth=} {--basicAuth=} {--dns=} {--domain=}';
 
     protected $description = 'Share a local url with a remote expose server';
 
@@ -53,6 +53,7 @@ class ShareCommand extends ServerAwareCommand
             ->setHost($this->getServerHost())
             ->setPort($this->getServerPort())
             ->setAuth($auth)
+            ->setBasicAuth($this->option('basicAuth'))
             ->createClient()
             ->share(
                 $this->argument('host'),
