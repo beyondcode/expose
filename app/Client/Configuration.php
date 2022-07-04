@@ -16,13 +16,18 @@ class Configuration
     /** @var string|null */
     protected $auth;
 
-    public function __construct(string $host, int $port, ?string $auth = null)
+    /** @var string|null */
+    protected $basicAuth;
+
+    public function __construct(string $host, int $port, ?string $auth = null, ?string $basicAuth = null)
     {
         $this->serverHost = $this->host = $host;
 
         $this->port = $port;
 
         $this->auth = $auth;
+
+        $this->basicAuth = $basicAuth;
     }
 
     public function host(): string
@@ -43,6 +48,11 @@ class Configuration
     public function auth(): ?string
     {
         return $this->auth;
+    }
+
+    public function basicAuth(): ?string
+    {
+        return $this->basicAuth;
     }
 
     public function port(): int

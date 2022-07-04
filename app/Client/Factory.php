@@ -28,6 +28,9 @@ class Factory
     /** @var string */
     protected $auth = '';
 
+    /** @var string */
+    protected $basicAuth;
+
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
 
@@ -67,6 +70,13 @@ class Factory
         return $this;
     }
 
+    public function setBasicAuth(?string $basicAuth)
+    {
+        $this->basicAuth = $basicAuth;
+
+        return $this;
+    }
+
     public function setLoop(LoopInterface $loop)
     {
         $this->loop = $loop;
@@ -77,7 +87,7 @@ class Factory
     protected function bindConfiguration()
     {
         app()->singleton(Configuration::class, function ($app) {
-            return new Configuration($this->host, $this->port, $this->auth);
+            return new Configuration($this->host, $this->port, $this->auth, $this->basicAuth);
         });
     }
 
