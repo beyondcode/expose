@@ -71,7 +71,6 @@ class Client
 
         $url = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path'));
 
-
         if (! is_null($port = Arr::get($parsedUrl, 'port'))) {
             $url .= ":{$port}";
         } elseif (Arr::get($parsedUrl, 'scheme') === 'https') {
