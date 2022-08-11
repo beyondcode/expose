@@ -88,6 +88,10 @@ class CheckBasicAuthentication
 
     protected function getCredentials()
     {
+        if (is_null($this->configuration->basicAuth())) {
+            return [];
+        }
+
         try {
             $credentials = explode(':', $this->configuration->basicAuth());
 
