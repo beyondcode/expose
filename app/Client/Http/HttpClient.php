@@ -84,12 +84,18 @@ class HttpClient
 
     protected function sendRequestToApplication(RequestInterface $request, $proxyConnection = null)
     {
+        $uri = $request->getUri();
+
+        if ($this->configuration->isSecureSharedUrl()) {
+            $uri = $uri->withScheme('https');
+        }
+
         (new Browser($this->loop, $this->createConnector()))
             ->withFollowRedirects(false)
             ->withRejectErrorResponse(false)
             ->requestStreaming(
                 $request->getMethod(),
-                $request->getUri(),
+                $uri,
                 $request->getHeaders(),
                 $request->getBody()
             )

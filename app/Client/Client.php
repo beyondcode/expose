@@ -71,9 +71,14 @@ class Client
 
         $url = Arr::get($parsedUrl, 'host', Arr::get($parsedUrl, 'path'));
 
-        if (Arr::get($parsedUrl, 'scheme') === 'https') {
+        $isHttps = Arr::get($parsedUrl, 'scheme') === 'https';
+
+        $this->configuration->setIsSecureSharedUrl($isHttps);
+
+        if ($isHttps && is_null(Arr::get($parsedUrl, 'port'))) {
             $url .= ':443';
         }
+
         if (! is_null($port = Arr::get($parsedUrl, 'port'))) {
             $url .= ":{$port}";
         }
