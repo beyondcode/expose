@@ -4,6 +4,7 @@ namespace App\Server\Support;
 
 use App\Server\Connections\ControlConnection;
 use Clue\React\Buzz\Browser;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 
 class RetrieveWelcomeMessageFromApi

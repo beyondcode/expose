@@ -2,6 +2,7 @@
 
 namespace App\Server\Connections;
 
+use App\Http\QueryParameters;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\Socket\Server;
@@ -13,6 +14,7 @@ class TcpControlConnection extends ControlConnection
     public $port;
     public $shared_port;
     public $shared_server;
+    public $client_version;
 
     public function __construct(ConnectionInterface $socket, int $port, Server $sharedServer, string $clientId, string $authToken = '')
     {
@@ -23,6 +25,7 @@ class TcpControlConnection extends ControlConnection
         $this->shared_at = now()->toDateTimeString();
         $this->shared_port = parse_url($sharedServer->getAddress(), PHP_URL_PORT);
         $this->authToken = $authToken;
+        $this->client_version = QueryParameters::create($socket->httpRequest)->get('version');
 
         $this->configureServer($sharedServer);
     }
@@ -78,6 +81,7 @@ class TcpControlConnection extends ControlConnection
             'port' => $this->port,
             'auth_token' => $this->authToken,
             'client_id' => $this->client_id,
+            'client_version' => $this->client_version,
             'shared_port' => $this->shared_port,
             'shared_at' => $this->shared_at,
         ];
