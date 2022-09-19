@@ -1,4 +1,4 @@
-![](https://expose.dev/images/expose/og_card.png)
+[![https://expose.dev/?ref=github](https://expose.dev/images/expose/og_card.png)](https://expose.dev/?ref=github)
 
 # Expose
 
