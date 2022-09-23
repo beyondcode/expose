@@ -18,7 +18,7 @@ expose share http://localhost:3000
 expose share my-local-site.dev
 ```
 
-By default, Expose assumes that you want to share unenecrypted local traffic through HTTP. If you want to share a local HTTPS URL append the protocol to the url, like this:
+By default, Expose assumes that you want to share unenecrypted local traffic through HTTP. If you want to share a local HTTPS URL prepend the protocol to the url, like this:
 
 ```bash
 # Will share access to https://my-local-site.dev 
