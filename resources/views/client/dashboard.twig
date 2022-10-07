@@ -2,6 +2,8 @@
 <head>
     <title>Expose Dashboard :: {{ subdomains|join(", ") }}</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-json-viewer@2.2.15/vue-json-viewer.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-json-viewer@2.2.22/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -337,7 +339,7 @@
                 </div>
 
                 <div v-if="view === 'request'">
-                    <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.query).length > 0">
+                    <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center" v-if="Object.keys(currentLog.request.query).length > 0">
                         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Query Parameters
                         </h3>
@@ -360,7 +362,7 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between" v-if="Object.keys(currentLog.request.post).length > 0">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center" v-if="Object.keys(currentLog.request.post).length > 0">
                         <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Post Parameters
                         </h3>
@@ -385,7 +387,7 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center">
                         <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Headers
                         </h3>
@@ -408,13 +410,28 @@
                         </dd>
                     </div>
 
-                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6">
+                    <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center">
                         <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
                             Request Body
                         </h3>
+                        <span class="inline-flex rounded-md shadow-sm ml-4">
+                            <button
+                                :data-clipboard-text="currentLog.request.body"
+                                type="button"
+                                class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard-request-body inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                Copy
+                            </button>
+                        </span>
                     </div>
                     <div>
-                        <pre class="p-6 prettyprint break-all whitespace-pre-wrap">@{ currentLog.request.body }</pre>
+                        <json-viewer
+                            v-if="requestIsJson()"
+                            :expand-depth="2"
+                            :value="JSON.parse(currentLog.request.body)"
+                        ></json-viewer>
+                        <pre
+                            v-else
+                            class="p-6 prettyprint break-all whitespace-pre-wrap">@{ currentLog.request.body }</pre>
                     </div>
                 </div>
 
@@ -453,31 +470,45 @@
                     </div>
 
                     <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex justify-between">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 flex justify-between items-center">
                             <span>Response</span>
                             <nav class="flex">
-                                <a href="#"
-                                   @click.prevent="setActiveTab('raw')"
-                                   :class="{'outline-none text-white bg-pink-500': activeTab === 'raw'}"
-                                   class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-100">
-                                    Raw
-                                </a>
-                                <a href="#"
-                                   @click.prevent="setActiveTab('preview')"
-                                   :class="{'outline-none text-white bg-pink-500': activeTab === 'preview'}"
-                                   class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-100 focus:outline-nonedark:hover:text-gray-100">
-                                    Preview
-                                </a>
+                                <template v-if="! responseIsJson()">
+                                    <a href="#"
+                                       @click.prevent="setActiveTab('raw')"
+                                       :class="{'outline-none text-white bg-pink-500': activeTab === 'raw'}"
+                                       class="px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-100">
+                                        Raw
+                                    </a>
+                                    <a href="#"
+                                       @click.prevent="setActiveTab('preview')"
+                                       :class="{'outline-none text-white bg-pink-500': activeTab === 'preview'}"
+                                       class="ml-4 px-3 py-2 font-medium text-sm leading-5 rounded-md text-gray-500 hover:text-gray-100 focus:outline-nonedark:hover:text-gray-100">
+                                        Preview
+                                    </a>
+                                </template>
+                                <span class="inline-flex rounded-md shadow-sm ml-4">
+                                    <button
+                                        type="button"
+                                        class="dark:bg-gray-800 dark:text-pink-500 dark:border-pink-500 clipboard-response-body inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                        Copy
+                                    </button>
+                                </span>
                             </nav>
                         </h3>
                     </div>
                     <div v-if="activeTab === 'raw'">
-                        <pre class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
+                        <json-viewer
+                            v-if="responseIsJson()"
+                            :expand-depth="2"
+                            :value="JSON.parse(currentLog.response.body)"
+                        ></json-viewer>
+
+                        <pre
+                            v-else
+                             class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
                     </div>
                     <div v-if="activeTab === 'preview'">
-                        <div v-if="responseIsJson()">
-                            <pre><span id="jsonResponseBody" class="json"></span></pre>
-                        </div>
                         <iframe v-else :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
                     </div>
                 </div>
@@ -492,6 +523,8 @@
 </div>
 
 <script>
+    Vue.use(JsonView.default)
+
     new Vue({
         el: '#app',
 
@@ -541,28 +574,37 @@
         methods: {
             setActiveTab: function(tab) {
                 this.activeTab = tab;
-                this.$nextTick(function () {
-                  this.formatJsonResponse();
-                });
             },
             clearLogs: function() {
                 fetch('/api/logs/clear');
                 this.logs = []
                 this.currentLog = null;
             },
-            formatJsonResponse: function () {
-                if (this.view === 'response' && this.activeTab === 'preview' && this.responseIsJson()) {
-                    const target = document.getElementById('jsonResponseBody');
-                    target.innerText = JSON.stringify(JSON.parse(this.currentLog.response.body), null, 2)
-                    hljs.highlightBlock(target);
+            responseIsJson: function() {
+                if (! this.currentLog || ! this.currentLog.response || ! this.currentLog.response.headers) {
+                    return false;
+                }
+
+                let hasContentType = /application\/json/g.test(this.currentLog.response.headers['Content-Type']);
+                try {
+                    JSON.parse(this.currentLog.response.body);
+                    return hasContentType;
+                } catch (e) {
+                    return false;
                 }
             },
-            responseIsJson: function() {
-              if (! this.currentLog || ! this.currentLog.response || ! this.currentLog.response.headers) {
-                return false;
-              }
+            requestIsJson: function() {
+                if (! this.currentLog || ! this.currentLog.request || ! this.currentLog.request.headers) {
+                    return false;
+                }
 
-              return /application\/json/g.test(this.currentLog.response.headers['Content-Type']);
+                let hasContentType = /application\/json/g.test(this.currentLog.request.headers['Content-Type']);
+                try {
+                    JSON.parse(this.currentLog.request.body);
+                    return hasContentType;
+                } catch (e) {
+                    return false;
+                }
             },
             toPhpArray: function(rows, variableName) {
                 let output = `$${variableName} = [\n`;
@@ -583,14 +625,12 @@
             },
             setLog: function (id) {
                 this.currentLogId = id;
-                this.formatJsonResponse();
 
                 let url = new URL(window.location);
                 url.hash = id;
                 window.history.pushState({}, '', url);
 
                 this.$nextTick(function () {
-                    this.formatJsonResponse()
                     new ClipboardJS('.clipboard');
 
                     new ClipboardJS('.clipboard-query', {
@@ -608,6 +648,18 @@
                     new ClipboardJS('.clipboard-headers', {
                         text: (trigger) => {
                             return this.toPhpArray(this.currentLog.request.headers, 'headers');
+                        }
+                    });
+
+                    new ClipboardJS('.clipboard-request-body', {
+                        text: (trigger) => {
+                            return this.currentLog.request.body;
+                        }
+                    });
+
+                    new ClipboardJS('.clipboard-response-body', {
+                        text: (trigger) => {
+                            return this.currentLog.response.body;
                         }
                     });
                 });
