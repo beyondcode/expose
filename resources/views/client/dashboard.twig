@@ -173,6 +173,28 @@
                               class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
                     </button>
                 </div>
+                <div class="flex items-center pb-4 justify-between">
+                    <span
+                        @click.prevent="sideBySide = !sideBySide"
+                        class="mr-3 cursor-pointer" id="annual-billing-label">
+                        <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Show Request/Response in individual tabs:</span>
+                   </span>
+                    <button type="button"
+                            :class="{
+                                'bg-pink-500': sideBySide,
+                                'dark:bg-gray-700 bg-gray-200': ! sideBySide,
+                            }"
+                            @click.prevent="sideBySide = !sideBySide"
+                            class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
+                        <span class="sr-only">Follow Request</span>
+                        <span aria-hidden="true"
+                              :class="{
+                                  'translate-x-5': sideBySide,
+                                  'translate-x-0': ! sideBySide,
+                                    }"
+                              class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+                    </button>
+                </div>
                 <div class="flex mb-4">
                         <span class="h-8 inline-flex rounded-md shadow-sm">
                               <button @click.prevent="clearLogs"
@@ -312,7 +334,11 @@
                     </div>
                 </div>
                 <div>
-                    <div class="hidden sm:block">
+                    <div
+                        :class="{
+                            'hidden' : sideBySide,
+                        }"
+                        class="sm:block">
                         <div class="border-b border-gray-200 dark:border-gray-700">
                             <nav class="-mb-px flex">
                                 <a href="#"
@@ -321,16 +347,17 @@
                                         'dark:bg-gray-900 dark:border-pink-500 border-indigo-500 dark:text-pink-500 text-indigo-600 dark:focus:text-pink-400 focus:text-indigo-800 dark:focus:border-pink-400 focus:border-indigo-700': view === 'request',
                                         'border-border-transparent dark:text-gray-200 text-gray-500 dark:hover:text-gray-100 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'response',
                                    }"
-                                   class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
+                                   class="flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
                                     Request
                                 </a>
                                 <a href="#"
+                                   v-if="sideBySide"
                                    @click.prevent="setView('response')"
                                    :class="{
                                         'dark:bg-gray-900 dark:border-pink-500 border-indigo-500 dark:text-pink-500 text-indigo-600 dark:focus:text-pink-400 focus:text-indigo-800 dark:focus:border-pink-400 focus:border-indigo-700': view === 'response',
                                         'border-border-transparent dark:text-gray-200 text-gray-500 dark:hover:text-gray-100 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300': view === 'request',
                                    }"
-                                   class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
+                                   class="flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none">
                                     Response
                                 </a>
                             </nav>
@@ -338,7 +365,7 @@
                     </div>
                 </div>
 
-                <div v-if="view === 'request'">
+                <div v-if="view === 'request' || ! sideBySide">
                     <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center" v-if="Object.keys(currentLog.request.query).length > 0">
                         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Query Parameters
@@ -435,7 +462,18 @@
                     </div>
                 </div>
 
-                <div v-if="view === 'response'">
+                <div
+                    v-if="! sideBySide"
+                     class="border-b border-t border-gray-200 dark:border-gray-700">
+                    <nav class="-mb-px flex">
+                        <a href="#"
+                           class="flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm leading-5 focus:outline-none dark:bg-gray-900 dark:border-pink-500 border-indigo-500 dark:text-pink-500 text-indigo-600 dark:focus:text-pink-400 focus:text-indigo-800 dark:focus:border-pink-400 focus:border-indigo-700">
+                            Response
+                        </a>
+                    </nav>
+                </div>
+
+                <div v-if="view === 'response' || ! sideBySide">
                     <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                             Headers
@@ -539,6 +577,7 @@
             maxLogs: {{ max_logs }},
             highlightNextLog: false,
             followLogs: true,
+            sideBySide: false,
             useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
         },
 
