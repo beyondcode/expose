@@ -390,9 +390,23 @@
                     </div>
 
                     <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center" v-if="Object.keys(currentLog.request.post).length > 0">
-                        <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
-                            Post Parameters
-                        </h3>
+                        <div class="flex">
+                            <svg
+                                v-if="postParametersVisible"
+                                @click="postParametersVisible = false"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                            <svg
+                                v-if="! postParametersVisible"
+                                @click="postParametersVisible = true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
+                                Post Parameters
+                            </h3>
+                        </div>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
                             <button
                                 type="button"
@@ -401,7 +415,9 @@
                             </button>
                         </span>
                     </div>
-                    <div v-for="parameter in currentLog.request.post"
+                    <div
+                        v-if="postParametersVisible"
+                        v-for="parameter in currentLog.request.post"
                          :key="'post_' + parameter.name"
                          class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
@@ -415,9 +431,24 @@
                     </div>
 
                     <div class="px-4 py-5 border-b border-t dark:border-gray-700 border-gray-200 sm:px-6 flex justify-between items-center">
-                        <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
-                            Headers
-                        </h3>
+                        <div class="flex">
+                            <svg
+                                v-if="requestHeadersVisible"
+                                @click="requestHeadersVisible = false"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                            <svg
+                                v-if="! requestHeadersVisible"
+                                @click="requestHeadersVisible = true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+
+                            <h3 class="text-lg leading-6 font-medium dark:text-gray-100 text-gray-900">
+                                Headers
+                            </h3>
+                        </div>
                         <span class="inline-flex rounded-md shadow-sm ml-4">
                             <button
                                 type="button"
@@ -426,7 +457,9 @@
                             </button>
                         </span>
                     </div>
-                    <div v-for="(value, header) in currentLog.request.headers"
+                    <div
+                            v-if="requestHeadersVisible"
+                            v-for="(value, header) in currentLog.request.headers"
                          :key="header"
                          class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
@@ -475,11 +508,29 @@
 
                 <div v-if="view === 'response' || ! sideBySide">
                     <div class="px-4 py-5 border-b dark:border-gray-700 border-gray-200 sm:px-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                            Headers
-                        </h3>
+                        <div class="flex">
+
+                            <svg
+                                v-if="responseHeadersVisible"
+                                @click="responseHeadersVisible = false"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                            <svg
+                                v-if="! responseHeadersVisible"
+                                @click="responseHeadersVisible = true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                                Headers
+                            </h3>
+                        </div>
                     </div>
-                    <div v-for="(value, header) in currentLog.response.headers"
+                    <div
+                        v-if="responseHeadersVisible"
+                        v-for="(value, header) in currentLog.response.headers"
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
@@ -579,6 +630,9 @@
             followLogs: true,
             sideBySide: false,
             useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
+            postParametersVisible: true,
+            requestHeadersVisible: true,
+            responseHeadersVisible: true,
         },
 
         watch: {
