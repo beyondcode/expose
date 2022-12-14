@@ -4,9 +4,9 @@ namespace Tests\Feature\Client;
 
 use App\Client\Configuration;
 use App\Client\Factory;
-use Clue\React\Buzz\Browser;
-use Clue\React\Buzz\Message\ResponseException;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use Tests\Feature\TestCase;
 
 class FileserverTest extends TestCase

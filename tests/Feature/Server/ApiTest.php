@@ -4,8 +4,8 @@ namespace Tests\Feature\Server;
 
 use App\Contracts\ConnectionManager;
 use App\Server\Factory;
-use Clue\React\Buzz\Browser;
-use Clue\React\Buzz\Message\ResponseException;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Nyholm\Psr7\Request;
 use Ratchet\Server\IoConnection;
@@ -24,9 +24,7 @@ class ApiTest extends TestCase
         parent::setUp();
 
         $this->browser = new Browser($this->loop);
-        $this->browser = $this->browser->withOptions([
-            'followRedirects' => false,
-        ]);
+        $this->browser = $this->browser->withFollowRedirects(false);
 
         $this->startServer();
     }

@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Logger\CliRequestLogger;
 use App\Logger\RequestLogger;
-use Clue\React\Buzz\Browser;
+use React\Http\Browser;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\str;

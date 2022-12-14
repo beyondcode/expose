@@ -2,9 +2,9 @@
 
 namespace App\Logger;
 
-use Clue\React\Buzz\Browser;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
+use React\Http\Browser;
 
 class RequestLogger
 {
