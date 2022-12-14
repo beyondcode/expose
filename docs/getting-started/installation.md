@@ -16,10 +16,10 @@ chmod +x expose
 ./expose
 ```
 
-You most likely want to put the `expose.phar` into a directory on your `PATH`, so you can simply call expose from any directory. For example:
+You most likely want to put the `expose` program into a directory on your `PATH`, so you can simply call expose from any directory. For example:
 
 ```
-sudo mv expose.phar /usr/local/bin/expose
+sudo mv expose /usr/local/bin/expose
 ```
 
 After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
