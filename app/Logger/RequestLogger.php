@@ -11,6 +11,9 @@ class RequestLogger
     /** @var array */
     protected $requests = [];
 
+    /** @var Browser */
+    protected $client;
+
     /** @var CliRequestLogger */
     protected $cliRequestLogger;
 

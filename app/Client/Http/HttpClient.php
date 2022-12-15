@@ -5,8 +5,8 @@ namespace App\Client\Http;
 use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
-use GuzzleHttp\Psr7\Message;
 use React\Http\Browser;
+use GuzzleHttp\Psr7\Message;
 use function GuzzleHttp\Psr7\parse_request;
 use Laminas\Http\Request;
 use Psr\Http\Message\RequestInterface;
@@ -100,27 +100,27 @@ class HttpClient
                 $request->getBody()
             )
             ->then(function (ResponseInterface $response) use ($proxyConnection) {
-                if (! isset($response->buffer)) {
-                    $response = $this->rewriteResponseHeaders($response);
+                $response = $this->rewriteResponseHeaders($response);
 
-                    $response->buffer = Message::toString($response);
-                }
+                $response = $response->withoutHeader('Transfer-Encoding');
 
-                $this->sendChunkToServer($response->buffer, $proxyConnection);
+                $responseBuffer = Message::toString($response);
+
+                $this->sendChunkToServer($responseBuffer, $proxyConnection);
 
                 /* @var $body \React\Stream\ReadableStreamInterface */
                 $body = $response->getBody();
 
                 $this->logResponse(Message::toString($response));
 
-                $body->on('data', function ($chunk) use ($proxyConnection, $response) {
-                    $response->buffer .= $chunk;
+                $body->on('data', function ($chunk) use ($proxyConnection, &$responseBuffer) {
+                    $responseBuffer .= $chunk;
 
                     $this->sendChunkToServer($chunk, $proxyConnection);
                 });
 
-                $body->on('close', function () use ($proxyConnection, $response) {
-                    $this->logResponse($response->buffer);
+                $body->on('close', function () use ($proxyConnection, &$responseBuffer) {
+                    $this->logResponse($responseBuffer);
 
                     optional($proxyConnection)->close();
                 });

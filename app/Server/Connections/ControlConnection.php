@@ -18,6 +18,7 @@ class ControlConnection
     public $subdomain;
     public $client_id;
     public $client_version;
+    public $message;
     public $proxies = [];
     protected $shared_at;
 
