@@ -4,11 +4,11 @@ namespace Tests\Feature\Server;
 
 use App\Contracts\ConnectionManager;
 use App\Server\Factory;
-use React\Http\Browser;
-use React\Http\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Nyholm\Psr7\Request;
 use Ratchet\Server\IoConnection;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use Tests\Feature\TestCase;
 
 class ApiTest extends TestCase
