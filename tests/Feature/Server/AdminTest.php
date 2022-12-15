@@ -3,11 +3,11 @@
 namespace Tests\Feature\Server;
 
 use App\Server\Factory;
-use React\Http\Browser;
-use React\Http\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use Tests\Feature\TestCase;
 
 class AdminTest extends TestCase
