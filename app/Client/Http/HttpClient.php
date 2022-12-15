@@ -5,7 +5,6 @@ namespace App\Client\Http;
 use App\Client\Configuration;
 use App\Client\Http\Modifiers\CheckBasicAuthentication;
 use App\Logger\RequestLogger;
-use React\Http\Browser;
 use GuzzleHttp\Psr7\Message;
 use function GuzzleHttp\Psr7\parse_request;
 use Laminas\Http\Request;
@@ -14,6 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
+use React\Http\Browser;
 use React\Socket\Connector;
 
 class HttpClient

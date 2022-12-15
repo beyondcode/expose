@@ -4,10 +4,10 @@ namespace Tests\Feature\Server;
 
 use App\Client\Client;
 use App\Server\Factory;
-use React\Http\Browser;
-use React\Http\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use React\Http\Server;
 use React\Socket\Connection;
 use Tests\Feature\TestCase;
