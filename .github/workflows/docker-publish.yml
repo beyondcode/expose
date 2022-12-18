@@ -21,6 +21,5 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          repository: mwangithegreat/expose-server
           tags: mwangithegreat/expose-server:latest,mwangithegreat/expose-server:${{ steps.version.outputs.VERSION }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
