@@ -152,7 +152,7 @@
                 </div>
                 <div class="flex items-center pb-4 justify-between">
                     <span
-                        @click.prevent="followLogs = !followLogs"
+                        @click.prevent="setFollowLogs(!followLogs)"
                         class="mr-3 cursor-pointer" id="annual-billing-label">
                         <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Follow Requests:</span>
                    </span>
@@ -161,7 +161,7 @@
                                 'bg-pink-500': followLogs,
                                 'dark:bg-gray-700 bg-gray-200': ! followLogs,
                             }"
-                            @click.prevent="followLogs = !followLogs"
+                            @click.prevent="setFollowLogs(!followLogs)"
                             class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
                         <span class="sr-only">Follow Request</span>
                         <!-- Enabled: "translate-x-5", Not Enabled: "translate-x-0" -->
@@ -175,7 +175,7 @@
                 </div>
                 <div class="flex items-center pb-4 justify-between">
                     <span
-                        @click.prevent="sideBySide = !sideBySide"
+                        @click.prevent="setSideBySide(!sideBySide)"
                         class="mr-3 cursor-pointer" id="annual-billing-label">
                         <span class="text-sm font-medium dark:text-gray-200 text-gray-900">Show Request/Response in individual tabs:</span>
                    </span>
@@ -184,7 +184,7 @@
                                 'bg-pink-500': sideBySide,
                                 'dark:bg-gray-700 bg-gray-200': ! sideBySide,
                             }"
-                            @click.prevent="sideBySide = !sideBySide"
+                            @click.prevent="setSideBySide(!sideBySide)"
                             class=" relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" role="switch" aria-checked="false" aria-labelledby="annual-billing-label">
                         <span class="sr-only">Follow Request</span>
                         <span aria-hidden="true"
@@ -393,13 +393,13 @@
                         <div class="flex">
                             <svg
                                 v-if="postParametersVisible"
-                                @click="postParametersVisible = false"
+                                @click="setPostParametersVisible(false)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                             <svg
                                 v-if="! postParametersVisible"
-                                @click="postParametersVisible = true"
+                                @click="setPostParametersVisible(true)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
@@ -434,13 +434,13 @@
                         <div class="flex">
                             <svg
                                 v-if="requestHeadersVisible"
-                                @click="requestHeadersVisible = false"
+                                @click="setRequestHeadersVisible(false)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                             <svg
                                 v-if="! requestHeadersVisible"
-                                @click="requestHeadersVisible = true"
+                                @click="setRequestHeadersVisible(true)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
@@ -458,7 +458,7 @@
                         </span>
                     </div>
                     <div
-                            v-if="requestHeadersVisible"
+                            v-if="requestHeadersVisible && currentLog.request"
                             v-for="(value, header) in currentLog.request.headers"
                          :key="header"
                          class="even:bg-gray-50 bg-gray-50 dark:even:bg-gray-700 dark:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -512,13 +512,13 @@
 
                             <svg
                                 v-if="responseHeadersVisible"
-                                @click="responseHeadersVisible = false"
+                                @click="setResponseHeadersVisible(false)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                             <svg
                                 v-if="! responseHeadersVisible"
-                                @click="responseHeadersVisible = true"
+                                @click="setResponseHeadersVisible(true)"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="cursor-pointer w-6 h-6 mr-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
@@ -530,7 +530,7 @@
                     </div>
                     <div
                         v-if="responseHeadersVisible"
-                        v-for="(value, header) in currentLog.response.headers"
+                        v-for="(value, header) in responseHeaders"
                          :key="header"
                          class="even:bg-gray-50 odd:bg-gray-50 dark:even:bg-gray-700 dark:odd:bg-gray-800 px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm leading-5 font-medium dark:text-gray-200 text-gray-700">
@@ -586,7 +586,7 @@
                             </nav>
                         </h3>
                     </div>
-                    <div v-if="activeTab === 'raw'">
+                    <div v-if="activeTab === 'raw' && currentLog.response">
                         <json-viewer
                             v-if="responseIsJson()"
                             :expand-depth="2"
@@ -598,7 +598,7 @@
                              class="p-6 text-sm whitespace-pre-wrap break-all">@{ currentLog.response.body }</pre>
                     </div>
                     <div v-if="activeTab === 'preview'">
-                        <iframe v-else :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
+                        <iframe :srcdoc="currentLog.response.body" style="height: 500px;" class="w-full h-full"></iframe>
                     </div>
                 </div>
             </div>
@@ -627,12 +627,12 @@
             logs: [],
             maxLogs: {{ max_logs }},
             highlightNextLog: false,
-            followLogs: true,
-            sideBySide: false,
-            useDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
-            postParametersVisible: true,
-            requestHeadersVisible: true,
-            responseHeadersVisible: true,
+            followLogs: window.localStorage.getItem('followLogs') !== null ? window.localStorage.getItem('followLogs') === 'true' : true,
+            sideBySide: window.localStorage.getItem('sideBySide') === 'true',
+            useDarkMode: window.localStorage.getItem('useDarkMode') !== null ? window.localStorage.getItem('useDarkMode') === 'true' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),
+            postParametersVisible: window.localStorage.getItem('postParametersVisible') !== null ? window.localStorage.getItem('postParametersVisible') === 'true' : true,
+            requestHeadersVisible: window.localStorage.getItem('requestHeadersVisible') !== null ? window.localStorage.getItem('requestHeadersVisible') === 'true' : true,
+            responseHeadersVisible: window.localStorage.getItem('responseHeadersVisible') !== null ? window.localStorage.getItem('responseHeadersVisible') === 'true' : true,
         },
 
         watch: {
@@ -640,8 +640,10 @@
                 handler: function(value) {
                     if (value) {
                         document.querySelector('html').classList.add('dark')
+                        window.localStorage.setItem('useDarkMode', 'true')
                     } else {
                         document.querySelector('html').classList.remove('dark')
+                        window.localStorage.setItem('useDarkMode', 'false')
                     }
                 },
                 immediate: true,
@@ -654,6 +656,15 @@
                     return log.id === this.currentLogId;
                 });
             },
+
+            responseHeaders: function() {
+                if (this.currentLog && this.currentLog.response) {
+                    return this.currentLog.response.headers;
+                }
+
+                return [];
+            },
+
             filteredLogs: function() {
                 if (this.search === '') {
                     return this.logs;
@@ -665,14 +676,41 @@
         },
 
         methods: {
+            setFollowLogs: function(value) {
+                this.followLogs = value;
+                window.localStorage.setItem('followLogs', value);
+            },
+
+            setSideBySide: function(value) {
+                this.sideBySide = value;
+                window.localStorage.setItem('sideBySide', value);
+            },
+
+            setPostParametersVisible: function(value) {
+                this.postParametersVisible = value;
+                window.localStorage.setItem('postParametersVisible', value);
+            },
+
+            setRequestHeadersVisible: function(value) {
+                this.requestHeadersVisible = value;
+                window.localStorage.setItem('requestHeadersVisible', value);
+            },
+
+            setResponseHeadersVisible: function(value) {
+                this.responseHeadersVisible = value;
+                window.localStorage.setItem('responseHeadersVisible', value);
+            },
+
             setActiveTab: function(tab) {
                 this.activeTab = tab;
             },
+
             clearLogs: function() {
                 fetch('/api/logs/clear');
                 this.logs = []
                 this.currentLog = null;
             },
+
             responseIsJson: function() {
                 if (! this.currentLog || ! this.currentLog.response || ! this.currentLog.response.headers) {
                     return false;
