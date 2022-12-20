@@ -6,6 +6,7 @@ order: 1
 # Installation
 
 ## PHP Archive (PHAR)
+
 We distribute Expose as a PHAR archive that contains everything you need in order to use Expose. Simply download it from [here]() and make it executable:
 
 ```
@@ -23,8 +24,9 @@ sudo mv expose /usr/local/bin/expose
 ```
 
 After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
- 
+
 ## Via Composer
+
 Expose is a PHP application and you can install the client for your local machine as a global composer dependency:
 
 ```bash
@@ -60,7 +62,6 @@ docker run expose serve my-domain.com # start a server
 ```
 
 Now you're ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
-
 
 ### Extending Expose
 
