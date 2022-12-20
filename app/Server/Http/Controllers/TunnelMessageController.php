@@ -120,7 +120,14 @@ class TunnelMessageController extends Controller
 
     protected function prepareRequest(Request $request, ControlConnection $controlConnection): Request
     {
-        $request::setTrustedProxies([$controlConnection->socket->remoteAddress, '127.0.0.1'], Request::HEADER_X_FORWARDED_ALL);
+        $request::setTrustedProxies(
+            [$controlConnection->socket->remoteAddress, '127.0.0.1'],
+            Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB
+        );
 
         $host = $controlConnection->serverHost;
 

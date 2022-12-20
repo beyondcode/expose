@@ -3,7 +3,7 @@
 namespace App\Client\Callbacks;
 
 use App\Server\Connections\ControlConnection;
-use Clue\React\Buzz\Browser;
+use React\Http\Browser;
 
 class WebHookConnectionCallback
 {

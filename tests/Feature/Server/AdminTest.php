@@ -3,11 +3,11 @@
 namespace Tests\Feature\Server;
 
 use App\Server\Factory;
-use Clue\React\Buzz\Browser;
-use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use Tests\Feature\TestCase;
 
 class AdminTest extends TestCase
@@ -23,9 +23,7 @@ class AdminTest extends TestCase
         parent::setUp();
 
         $this->browser = new Browser($this->loop);
-        $this->browser = $this->browser->withOptions([
-            'followRedirects' => false,
-        ]);
+        $this->browser = $this->browser->withFollowRedirects(false);
 
         $this->startServer();
     }

@@ -101,7 +101,7 @@ class ConnectionHandler
                     }
                 }
 
-                public function accept()
+                public function accept(): bool
                 {
                     return $this->isAccepted($this->filename);
                 }

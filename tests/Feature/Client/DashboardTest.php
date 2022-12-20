@@ -7,8 +7,6 @@ use App\Client\Factory;
 use App\Client\Http\HttpClient;
 use App\Logger\LoggedRequest;
 use App\Logger\RequestLogger;
-use Clue\React\Buzz\Browser;
-use Clue\React\Buzz\Message\ResponseException;
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use function GuzzleHttp\Psr7\str;
@@ -16,6 +14,8 @@ use Illuminate\Support\Arr;
 use Mockery as m;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
+use React\Http\Message\ResponseException;
 use Tests\Feature\TestCase;
 
 class DashboardTest extends TestCase

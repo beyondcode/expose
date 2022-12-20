@@ -4,12 +4,12 @@ namespace App\Providers;
 
 use App\Logger\CliRequestLogger;
 use App\Logger\RequestLogger;
-use Clue\React\Buzz\Browser;
 use Illuminate\Support\ServiceProvider;
 use Laminas\Uri\Uri;
 use Laminas\Uri\UriFactory;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
+use React\Http\Browser;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(LoopInterface::class, function () {
             return LoopFactory::create();
+        });
+
+        $this->app->bind(Browser::class, function ($app) {
+            return new Browser($app->make(LoopInterface::class));
         });
 
         $this->app->singleton(RequestLogger::class, function ($app) {
