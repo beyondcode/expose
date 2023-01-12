@@ -4,8 +4,6 @@ namespace App\Client\Http\Controllers;
 
 use App\Client\Client;
 use App\Http\Controllers\Controller;
-use GuzzleHttp\Psr7\Message;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Ratchet\ConnectionInterface;
 
