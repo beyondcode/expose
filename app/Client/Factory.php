@@ -7,6 +7,7 @@ use App\Client\Http\Controllers\AttachDataToLogController;
 use App\Client\Http\Controllers\ClearLogsController;
 use App\Client\Http\Controllers\CreateTunnelController;
 use App\Client\Http\Controllers\DashboardController;
+use App\Client\Http\Controllers\GetTunnelsController;
 use App\Client\Http\Controllers\LogController;
 use App\Client\Http\Controllers\PushLogsToDashboardController;
 use App\Client\Http\Controllers\ReplayLogController;
@@ -143,6 +144,7 @@ class Factory
     {
         $this->router->get('/', DashboardController::class);
 
+        $this->router->get('/api/tunnels', GetTunnelsController::class);
         $this->router->post('/api/tunnel', CreateTunnelController::class);
         $this->router->get('/api/logs', LogController::class);
         $this->router->post('/api/logs', PushLogsToDashboardController::class);
