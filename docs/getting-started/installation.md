@@ -22,7 +22,7 @@ You most likely want to put the `expose` program into a directory on your `PATH`
 sudo mv expose /usr/local/bin/expose
 ```
 
-After that, you are ready to go and can [share your first site](/docs/expose/getting-started/sharing-your-first-site).
+After that, you are ready to go and can [share your first site](/docs/getting-started/sharing-your-first-site).
  
 ## Via Composer
 Expose is a PHP application and you can install the client for your local machine as a global composer dependency:
