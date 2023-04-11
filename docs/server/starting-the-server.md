@@ -61,7 +61,7 @@ command=/usr/bin/php /home/expose/expose serve
 numprocs=1
 autostart=true
 autorestart=true
-user=forge
+environment=HOME="/home/forge/",USER="forge"
 ```
 
 Once created, instruct `supervisor` to reload its configuration files (without impacting the already running `supervisor` jobs).
