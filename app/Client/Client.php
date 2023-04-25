@@ -93,17 +93,19 @@ class Client
 
         $exposeVersion = config('app.version');
 
+        $serverPort = $this->configuration->port();
+
         $wsProtocol = $this->configuration->port() === 443 ? 'wss' : 'ws';
 
         connect($wsProtocol."://{$this->configuration->host()}:{$this->configuration->port()}/expose/control?authToken={$authToken}&version={$exposeVersion}", [], [
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
-            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $serverHost, $deferred, $authToken) {
+            ->then(function (WebSocket $clientConnection) use ($sharedUrl, $subdomain, $serverHost, $serverPort, $deferred, $authToken) {
                 $this->connectionRetries = 0;
 
                 $connection = ControlConnection::create($clientConnection);
 
-                $connection->authenticate($sharedUrl, $subdomain, $serverHost);
+                $connection->authenticate($sharedUrl, $subdomain, $serverHost, $serverPort);
 
                 $clientConnection->on('close', function () use ($sharedUrl, $subdomain, $serverHost, $authToken) {
                     $this->logger->error('Connection to server closed.');

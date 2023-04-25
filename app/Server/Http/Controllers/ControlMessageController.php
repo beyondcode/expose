@@ -183,7 +183,7 @@ class ControlMessageController implements MessageComponentInterface
 
                 $data->subdomain = $subdomain;
 
-                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->server_host, $connection);
+                $connectionInfo = $this->connectionManager->storeConnection($data->host, $data->subdomain, $data->server_host, $data->server_port, $connection);
 
                 $this->connectionManager->limitConnectionLength($connectionInfo, config('expose.admin.maximum_connection_length'));
 
