@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Concerns;
 
-use function GuzzleHttp\Psr7\stream_for;
 use Ratchet\ConnectionInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+
+use function GuzzleHttp\Psr7\stream_for;
 
 trait LoadsViews
 {
