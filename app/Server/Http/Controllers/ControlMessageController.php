@@ -14,8 +14,9 @@ use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use function React\Promise\reject;
 use stdClass;
+
+use function React\Promise\reject;
 
 class ControlMessageController implements MessageComponentInterface
 {
