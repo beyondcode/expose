@@ -108,9 +108,9 @@ class Factory
 
     public function createClient()
     {
-        $this->bindClient();
-
         $this->bindConfiguration();
+
+        $this->bindClient();
 
         $this->bindProxyManager();
 
