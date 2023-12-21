@@ -16,5 +16,7 @@
     "compression": "GZ",
     "compactors": [
         "KevinGH\\Box\\Compactor\\Json"
-    ]
+    ],
+    "output": "builds/expose",
+    "main": "expose"
 }
