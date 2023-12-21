@@ -53,7 +53,7 @@ class ConnectionManager implements ConnectionManagerContract
         });
     }
 
-    public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ConnectionInterface $connection): ControlConnection
+    public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ?string $serverPort, ConnectionInterface $connection): ControlConnection
     {
         $clientId = (string) uniqid();
 
@@ -65,6 +65,7 @@ class ConnectionManager implements ConnectionManagerContract
             $subdomain ?? $this->subdomainGenerator->generateSubdomain(),
             $clientId,
             $serverHost,
+            $serverPort,
             $this->getAuthTokenFromConnection($connection)
         );
 

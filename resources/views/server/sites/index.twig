@@ -29,7 +29,7 @@
                                 @{ site.host }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
-                                @{ site.subdomain }.{{ configuration.hostname()}}:{{ configuration.port() }}
+                                @{ site.subdomain }.@{ site.server_host}:@{ site.server_port }
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                 @{ site.user?.name }

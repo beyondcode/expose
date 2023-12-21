@@ -14,6 +14,7 @@ class ControlConnection
     public $socket;
     public $host;
     public $serverHost;
+    public $serverPort;
     public $authToken;
     public $subdomain;
     public $client_id;
@@ -22,7 +23,7 @@ class ControlConnection
     public $proxies = [];
     protected $shared_at;
 
-    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId, string $serverHost, string $authToken = '')
+    public function __construct(ConnectionInterface $socket, string $host, string $subdomain, string $clientId, string $serverHost, string $serverPort = '', string $authToken = '')
     {
         $this->socket = $socket;
         $this->host = $host;
@@ -30,6 +31,7 @@ class ControlConnection
         $this->client_id = $clientId;
         $this->authToken = $authToken;
         $this->serverHost = $serverHost;
+        $this->serverPort = $serverPort;
         $this->shared_at = now()->toDateTimeString();
         $this->client_version = QueryParameters::create($socket->httpRequest)->get('version');
     }
@@ -69,6 +71,7 @@ class ControlConnection
             'host' => $this->host,
             'remote_address' => $this->socket->remoteAddress ?? null,
             'server_host' => $this->serverHost,
+            'server_port' => $this->serverPort,
             'client_id' => $this->client_id,
             'client_version' => $this->client_version,
             'auth_token' => $this->authToken,

@@ -8,7 +8,7 @@ use Ratchet\ConnectionInterface;
 
 interface ConnectionManager
 {
-    public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ConnectionInterface $connection): ControlConnection;
+    public function storeConnection(string $host, ?string $subdomain, ?string $serverHost, ?string $serverPort, ConnectionInterface $connection): ControlConnection;
 
     public function storeTcpConnection(int $port, ConnectionInterface $connection): ControlConnection;
 
