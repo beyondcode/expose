@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Check the docs
+    url: https://expose.dev/docs/introduction
+    about: "This repository contains the open source version of Expose. Please contact our email support if you have issues with our network or Expose Pro!"
+  - name: Security vulnerabilities
+    url: https://@beyondco.de
+    about: If you want to report a security issue, please contact our support.
