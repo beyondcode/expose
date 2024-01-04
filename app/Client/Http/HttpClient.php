@@ -50,7 +50,17 @@ class HttpClient
 
         $this->request = $this->parseRequest($requestData);
 
-        $this->logger->logRequest($requestData, $this->request);
+        $request      = $this->request;
+        $content_type = $request->getHeader('content-type');
+
+        $is_post   = $request->getMethod() == 'POST';
+        $is_upload = $is_post && $content_type->match('multipart/form-data');
+
+        // Do not log upload requests
+
+        if (!$is_upload) {
+            $this->logger->logRequest($requestData, $this->request);
+        }
 
         $request = $this->passRequestThroughModifiers(parse_request($requestData), $proxyConnection);
 
