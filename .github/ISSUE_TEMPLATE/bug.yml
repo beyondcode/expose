@@ -1,0 +1,52 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a bug report, please search for the behaviour in the existing issues.
+
+        ---
+
+        Thank you for taking the time to file a bug report. To address this bug as fast as possible, we need some information.
+  - type: dropdown
+    id: arch
+    attributes:
+      label: System architecture
+      description: "Which operating system architecture are you using?"
+      options:
+        - Mac, Intel (x86)
+        - Mac, ARM64 (M1, M2, etc)
+        - Windows
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: php
+    attributes:
+      label: PHP Version
+      description: "If your problem only occurs with a certain PHP version, please provide it in the field below."
+      placeholder: "PHP 8.2.8 (cli) (built: Jul  7 2023 00:11:29) (NTS)"
+    validations:
+      required: false
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug description
+      description: What happened and what did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which steps do we need to take to reproduce this error?
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: If applicable, provide relevant log output. No need for backticks here.
+      render: shell

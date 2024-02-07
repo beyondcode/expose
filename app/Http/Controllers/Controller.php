@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\LoadsViews;
 use App\Http\Controllers\Concerns\ParsesIncomingRequest;
-use function GuzzleHttp\Psr7\parse_request;
 use Illuminate\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
+
+use function GuzzleHttp\Psr7\parse_request;
 
 abstract class Controller implements HttpServerInterface
 {

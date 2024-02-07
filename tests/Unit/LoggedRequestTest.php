@@ -4,9 +4,10 @@ namespace Tests\Unit;
 
 use App\Logger\LoggedRequest;
 use GuzzleHttp\Psr7\Request;
-use function GuzzleHttp\Psr7\str;
 use Laminas\Http\Request as LaminasRequest;
 use Tests\TestCase;
+
+use function GuzzleHttp\Psr7\str;
 
 class LoggedRequestTest extends TestCase
 {

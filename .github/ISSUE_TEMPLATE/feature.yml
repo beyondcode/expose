@@ -1,0 +1,21 @@
+name: Feature Request
+description: Propose a new feature for the open source version of Expose
+title: "[Feature Request]: "
+labels: [feature request]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature for the Expose open source version!
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: How should this feature look like?
+    validations:
+      required: true
+  - type: textarea
+    id: valuable
+    attributes:
+      label: Is this feature valuable for other users as well and why?
+      description: We want to build software that provides a great experience for all of us.
