@@ -135,7 +135,7 @@ class Factory
 
     protected function addAdminRoutes()
     {
-        $adminCondition = 'request.headers.get("Host") matches "/^' . config('expose.admin.subdomain') . '\\\\./i"';
+        $adminCondition = 'request.headers.get("Host") matches "/^'.config('expose.admin.subdomain').'\\\\./i"';
 
         $this->router->get('/', RedirectToUsersController::class, $adminCondition);
         $this->router->get('/users', ListUsersController::class, $adminCondition);
@@ -173,7 +173,7 @@ class Factory
 
     protected function addValidateTunnel()
     {
-        $localCondition = 'request.headers.get("Host") matches "/^' . $this->host . ':' . $this->port . '$/i"';
+        $localCondition = 'request.headers.get("Host") matches "/^'.$this->host.':'.$this->port.'$/i"';
 
         $this->router->get('/validate-tunnel', ValidateTunnelController::class, $localCondition);
 
@@ -287,7 +287,7 @@ class Factory
         app()->singleton(DatabaseInterface::class, function () {
             $factory = new \Clue\React\SQLite\Factory($this->loop);
 
-            $options = ['worker_command' => Phar::running(false) ? Phar::running(false) . ' --sqlite-worker' : null];
+            $options = ['worker_command' => Phar::running(false) ? Phar::running(false).' --sqlite-worker' : null];
 
             return $factory->openLazy(
                 config('expose.admin.database', ':memory:'),

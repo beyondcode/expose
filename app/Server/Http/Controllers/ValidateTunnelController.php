@@ -56,7 +56,7 @@ class ValidateTunnelController extends Controller
 
         // Also allow the admin dashboard
         $adminSubdomain = config('expose.admin.subdomain');
-        if ($domain === $adminSubdomain . '.' . $hostname) {
+        if ($domain === $adminSubdomain.'.'.$hostname) {
             $this->isSuccessful($httpConnection);
 
             return;
@@ -91,7 +91,6 @@ class ValidateTunnelController extends Controller
 
             return;
         }
-
 
         $httpConnection->send(respond_json(['exists' => false, 'error' => 'no_tunnel_found'], 404));
         $httpConnection->close();
