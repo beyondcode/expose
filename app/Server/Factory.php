@@ -38,6 +38,7 @@ use App\Server\Http\Controllers\Admin\StoreSubdomainController;
 use App\Server\Http\Controllers\Admin\StoreUsersController;
 use App\Server\Http\Controllers\ControlMessageController;
 use App\Server\Http\Controllers\TunnelMessageController;
+use App\Server\Http\Controllers\ValidateTunnelController;
 use App\Server\Http\Router;
 use App\Server\LoggerRepository\NullLogger;
 use App\Server\StatisticsCollector\DatabaseStatisticsCollector;
@@ -166,6 +167,15 @@ class Factory
 
         $this->router->get('/api/tcp', GetTcpConnectionsController::class, $adminCondition);
         $this->router->delete('/api/tcp/{id}', DisconnectTcpConnectionController::class, $adminCondition);
+
+        return $this;
+    }
+
+    protected function addValidateTunnel()
+    {
+        $this->router->get('/validate-tunnel', ValidateTunnelController::class);
+
+        return $this;
     }
 
     protected function bindConfiguration()
@@ -209,7 +219,8 @@ class Factory
             ->ensureDatabaseIsInitialized()
             ->registerStatisticsCollector()
             ->bindConnectionManager()
-            ->addAdminRoutes();
+            ->addAdminRoutes()
+            ->addValidateTunnel();
 
         $controlConnection = $this->addControlConnectionRoute();
 
