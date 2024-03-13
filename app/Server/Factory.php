@@ -175,8 +175,7 @@ class Factory
     {
         $localCondition = 'request.headers.get("Host") matches "/^' . $this->host . ':' . $this->port . '$/i"';
 
-//        $this->router->get('/validate-tunnel', ValidateTunnelController::class, $localCondition);
-        $this->router->get('/validate-tunnel', ValidateTunnelController::class);
+        $this->router->get('/validate-tunnel', ValidateTunnelController::class, $localCondition);
 
         return $this;
     }
