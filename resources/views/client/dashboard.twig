@@ -604,7 +604,7 @@
             </div>
             <div v-else  class="flex-col bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg justify-center items-center flex py-4">
                 <h1 class="text-lg">Waiting for connections...</h1>
-                <img src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ subdomains[0] ?? '' | url_encode }}&choe=UTF-8&chf=bg,s,FFFFFF00" />
+                <img src="https://image-charts.com/chart?chs=500x500&cht=qr&chl={{ subdomains[0] ?? '' | url_encode }}&choe=UTF-8&chf=bg,s,FFFFFF00" />
                 <a class="text-sm" href="{{ subdomains[0] }}" target="_blank">{{ subdomains[0] }}</a>
             </div>
         </div>
