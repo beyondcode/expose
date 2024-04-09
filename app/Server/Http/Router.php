@@ -3,8 +3,6 @@
 namespace App\Server\Http;
 
 use App\Http\QueryParameters;
-use function GuzzleHttp\Psr7\build_query;
-use function GuzzleHttp\Psr7\parse_query;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
@@ -15,6 +13,9 @@ use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+
+use function GuzzleHttp\Psr7\build_query;
+use function GuzzleHttp\Psr7\parse_query;
 
 class Router implements HttpServerInterface
 {
@@ -72,7 +73,7 @@ class Router implements HttpServerInterface
 
         $parameters = [];
         foreach ($route as $key => $value) {
-            if ((is_string($key)) && ('_' !== substr($key, 0, 1))) {
+            if (is_string($key) && ('_' !== substr($key, 0, 1))) {
                 $parameters[$key] = $value;
             }
         }

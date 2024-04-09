@@ -8,13 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Server\Configuration;
 use App\Server\Connections\ControlConnection;
 use App\Server\Connections\HttpConnection;
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\Frame;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+
+use function GuzzleHttp\Psr7\str;
 
 class TunnelMessageController extends Controller
 {

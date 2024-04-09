@@ -4,7 +4,6 @@ namespace App\Logger;
 
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Message;
-use function GuzzleHttp\Psr7\parse_request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laminas\Http\Header\GenericHeader;
@@ -12,6 +11,8 @@ use Laminas\Http\Request;
 use Laminas\Http\Response;
 use Namshi\Cuzzle\Formatter\CurlFormatter;
 use Riverline\MultiPartParser\StreamedPart;
+
+use function GuzzleHttp\Psr7\parse_request;
 
 class LoggedRequest implements \JsonSerializable
 {

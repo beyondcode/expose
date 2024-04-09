@@ -6,11 +6,12 @@ use App\Client\Connections\ControlConnection;
 use App\Logger\CliRequestLogger;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+
+use function Ratchet\Client\connect;
 
 class Client
 {
