@@ -30,4 +30,9 @@ class HttpConnection
 
         $this->socket->close();
     }
+
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->socket;
+    }
 }

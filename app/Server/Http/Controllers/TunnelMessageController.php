@@ -98,6 +98,10 @@ class TunnelMessageController extends Controller
                 $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
                 $request = $psrHttpFactory->createRequest($request);
 
+                $httpConnection->getConnection()->on('data', function($d) use ($proxy) {
+                    $proxy->send(new Frame($d, true, Frame::OP_BINARY));
+                });
+
                 $binaryMsg = new Frame(str($request), true, Frame::OP_BINARY);
                 $proxy->send($binaryMsg);
             });
