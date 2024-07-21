@@ -54,7 +54,7 @@ class HttpClient
 
         $request = $this->passRequestThroughModifiers(parse_request($requestData), $proxyConnection);
 
-        transform($request, function ($request) use ($proxyConnection) {
+        return transform($request, function ($request) use ($proxyConnection) {
             return $this->sendRequestToApplication($request, $proxyConnection);
         });
     }

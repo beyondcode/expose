@@ -36,8 +36,6 @@ class ProxyManager
                 $localRequestConnection = null;
 
                 $proxyConnection->on('message', function ($message) use (&$localRequestConnection, $proxyConnection, $connectionData) {
-                    $this->performRequest($proxyConnection, (string) $message, $connectionData);
-
                     if ($localRequestConnection) {
                         $localRequestConnection->write($message);
                         return;
