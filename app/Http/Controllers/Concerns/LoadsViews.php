@@ -30,4 +30,8 @@ trait LoadsViews
             var_dump($e->getMessage());
         }
     }
+
+    protected function getBlade(?ConnectionInterface $connection, string $view, array $data = []) {
+        return stream_for(view($view, $data)); // TODO: deprecated
+    }
 }
