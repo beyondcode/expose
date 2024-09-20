@@ -94,7 +94,7 @@ abstract class ServerAwareCommand extends Command
             ])->get(
                 // config('expose.server_endpoint', static::DEFAULT_SERVER_ENDPOINT)
                 'https://expose-platform.test/api/servers'
-                )->json();
+            )->json();
         } catch (\Throwable $e) {
             return [];
         }
