@@ -31,7 +31,8 @@ trait LoadsViews
         }
     }
 
-    protected function getBlade(?ConnectionInterface $connection, string $view, array $data = []) {
+    protected function getBlade(?ConnectionInterface $connection, string $view, array $data = [])
+    {
         return stream_for(view($view, $data)); // TODO: deprecated
     }
 }
