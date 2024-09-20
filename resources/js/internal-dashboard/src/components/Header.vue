@@ -3,7 +3,7 @@ import { useColorMode } from '@vueuse/core'
 import Search from '@/components/ui/Search.vue'
 import { Icon } from '@iconify/vue'
 import { Button } from '@/components/ui/button'
-import { ref } from 'vue';
+
 import {
     Tooltip,
     TooltipContent,

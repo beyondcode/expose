@@ -76,10 +76,25 @@ const connect = () => {
 
 
 
+
 </script>
 
 <template>
-    <Card class="w-full md:w-2/5 md:max-w-[400px]">
+    <Card class="min-w-[350px] w-full md:w-auto">
+        <div class="flex items-center justify-between p-3 border-b">
+            <div class="items-center flex space-x-2 text-sm">
+                <Checkbox v-model:checked="followRequests" id="followRequests"/>
+                <label for="followRequests"
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Follow Requests
+                </label>
+            </div>
+            <Button @click="loadLogs" variant="outline" class="">
+                Clear
+            </Button>
+
+
+        </div>
         <Table>
             <TableHeader>
                 <TableRow>
