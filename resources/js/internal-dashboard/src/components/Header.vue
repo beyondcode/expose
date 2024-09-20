@@ -18,7 +18,6 @@ defineProps<{
 
 const mode = useColorMode()
 
-const followRequests = ref(true as boolean)
 
 const toggleAppearance = () => {
     if (mode.value === 'light') {
@@ -28,17 +27,12 @@ const toggleAppearance = () => {
     }
 }
 
-const toggleFollowRequests = () => {
-    followRequests.value = !followRequests.value
-}
-
-
 </script>
 
 
 <template>
     <div>
-        <div class="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto py-6 flex items-center justify-between">
             <div>
                 <a href="https://expose.dev" target="_blank" class="inline-flex items-center self-start">
                     <img src="https://beyondco.de/apps/icons/expose.png" class="h-10">
@@ -75,20 +69,6 @@ const toggleFollowRequests = () => {
 
             <div class="flex items-center space-x-4">
                 <Search />
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button @click="toggleFollowRequests" variant="outline"
-                                :class="{ 'border-pink-600 text-pink-600': followRequests }">
-                                <Icon icon="radix-icons:enter" class="h-[1.2rem] w-[1.2rem] " />
-                                <span class="sr-only">Toggle follow requests</span>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Follow Requests: {{ followRequests }}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
 
                 <TooltipProvider>
                     <Tooltip>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Button } from './ui/button';
+import { Checkbox } from './ui/checkbox';
 import { Card } from './ui/card';
 import ResponseBadge from '@/components/ui/ResponseBadge.vue'
 import {
@@ -15,8 +17,8 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
+const followRequests = ref(true as boolean); // TODO:
 
-defineProps(["requests"])
 
 </script>
 
