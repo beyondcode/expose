@@ -37,7 +37,7 @@ defineProps(["requests"])
             <TableBody>
                 <TableRow v-for="request in requests" :key="request.id">
                     <TableCell class="pr-0">
-                        <ResponseBadge :statusCode="request.response.status" />
+                        <ResponseBadge :statusCode="request.response && request.response.status ? request.response.status : null" />
                     </TableCell>
 
                     <TableCell class="text-left pr-0">
