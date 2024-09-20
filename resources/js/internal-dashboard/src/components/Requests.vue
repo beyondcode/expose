@@ -79,7 +79,7 @@ const connect = () => {
 </script>
 
 <template>
-    <Card class="w-full">
+    <Card class="w-full md:w-2/5 md:max-w-[400px]">
         <Table>
             <TableHeader>
                 <TableRow>
