@@ -30,3 +30,9 @@ declare interface RequestData {
     request: RequestData;
     response: ResponseData;
   }
+
+  interface InternalDashboardPageData {
+    subdomains: string[];
+    user: object;
+    max_logs: number;
+  }

@@ -10,8 +10,7 @@
 </head>
 
 <body>
-    <div id="internalDashboard">
-    </div>
+    <div id="internalDashboard" data-page='@json($page)'></div>
 
     <script src="{{ $jsFile }}"></script>
 </body>

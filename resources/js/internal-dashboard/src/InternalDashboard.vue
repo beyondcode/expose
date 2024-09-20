@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
 import ResponseBadge from '@/components/ui/ResponseBadge.vue'
-import { exampleRequests, exampleSubdomains } from './lib/devUtils';
+import { exampleRequests, exampleSubdomains, exampleUser } from './lib/devUtils';
 import { Card } from './components/ui/card';
 import {
     Table,
@@ -18,15 +18,24 @@ import {
     TooltipTrigger
 } from '@/components/ui/tooltip'
 
+const props = defineProps<{
+  pageData?: InternalDashboardPageData
+}>();
+
+const page: InternalDashboardPageData = {
+  subdomains: props.pageData?.subdomains ?? exampleSubdomains(),
+  user: props.pageData?.user ?? exampleUser(),
+  max_logs: props.pageData?.max_logs ?? 100,
+};
+
+console.debug(page);
 
 const requests = exampleRequests() as ExposeRequest[]
-const subdomains = exampleSubdomains() as string[]
 </script>
 
 <template>
     <div class="">
-
-        <Header :subdomains="subdomains" />
+        <Header :subdomains="page.subdomains" />
 
 
         <div class="flex items-start max-w-7xl mx-auto mt-8 space-x-8">
@@ -56,7 +65,8 @@ const subdomains = exampleSubdomains() as string[]
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <TableCell class="font-medium max-w-[200px] truncate text-left">
-                                                <span class="opacity-60">{{ request.request.method }}</span> <br />{{ request.request.uri }}
+                                                <span class="opacity-60">{{ request.request.method }}</span> <br />{{
+                                                request.request.uri }}
                                             </TableCell>
                                         </TooltipTrigger>
                                         <TooltipContent>

@@ -13,9 +13,11 @@ class DashboardController extends Controller
     {
         $httpConnection->send(respond_html(
             $this->getBlade($httpConnection, 'client.internal_dashboard', [
-                'user' => Client::$user,
-                'subdomains' => Client::$subdomains,
-                'max_logs' => config()->get('expose.max_logged_requests', 10),
+                'page' => [  
+                    'user' => Client::$user,
+                    'subdomains' => Client::$subdomains,
+                    'max_logs' => config()->get('expose.max_logged_requests', 10),
+                ],
 
                 'jsFile' => $this->getJsFilePath(),
                 'cssFile' => $this->getCssFilePath(),

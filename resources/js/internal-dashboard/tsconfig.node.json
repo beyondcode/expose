@@ -5,7 +5,7 @@
           "@/*": ["./src/*"]
         },
       "target": "ES2022",
-      "lib": ["ES2023"],
+      "lib": ["ES2023", "dom"],
       "module": "ESNext",
       "skipLibCheck": true,
   
