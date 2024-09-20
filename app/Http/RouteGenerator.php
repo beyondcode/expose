@@ -4,6 +4,7 @@ namespace App\Http;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use App\Client\Http\Controllers\FileController;
 
 class RouteGenerator
 {
@@ -53,6 +54,14 @@ class RouteGenerator
     public function addSymfonyRoute(string $name, Route $route)
     {
         $this->routes->add($name, $route);
+    }
+
+    public function addPublicFilesystem() {
+        $this->routes->add('get-files', new Route(
+            '/files/{path}',
+            ['_controller' => FileController::class],
+            ['path' => '.*']
+        ));
     }
 
     protected function getRoute(string $method, string $uri, $action, string $condition = ''): Route
