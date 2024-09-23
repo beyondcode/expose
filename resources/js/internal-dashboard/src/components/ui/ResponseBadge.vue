@@ -4,7 +4,8 @@ import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
     statusCode: number | null,
-    size?: string | null
+    size?: string | null,
+    reason?: string | null,
 }>(), {
     size: 'xs'
 })
@@ -18,15 +19,15 @@ const badgeColor = computed(() => {
 
     switch (startsWith) {
         case '2':
-            return 'bg-green-500'
+            return 'bg-green-500 hover:bg-green-500'
         case '3':
-            return 'bg-yellow-500'
+            return 'bg-yellow-500 hover:bg-yellow-500'
         case '4':
-            return 'bg-orange-500'
+            return 'bg-orange-500 hover:bg-orange-500'
         case '5':
-            return 'bg-red-500'
+            return 'bg-red-500 hover:bg-red-500'
         default:
-            return 'bg-gray-500'
+            return 'bg-gray-500 hover:bg-gray-500'
     }
 })
 
@@ -46,7 +47,7 @@ const badgeSize = computed(() => {
 <template>
     <div>
         <Badge class="font-mono" :class="[badgeColor, badgeSize]">
-            <span v-if="statusCode">{{ statusCode }}</span>
+            <span v-if="statusCode">{{ statusCode }}<span v-if="reason"> - {{ reason }}</span></span>
             <span v-else class="opacity-0">999</span>
         </Badge>
     </div>

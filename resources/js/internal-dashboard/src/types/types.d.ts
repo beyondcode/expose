@@ -15,6 +15,7 @@ declare interface RequestData {
 
   declare interface ResponseData {
     status: number;
+    reason?: string;
     headers: {
       Server: string;
       "Content-Type": string;
