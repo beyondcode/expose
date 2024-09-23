@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import Request from './Tabs/request.vue';
-import Response from './Tabs/Response.vue';
+import Request from './Tabs/Request.vue';
 import ResponseBadge from '../ui/ResponseBadge.vue';
 import { Button } from '../ui/button';
-import { Card } from '../ui/card';
 import { Icon } from '@iconify/vue'
 import {
     Tooltip,
@@ -14,7 +12,7 @@ import {
 } from '@/components/ui/tooltip'
 
 
-const props = defineProps<{
+defineProps<{
     log: ExposeLog
 }>()
 

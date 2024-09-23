@@ -9,5 +9,6 @@ const props = defineProps<{
 <template>
      <div>
         {{ response }}
+        {{ props }}
      </div>
 </template>
