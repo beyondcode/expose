@@ -2,9 +2,12 @@
 import { Badge } from '@/components/ui/badge'
 import { computed } from 'vue';
 
-const props = defineProps<{
-    statusCode: Number | null
-}>()
+const props = withDefaults(defineProps<{
+    statusCode: number | null,
+    size?: string | null
+}>(), {
+    size: 'xs'
+})
 
 const badgeColor = computed(() => {
     if (props.statusCode === null) {
@@ -12,7 +15,6 @@ const badgeColor = computed(() => {
     }
 
     const startsWith = props.statusCode.toString().charAt(0);
-
 
     switch (startsWith) {
         case '2':
@@ -28,11 +30,22 @@ const badgeColor = computed(() => {
     }
 })
 
+const badgeSize = computed(() => {
+    switch (props.size) {
+        case 'base':
+            return 'text-base'
+        case 'sm':
+            return 'text-sm'
+        default:
+            return 'text-xs'
+    }
+})
+
 </script>
 
 <template>
     <div>
-        <Badge class="font-mono font-normal" :class="badgeColor">
+        <Badge class="font-mono" :class="[badgeColor, badgeSize]">
             <span v-if="statusCode">{{ statusCode }}</span>
             <span v-else class="opacity-0">999</span>
         </Badge>
