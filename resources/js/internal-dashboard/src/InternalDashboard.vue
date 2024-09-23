@@ -19,6 +19,7 @@ const page: InternalDashboardPageData = {
 };
 
 const currentLog = ref({} as ExposeLog)
+const search = ref('' as string)
 
 console.debug(page);
 
@@ -29,11 +30,11 @@ const setLog = (log: ExposeLog) => {
 
 <template>
     <div class="px-4">
-        <Header :subdomains="page.subdomains" />
+        <Header :subdomains="page.subdomains" @search-updated="search = $event" />
 
 
         <div class="flex flex-col md:flex-row items-start max-w-7xl mx-auto mt-8 space-y-4 md:space-y-0 md:space-x-4">
-            <Logs :maxLogs="page.max_logs" @set-log="setLog" />
+            <Logs :maxLogs="page.max_logs" :search="search" @set-log="setLog" />
 
             <Card class="p-4 w-full">
                 <EmptyState v-if="isEmptyObject(currentLog)" />

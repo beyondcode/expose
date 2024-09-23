@@ -19,10 +19,11 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
-    maxLogs: Number
+    maxLogs: Number,
+    search: String,
 })
 
 const emit = defineEmits(['set-log'])
@@ -76,6 +77,18 @@ const connect = () => {
 }
 
 
+const filteredLogs = computed(() => {
+    const searchTerm = props.search ?? '';
+    
+    if (searchTerm === '') {
+        return logs.value;
+    }
+
+    return logs.value.filter(log => {
+        return log.request.uri.indexOf(searchTerm) !== -1;
+    })
+})
+
 
 
 </script>
@@ -84,7 +97,7 @@ const connect = () => {
     <Card class="min-w-[350px] w-full md:w-auto">
         <div class="flex items-center justify-between p-3 border-b">
             <div class="items-center flex space-x-2 text-sm">
-                <Switch v-model:checked="followRequests" id="followRequests"/>
+                <Switch v-model:checked="followRequests" id="followRequests" />
                 <label for="followRequests"
                     class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                     Follow Requests
@@ -93,7 +106,6 @@ const connect = () => {
             <Button @click="loadLogs" variant="outline" class="">
                 Clear
             </Button>
-
 
         </div>
         <Table>
@@ -109,7 +121,7 @@ const connect = () => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                <TableRow v-for="request in logs" :key="request.id" @click="emit('set-log', request)">
+                <TableRow v-for="request in filteredLogs" :key="request.id" @click="emit('set-log', request)">
                     <TableCell class="pr-0">
                         <ResponseBadge
                             :statusCode="request.response && request.response.status ? request.response.status : null" />

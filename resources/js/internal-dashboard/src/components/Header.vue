@@ -10,14 +10,17 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
+import { ref, watch } from 'vue'
 
 defineProps<{
     subdomains: string[]
 }>()
 
+const emit = defineEmits(['search-updated'])
 
 const mode = useColorMode()
 
+const search = ref('' as string)
 
 const toggleAppearance = () => {
     if (mode.value === 'light') {
@@ -26,6 +29,12 @@ const toggleAppearance = () => {
         mode.value = 'light'
     }
 }
+
+watch(() => search.value, () => {
+    emit('search-updated', search.value)
+})
+
+
 
 </script>
 
@@ -68,7 +77,7 @@ const toggleAppearance = () => {
             </div>
 
             <div class="flex items-center space-x-4">
-                <Search />
+                <Search v-model="search" />
 
                 <TooltipProvider>
                     <Tooltip>
