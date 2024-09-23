@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
 import { Card } from '../ui/card';
 import ResponseBadge from '@/components/ui/ResponseBadge.vue'
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { Switch } from '@/components/ui/switch'
 
 import {
     Table,
@@ -84,7 +84,7 @@ const connect = () => {
     <Card class="min-w-[350px] w-full md:w-auto">
         <div class="flex items-center justify-between p-3 border-b">
             <div class="items-center flex space-x-2 text-sm">
-                <Checkbox v-model:checked="followRequests" id="followRequests"/>
+                <Switch v-model:checked="followRequests" id="followRequests"/>
                 <label for="followRequests"
                     class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                     Follow Requests

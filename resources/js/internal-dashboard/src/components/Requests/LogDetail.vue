@@ -4,6 +4,7 @@ import Request from './Tabs/request.vue';
 import Response from './Tabs/Response.vue';
 import ResponseBadge from '../ui/ResponseBadge.vue';
 import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 import { Icon } from '@iconify/vue'
 import {
     Tooltip,
@@ -30,7 +31,7 @@ const props = defineProps<{
                             <TooltipTrigger>
                                 <div class="text-lg font-medium truncate pt-0.5">
                                     <span class="opacity-60">{{ log.request.method }}</span>
-                                    {{ log.request.uri }}/very/long/request/indeed/yes
+                                    {{ log.request.uri }}
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -55,21 +56,23 @@ const props = defineProps<{
                 </div>
             </div>
         </div>
-        <Tabs default-value="request" class="w-[400px] mt-16">
-            <TabsList>
-                <TabsTrigger value="request">
-                    Request
-                </TabsTrigger>
-                <TabsTrigger value="response">
-                    Response
-                </TabsTrigger>
-            </TabsList>
-            <TabsContent value="request">
-                <!-- <Request :request="log.request" /> -->
-            </TabsContent>
-            <TabsContent value="response">
-                <!-- <Response :response="log.response" /> -->
-            </TabsContent>
-        </Tabs>
+        <div class="w-full">
+            <Tabs default-value="request" class="mt-16">
+                <TabsList class="w-full">
+                    <TabsTrigger value="request" class="w-full">
+                        Request
+                    </TabsTrigger>
+                    <TabsTrigger value="response" class="w-full">
+                        Response
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="request">
+                    <Request :request="log.request" />
+                </TabsContent>
+                <TabsContent value="response">
+                    <!-- <Response :response="log.response" /> -->
+                </TabsContent>
+            </Tabs>
+        </div>
     </div>
 </template>

@@ -7,6 +7,7 @@ declare interface RequestData {
       "User-Agent": string;
       "x-forwarded-for"?: string;
       "x-forwarded-proto"?: string;
+      "Content-Type"?: string;
     };
     body?: string;
     query: any[];
