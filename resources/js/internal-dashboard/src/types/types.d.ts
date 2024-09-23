@@ -22,7 +22,7 @@ declare interface RequestData {
     body: string;
   }
 
-  declare interface ExposeRequest {
+  declare interface ExposeLog {
     id: string;
     performed_at: string;
     duration: number;

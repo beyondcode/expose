@@ -6,7 +6,7 @@ export function exampleUser(): object {
     return { "can_specify_subdomains": 0 };
 }
 
-export function exampleRequests(): ExposeRequest[] {
+export function exampleRequests(): ExposeLog[] {
     return [
         {
           "id": "66ec2e13a3b60",

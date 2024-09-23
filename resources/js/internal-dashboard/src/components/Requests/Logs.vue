@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Button } from './ui/button';
-import { Checkbox } from './ui/checkbox';
-import { Card } from './ui/card';
+import { Button } from '../ui/button';
+import { Checkbox } from '../ui/checkbox';
+import { Card } from '../ui/card';
 import ResponseBadge from '@/components/ui/ResponseBadge.vue'
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
@@ -27,7 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits(['set-log'])
 
-const logs = ref([] as ExposeRequest[]);
+const logs = ref([] as ExposeLog[]);
 const highlightNextLog = ref(false as boolean); // TODO:
 const followRequests = ref(true as boolean); // TODO:
 
@@ -47,6 +47,7 @@ const loadLogs = () => {
 
             console.debug("loadLogs");
             console.debug(logs.value);
+            emit('set-log', logs.value[0]);
         });
 }
 

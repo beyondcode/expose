@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
-import Requests from '@/components/Requests.vue'
+import Logs from '@/components/Requests/Logs.vue'
+import LogDetail from '@/components/Requests/LogDetail.vue'
 import { exampleSubdomains, exampleUser } from './lib/devUtils';
 import { Card } from './components/ui/card';
 import { ref } from 'vue';
 import { isEmptyObject } from './lib/utils';
+import EmptyState from './components/Requests/EmptyState.vue';
 
 const props = defineProps<{
     pageData?: InternalDashboardPageData
@@ -16,11 +18,11 @@ const page: InternalDashboardPageData = {
     max_logs: props.pageData?.max_logs ?? 100,
 };
 
-const currentLog = ref({} as ExposeRequest)
+const currentLog = ref({} as ExposeLog)
 
 console.debug(page);
 
-const setLog = (log: ExposeRequest) => {
+const setLog = (log: ExposeLog) => {
     currentLog.value = log;
 }
 </script>
@@ -31,16 +33,11 @@ const setLog = (log: ExposeRequest) => {
 
 
         <div class="flex flex-col md:flex-row items-start max-w-7xl mx-auto mt-8 space-y-4 md:space-y-0 md:space-x-4">
-            <Requests :maxLogs="page.max_logs" @set-log="setLog" />
+            <Logs :maxLogs="page.max_logs" @set-log="setLog" />
 
             <Card class="p-4 w-full">
-                <template v-if="isEmptyObject(currentLog)">
-                    //
-                </template>
-                <template v-else>
-                    {{ currentLog.id }}<br/>
-                    {{ currentLog.request.uri }}
-                </template>
+                <EmptyState v-if="isEmptyObject(currentLog)" />
+                <LogDetail v-else :log="currentLog" />
             </Card>
         </div>
 
