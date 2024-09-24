@@ -32,3 +32,20 @@ export function toPhpArray(rows: Record<string, string>, variableName: string): 
 
     return output;
 }
+
+export function bodyIsJson(payload: ResponseData | RequestData): boolean {
+    if (!payload || !payload.headers || payload.headers['Content-Type'] === null) {
+        return false;
+    }
+
+    const contentType = payload.headers['Content-Type'];
+    let hasContentType = contentType ? /application\/json/g.test(contentType) : false;
+    try {
+        if (payload.body) {
+            JSON.parse(payload.body);
+        }
+        return hasContentType;
+    } catch (e) {
+        return false;
+    }
+}

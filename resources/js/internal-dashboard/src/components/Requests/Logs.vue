@@ -94,7 +94,7 @@ const filteredLogs = computed(() => {
 </script>
 
 <template>
-    <Card class="min-w-[350px] w-full md:w-auto">
+    <Card class="min-w-[360px] w-full md:w-auto">
         <div class="flex items-center justify-between p-3 border-b">
             <div class="items-center flex space-x-2 text-sm">
                 <Switch v-model:checked="followRequests" id="followRequests" />

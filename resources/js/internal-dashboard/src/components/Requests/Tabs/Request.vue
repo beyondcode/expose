@@ -10,29 +10,12 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@iconify/vue'
 import { JsonViewer } from "vue3-json-viewer"
 import "vue3-json-viewer/dist/index.css";
-import { copyToClipboard, toPhpArray } from '@/lib/utils'
+import { bodyIsJson, copyToClipboard, toPhpArray } from '@/lib/utils'
 
 
 const props = defineProps<{
     request: RequestData
 }>()
-
-const requestIsJson = () => {
-    if (!props.request || !props.request.headers || props.request.headers['Content-Type'] === null) {
-        return false;
-    }
-
-    const contentType = props.request.headers['Content-Type'];
-    let hasContentType = contentType ? /application\/json/g.test(contentType) : false;
-    try {
-        if (props.request.body) {
-            JSON.parse(props.request.body);
-        }
-        return hasContentType;
-    } catch (e) {
-        return false;
-    }
-}
 
 </script>
 
@@ -100,7 +83,7 @@ const requestIsJson = () => {
             </div>
 
             <div v-else>
-                <JsonViewer v-if="requestIsJson()" :expand-depth="2" :value="JSON.parse(request.body ?? '')" />
+                <JsonViewer v-if="bodyIsJson(request)" :expand-depth="2" :value="JSON.parse(request.body ?? '')" />
                 <pre v-else class="p-6 prettyprint break-all whitespace-pre-wrap">{{ request.body ?? '' }}
             </pre>
             </div>
