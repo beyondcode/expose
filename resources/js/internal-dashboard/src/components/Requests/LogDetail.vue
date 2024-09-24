@@ -11,12 +11,15 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
+import { Switch } from '@/components/ui/switch'
+import { ref } from 'vue';
 import { copyToClipboard } from '@/lib/utils';
 
 defineProps<{
     log: ExposeLog
 }>()
 
+const sideBySide = ref(true as boolean)
 </script>
 
 <template>
@@ -55,8 +58,15 @@ defineProps<{
                 </div>
             </div>
         </div>
-        <div class="w-full">
-            <Tabs default-value="request" class="mt-16">
+        <div class="w-full mt-16">
+            <div class="flex items-center justify-end space-x-2 mb-4">
+                <Switch v-model:checked="sideBySide" id="tabs" />
+                <label for="tabs"
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Tabs
+                </label>
+            </div>
+            <Tabs v-if="sideBySide" default-value="request" class="">
                 <TabsList class="w-full">
                     <TabsTrigger value="request" class="w-full">
                         Request
@@ -69,9 +79,20 @@ defineProps<{
                     <Request :request="log.request" />
                 </TabsContent>
                 <TabsContent value="response">
-                    <!-- <Response :response="log.response" /> -->
+                    <Response :response="log.response" />
                 </TabsContent>
             </Tabs>
+
+            <div v-else>
+                <div class="text-sm font-medium rounded-sm border-4 border-gray-100 px-3 py-1.5 text-center">
+                    Request
+                </div>
+                <Request :request="log.request" />
+                <div class="text-sm font-medium rounded-sm border-4 border-gray-100 px-3 py-1.5 text-center">
+                    Response
+                </div>
+                <Response :response="log.response" />
+            </div>
         </div>
     </div>
 </template>
