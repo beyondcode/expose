@@ -78,11 +78,18 @@ const props = defineProps<{
         <div class="mt-4">
             <div class="pt-4 font-medium text-base">Body</div>
 
+
             <div v-if="request.body === null || request.body === undefined || request.body === ''">
                 <span class="text-sm opacity-75 font-mono">Request body is empty.</span>
             </div>
 
             <div v-else>
+                <div class="flex justify-end">
+                    <Button @click="copyToClipboard(request.body)" variant="outline">
+                        <Icon icon="radix-icons:clipboard-copy" class="h-4 w-4 mr-2" />
+                        Copy
+                    </Button>
+                </div>
                 <JsonViewer v-if="bodyIsJson(request)" :expand-depth="2" :value="JSON.parse(request.body ?? '')" />
                 <pre v-else class="p-6 prettyprint break-all whitespace-pre-wrap">{{ request.body ?? '' }}
             </pre>

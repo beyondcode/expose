@@ -62,6 +62,12 @@ const props = defineProps<{
             </div>
 
             <div v-else>
+                <div class="flex justify-end">
+                    <Button @click="copyToClipboard(response.body)" variant="outline">
+                        <Icon icon="radix-icons:clipboard-copy" class="h-4 w-4 mr-2" />
+                        Copy
+                    </Button>
+                </div>
                 <JsonViewer v-if="bodyIsJson(response)" :expand-depth="2" :value="JSON.parse(response.body ?? '')" />
                 <pre v-else class="p-6 prettyprint break-all whitespace-pre-wrap">{{ response.body ?? '' }}
             </pre>
