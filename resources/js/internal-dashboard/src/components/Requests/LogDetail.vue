@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Request from './Tabs/Request.vue';
+import Response from './Tabs/Response.vue';
 import ResponseBadge from '../ui/ResponseBadge.vue';
 import { Button } from '../ui/button';
 import { Icon } from '@iconify/vue'
@@ -10,7 +11,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
-
+import { copyToClipboard } from '@/lib/utils';
 
 defineProps<{
     log: ExposeLog
@@ -39,7 +40,7 @@ defineProps<{
                     </TooltipProvider>
                     <div class="flex items-center justify-end w-full mb-2 sm:mb-0 sm:w-auto space-x-2">
                         <Button variant="outline">Replay</Button>
-                        <Button variant="outline">
+                        <Button variant="outline" @click="copyToClipboard(log.request.curl)">
                             <Icon icon="radix-icons:clipboard-copy" class="h-4 w-4 mr-2" />
                             cURL
                         </Button>

@@ -12,6 +12,7 @@ declare interface RequestData {
     body?: string;
     query: any[];
     post: any[];
+    curl: string;
   }
 
   declare interface ResponseData {
