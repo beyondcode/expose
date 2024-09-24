@@ -91,12 +91,16 @@ class TunnelMessageController extends Controller
 
         $httpConnection = $this->connectionManager->storeHttpConnection($httpConnection, $requestId);
 
-        transform($this->passRequestThroughModifiers($request, $httpConnection), function (Request $request) use ($controlConnection, $requestId) {
-            $controlConnection->once('proxy_ready_'.$requestId, function (ConnectionInterface $proxy) use ($request) {
+        transform($this->passRequestThroughModifiers($request, $httpConnection), function (Request $request) use ($httpConnection, $controlConnection, $requestId) {
+            $controlConnection->once('proxy_ready_'.$requestId, function (ConnectionInterface $proxy) use ($httpConnection, $request) {
                 // Convert the Laravel request into a PSR7 request
                 $psr17Factory = new Psr17Factory();
                 $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
                 $request = $psrHttpFactory->createRequest($request);
+
+                $httpConnection->getConnection()->on('data', function($d) use ($proxy) {
+                    $proxy->send(new Frame($d, true, Frame::OP_BINARY));
+                });
 
                 $binaryMsg = new Frame(str($request), true, Frame::OP_BINARY);
                 $proxy->send($binaryMsg);

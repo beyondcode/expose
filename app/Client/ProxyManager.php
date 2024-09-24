@@ -3,6 +3,7 @@
 namespace App\Client;
 
 use App\Client\Http\HttpClient;
+use Psr\Http\Message\ResponseInterface;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\EventLoop\LoopInterface;
@@ -32,8 +33,28 @@ class ProxyManager
             'X-Expose-Control' => 'enabled',
         ], $this->loop)
             ->then(function (WebSocket $proxyConnection) use ($clientId, $connectionData) {
-                $proxyConnection->on('message', function ($message) use ($proxyConnection, $connectionData) {
-                    $this->performRequest($proxyConnection, (string) $message, $connectionData);
+                $localRequestConnection = null;
+
+                $proxyConnection->on('message', function ($message) use (&$localRequestConnection, $proxyConnection, $connectionData) {
+                    if ($localRequestConnection) {
+                        $localRequestConnection->write($message);
+                        return;
+                    }
+
+                    $this->performRequest($proxyConnection, (string) $message, $connectionData)->then(function (ResponseInterface $response) use ($proxyConnection, &$localRequestConnection) {
+                        /** @var $body \React\Stream\DuplexStreamInterface */
+                        $body = $response->getBody();
+                        if ($body) {
+                            $localRequestConnection = $body;
+                        }
+
+                        if ($body->isWritable()) {
+                            $body->on('data', function ($chunk) use ($proxyConnection) {
+                                $binaryMsg = new Frame($chunk, true, Frame::OP_BINARY);
+                                $proxyConnection->send($binaryMsg);
+                            });
+                        }
+                    });
                 });
 
                 $proxyConnection->send(json_encode([
@@ -79,6 +100,6 @@ class ProxyManager
 
     protected function performRequest(WebSocket $proxyConnection, string $requestData, $connectionData)
     {
-        app(HttpClient::class)->performRequest((string) $requestData, $proxyConnection, $connectionData);
+        return app(HttpClient::class)->performRequest((string) $requestData, $proxyConnection, $connectionData);
     }
 }
