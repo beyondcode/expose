@@ -25,15 +25,17 @@ class DashboardController extends Controller
         ));
     }
 
-    private function getJsFilePath() {
-        return "/files/build/internal-dashboard/assets/" . collect(scandir(app()->basePath() . "/public/build/internal-dashboard/assets/"))->filter(function($file) {
-            return str($file)->startsWith("index-") && str($file)->endsWith(".js");
+    private function getJsFilePath()
+    {
+        return '/files/build/internal-dashboard/assets/'.collect(scandir(app()->basePath().'/public/build/internal-dashboard/assets/'))->filter(function ($file) {
+            return str($file)->startsWith('index-') && str($file)->endsWith('.js');
         })->first();
     }
 
-    private function getCssFilePath() {
-        return "/files/build/internal-dashboard/assets/" . collect(scandir(app()->basePath() . "/public/build/internal-dashboard/assets/"))->filter(function($file) {
-            return str($file)->startsWith("index-") && str($file)->endsWith(".css");
+    private function getCssFilePath()
+    {
+        return '/files/build/internal-dashboard/assets/'.collect(scandir(app()->basePath().'/public/build/internal-dashboard/assets/'))->filter(function ($file) {
+            return str($file)->startsWith('index-') && str($file)->endsWith('.css');
         })->first();
     }
 }

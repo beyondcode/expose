@@ -2,9 +2,9 @@
 
 namespace App\Http;
 
+use App\Client\Http\Controllers\FileController;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use App\Client\Http\Controllers\FileController;
 
 class RouteGenerator
 {
@@ -56,7 +56,8 @@ class RouteGenerator
         $this->routes->add($name, $route);
     }
 
-    public function addPublicFilesystem() {
+    public function addPublicFilesystem()
+    {
         $this->routes->add('get-files', new Route(
             '/files/{path}',
             ['_controller' => FileController::class],

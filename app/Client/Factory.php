@@ -17,7 +17,6 @@ use App\WebSockets\Socket;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
-use Symfony\Component\Routing\Route;
 
 class Factory
 {
